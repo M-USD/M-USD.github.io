@@ -1,15 +1,21 @@
-// Main Application Logic - FINAL CORRECTED VERSION with Password Strength
+// Main Application Logic - PRODUCTION READY
 class PhoneChainApp {
     constructor() {
         this.currentUser = null;
+        this.isInitialized = false;
         this.init();
     }
 
     init() {
+        if (this.isInitialized) return;
+        
         this.checkExistingSession();
         this.setupEventListeners();
         this.updateSecurityStatus();
         this.startPeriodicUpdates();
+        this.isInitialized = true;
+        
+        console.log('✅ M-USD App initialized');
     }
 
     setupEventListeners() {
@@ -44,6 +50,13 @@ class PhoneChainApp {
         document.getElementById('sendAmount')?.addEventListener('input', () => {
             if (document.getElementById('sendSection').classList.contains('active')) {
                 this.updateFeeDisplay();
+            }
+        });
+
+        // Handle page visibility changes
+        document.addEventListener('visibilitychange', () => {
+            if (!document.hidden && this.currentUser) {
+                this.updateDashboard();
             }
         });
     }
@@ -167,20 +180,21 @@ class PhoneChainApp {
 
     // Authentication
     async login() {
-        const phoneNumber = document.getElementById('phoneNumber').value.trim();
-        const password = document.getElementById('password').value;
+        const phoneNumber = security.sanitizeInput(document.getElementById('phoneNumber').value.trim(), 'phone');
+        const password = security.sanitizeInput(document.getElementById('password').value);
 
         if (!phoneNumber || !password) {
-            this.showNotification('❌Please enter phone number and password', 'error');
+            this.showNotification('❌ Please enter phone number and password', 'error');
             return;
         }
 
         if (!security.validatePhoneNumber(phoneNumber)) {
-            this.showNotification('❌Please enter a valid phone number', 'error');
+            this.showNotification('❌ Please enter a valid phone number', 'error');
             return;
         }
 
         try {
+            this.showLoading('Logging in...');
             console.log('Attempting login for:', phoneNumber);
             const user = blockchain.authenticateUser(phoneNumber, password);
             this.currentUser = user;
@@ -193,47 +207,50 @@ class PhoneChainApp {
             });
 
             this.showDashboard();
-            this.showNotification('✅Login successful!', 'success');
+            this.showNotification('✅ Login successful!', 'success');
         } catch (error) {
             console.error('Login error:', error);
             this.showNotification(error.message, 'error');
+        } finally {
+            this.hideLoading();
         }
     }
 
     async register() {
-        const phoneNumber = document.getElementById('regPhone').value.trim();
-        const password = document.getElementById('regPassword').value;
-        const confirmPassword = document.getElementById('confirmPassword').value;
+        const phoneNumber = security.sanitizeInput(document.getElementById('regPhone').value.trim(), 'phone');
+        const password = security.sanitizeInput(document.getElementById('regPassword').value);
+        const confirmPassword = security.sanitizeInput(document.getElementById('confirmPassword').value);
 
         if (!phoneNumber || !password || !confirmPassword) {
-            this.showNotification('📵Please fill all fields', 'error');
+            this.showNotification('📵 Please fill all fields', 'error');
             return;
         }
 
         if (!security.validatePhoneNumber(phoneNumber)) {
-            this.showNotification('📵Please enter a valid phone number', 'error');
+            this.showNotification('📵 Please enter a valid phone number', 'error');
             return;
         }
 
         // Check password strength
         const strength = this.calculatePasswordStrength(password);
         if (strength.text === 'Very Weak' || strength.text === 'Weak') {
-            if (!confirm(`📵Your password is ${strength.text.toLowerCase()}. Are you sure you want to continue❓`)) {
+            if (!confirm(`📵 Your password is ${strength.text.toLowerCase()}. Are you sure you want to continue?`)) {
                 return;
             }
         }
 
         if (!security.validatePassword(password)) {
-            this.showNotification('📵Password must be at least 6 characters', 'error');
+            this.showNotification(`📵 Password must be at least ${security.PASSWORD_MIN_LENGTH} characters`, 'error');
             return;
         }
 
         if (password !== confirmPassword) {
-            this.showNotification('📵Passwords do not match', 'error');
+            this.showNotification('📵 Passwords do not match', 'error');
             return;
         }
 
         try {
+            this.showLoading('Creating account...');
             const user = blockchain.registerUser(phoneNumber, password);
             this.currentUser = user;
             security.startSession(user);
@@ -244,9 +261,11 @@ class PhoneChainApp {
             });
 
             this.showDashboard();
-            this.showNotification('Account created successfully! Welcome to M-USD !', 'success');
+            this.showNotification('Account created successfully! Welcome to M-USD!', 'success');
         } catch (error) {
             this.showNotification(error.message, 'error');
+        } finally {
+            this.hideLoading();
         }
     }
 
@@ -255,32 +274,32 @@ class PhoneChainApp {
         database.clearSession();
         this.currentUser = null;
         this.showLogin();
-        this.showNotification('👋Logged out successfully', 'success');
+        this.showNotification('👋 Logged out successfully', 'success');
     }
 
     // Transaction handling
     async sendMoney() {
         if (!this.currentUser) {
-            this.showNotification('📵Please login first', 'error');
+            this.showNotification('📵 Please login first', 'error');
             return;
         }
 
-        const recipientPhone = document.getElementById('recipientPhone').value.trim();
-        const amount = parseFloat(document.getElementById('sendAmount').value);
-        const password = document.getElementById('txPassword').value;
+        const recipientPhone = security.sanitizeInput(document.getElementById('recipientPhone').value.trim(), 'phone');
+        const amount = parseFloat(security.sanitizeInput(document.getElementById('sendAmount').value, 'amount'));
+        const password = security.sanitizeInput(document.getElementById('txPassword').value);
 
         if (!recipientPhone || !amount || !password) {
-            this.showNotification('📵Please fill all fields', 'error');
+            this.showNotification('📵 Please fill all fields', 'error');
             return;
         }
 
         if (recipientPhone === this.currentUser.phoneNumber) {
-            this.showNotification('📵Cannot send to yourself', 'error');
+            this.showNotification('📵 Cannot send to yourself', 'error');
             return;
         }
 
         if (amount <= 0) {
-            this.showNotification('📵Amount must be positive', 'error');
+            this.showNotification('📵 Amount must be positive', 'error');
             return;
         }
 
@@ -288,11 +307,12 @@ class PhoneChainApp {
         const fee = security.calculateTransactionFee(amount);
         const total = amount + fee;
 
-        if (!confirm(`Send ${amount} USD to ${recipientPhone}?\nTransaction fee: ${fee.toFixed(2)} USD\nTotal: ${total.toFixed(2)} USD`)) {
+        if (!confirm(`Send ${amount.toFixed(2)} USD to ${recipientPhone}?\nTransaction fee: ${fee.toFixed(2)} USD\nTotal: ${total.toFixed(2)} USD`)) {
             return;
         }
 
         try {
+            this.showLoading('Processing transaction...');
             const result = blockchain.sendMoney(
                 this.currentUser.phoneNumber, 
                 recipientPhone, 
@@ -315,6 +335,8 @@ class PhoneChainApp {
         } catch (error) {
             console.error('Send money error:', error);
             this.showNotification(error.message, 'error');
+        } finally {
+            this.hideLoading();
         }
     }
 
@@ -347,7 +369,10 @@ class PhoneChainApp {
             const div = document.createElement('div');
             div.id = 'feeInfo';
             div.style.cssText = 'background: #f0f8ff; padding: 10px; border-radius: 5px; margin: 10px 0; font-size: 14px;';
-            document.querySelector('#sendSection .form-group').insertBefore(div, document.querySelector('#sendSection .btn'));
+            const sendSection = document.querySelector('#sendSection .form-group');
+            if (sendSection) {
+                sendSection.insertBefore(div, document.querySelector('#sendSection .btn'));
+            }
             return div;
         })();
         
@@ -464,6 +489,8 @@ class PhoneChainApp {
             const transactions = blockchain.getUserTransactions(this.currentUser.phoneNumber);
             const historyContainer = document.getElementById('transactionHistory');
             
+            if (!historyContainer) return;
+            
             if (transactions.length === 0) {
                 historyContainer.innerHTML = '<div class="transaction-item">No transactions yet</div>';
                 return;
@@ -474,7 +501,7 @@ class PhoneChainApp {
                 const otherParty = isSend ? transaction.to : transaction.from;
                 const amountClass = isSend ? 'negative' : 'positive';
                 const typeIcon = transaction.type === 'fee' ? '💰' : (isSend ? '📤' : '📥');
-                const typeText = transaction.type === 'fee' ? 'Transaction Cost' : (isSend ? 'Confirmed.You have sent' : 'Confirmed.You have received ');
+                const typeText = transaction.type === 'fee' ? 'Transaction Cost' : (isSend ? 'Confirmed. You have sent' : 'Confirmed. You have received');
                 
                 // Show reason for admin deductions
                 const reasonText = transaction.reason ? `<div class="transaction-reason"><small>Reason: ${transaction.reason}</small></div>` : '';
@@ -496,96 +523,69 @@ class PhoneChainApp {
             }).join('');
         } catch (error) {
             console.error('Load history error:', error);
-            document.getElementById('transactionHistory').innerHTML = '<div class="transaction-item">Error loading transactions</div>';
+            const historyContainer = document.getElementById('transactionHistory');
+            if (historyContainer) {
+                historyContainer.innerHTML = '<div class="transaction-item">Error loading transactions</div>';
+            }
         }
     }
     
-showLoading(message = 'Loading...') {
-    const loader = document.createElement('div');
-    loader.id = 'globalLoader';
-    loader.innerHTML = `
-        <div class="loading-overlay">
-            <div class="loading-spinner"></div>
-            <div class="loading-message">${message}</div>
-        </div>
-    `;
-    document.body.appendChild(loader);
-}
-
-hideLoading() {
-    const loader = document.getElementById('globalLoader');
-    if (loader) loader.remove();
-}
-
-// Use in all async operations
-async sendMoney() {
-    this.showLoading('Processing transaction...');
-    try {
-        // your existing code
-    } finally {
-        this.hideLoading();
+    showLoading(message = 'Loading...') {
+        let loader = document.getElementById('globalLoader');
+        if (!loader) {
+            loader = document.createElement('div');
+            loader.id = 'globalLoader';
+            loader.innerHTML = `
+                <div class="loading-overlay">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-message">${message}</div>
+                </div>
+            `;
+            loader.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0,0,0,0.7);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                color: white;
+                font-size: 18px;
+            `;
+            document.body.appendChild(loader);
+        }
+        loader.style.display = 'flex';
     }
-}
-    
+
+    hideLoading() {
+        const loader = document.getElementById('globalLoader');
+        if (loader) {
+            loader.style.display = 'none';
+        }
+    }
 
     updateSecurityStatus() {
         const sessionStatus = document.getElementById('sessionStatus');
-        if (security.isSessionValid()) {
-            sessionStatus.innerHTML = '<span class="status good">●</span> Honest';
-        } else {
-            sessionStatus.innerHTML = '<span class="status warning">●</span> Intellect';
+        if (sessionStatus) {
+            if (security.isSessionValid()) {
+                sessionStatus.innerHTML = '<span class="status good">●</span> Session Active';
+            } else {
+                sessionStatus.innerHTML = '<span class="status warning">●</span> Session Expired';
+            }
         }
-    }
-    updateErrorLogs() {
-        const container = document.getElementById('errorLogs');
-        if (!container) return;
-        
-        const recentErrors = aiMonitor.errors.slice(-10).reverse();
-        
-        if (recentErrors.length === 0) {
-            container.innerHTML = '<div class="no-data">No recent errors</div>';
-            return;
-        }
-        
-        container.innerHTML = recentErrors.map(error => `
-            <div class="error-log">
-                <strong>${error.type}</strong><br>
-                ${error.message}<br>
-                <small>${new Date(error.timestamp).toLocaleString()}</small>
-            </div>
-        `).join('');
-    }
-
-    updateCorrectionLogs() {
-        const container = document.getElementById('correctionLogs');
-        if (!container) return;
-        
-        const recentCorrections = aiMonitor.corrections.slice(-10).reverse();
-        
-        if (recentCorrections.length === 0) {
-            container.innerHTML = '<div class="no-data">No recent corrections</div>';
-            return;
-        }
-        
-        container.innerHTML = recentCorrections.map(correction => `
-            <div class="correction-log">
-                <strong>${correction.type}</strong><br>
-                ${correction.message}<br>
-                <small>${new Date(correction.timestamp).toLocaleString()} - ${correction.status}</small>
-            </div>
-        `).join('');
-    }
-
-    runSecurityScan() {
-        const results = enhancedSecurity.securityScan();
-        this.showNotification(`Security scan completed. Found ${results.issues.length} issues.`, 'success');
-        this.updateSecurityDashboard();
     }
 
     // Periodic updates
     startPeriodicUpdates() {
-        // Update connection status every 5 seconds
-        
+        // Update dashboard every 30 seconds when user is logged in
+        setInterval(() => {
+            if (this.currentUser && document.getElementById('dashboard').classList.contains('active')) {
+                this.updateDashboard();
+            }
+        }, 30000);
     }
 
     // Notification system
@@ -595,9 +595,11 @@ async sendMoney() {
         
         notification.textContent = message;
         notification.className = `notification ${type}`;
+        notification.style.display = 'block';
         
         setTimeout(() => {
             notification.classList.remove('success', 'error', 'warning');
+            notification.style.display = 'none';
         }, 5000);
     }
 
@@ -610,110 +612,17 @@ async sendMoney() {
         return phone.replace(/(\+\d{1})(\d{3})(\d{3})(\d{4})/, '$1 $2 $3 $4');
     }
     
-    
-    
-    
-    
-    
-    
-// Add to PhoneChainApp class
-showDepositOptions() {
-    const amount = parseFloat(prompt('Enter amount to deposit (USD):')) || 0;
-    if (amount <= 0) {
-        this.showNotification('Please enter a valid amount', 'error');
-        return;
+    // Open admin panel
+    openAdminPanel() {
+        window.location.href = 'admin.html';
     }
 
-    if (amount > 1000000) {
-        this.showNotification('Maximum deposit is $1,000,000', 'error');
-        return;
-    }
-
-    this.showDepositModal(amount);
-}
-
-showDepositModal(amount = null) {
-    if (!amount) {
-        amount = parseFloat(prompt('Enter deposit amount (USD):')) || 0;
-        if (amount <= 0) return;
-    }
-
-    const modal = document.createElement('div');
-    modal.style.cssText = `
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0,0,0,0.8);
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        z-index: 10000;
-    `;
-
-    modal.innerHTML = `
-        <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%;">
-            <h2>💳 Deposit USD</h2>
-            <p style="font-size: 1.2em; text-align: center; margin: 20px 0;">
-                <strong>Amount: $${amount.toFixed(2)}</strong>
-            </p>
-            
-            <div class="payment-methods" style="display: grid; gap: 10px; margin: 20px 0;">
-                <button onclick="paymentGateway.processStripePayment(${amount}, '${this.currentUser.phoneNumber}')" 
-                        class="btn" style="background: #635bff; color: white; padding: 15px; text-align: left;">
-                    <span>💳</span> Credit/Debit Card (Stripe)
-                </button>
-                
-                <button onclick="paymentGateway.processPayPalPayment(${amount}, '${this.currentUser.phoneNumber}')" 
-                        class="btn" style="background: #0070ba; color: white; padding: 15px; text-align: left;">
-                    <span>📊</span> PayPal
-                </button>
-                
-                <button onclick="paymentGateway.processBankTransfer(${amount}, '${this.currentUser.phoneNumber}')" 
-                        class="btn" style="background: #38a169; color: white; padding: 15px; text-align: left;">
-                    <span>🏦</span> Bank Transfer
-                </button>
-            </div>
-            
-            <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
-                <h4>💰 Instant Funding</h4>
-                <p>Credit card and PayPal deposits are instant. Bank transfers take 1-2 business days.</p>
-            </div>
-            
-            <button onclick="this.closest('[style]').remove()" class="btn secondary" style="width: 100%;">
-                Cancel
-            </button>
-        </div>
-    `;
-
-    document.body.appendChild(modal);
-}
-
-
-
-}
-// Add global functions
-function showDepositOptions() { app.showDepositOptions(); }
-function showDepositModal(provider) { 
-    const amount = parseFloat(prompt('Enter deposit amount (USD):')) || 0;
-    if (amount > 0) {
-        if (provider === 'stripe') {
-            paymentGateway.processStripePayment(amount, app.currentUser.phoneNumber);
-        } else if (provider === 'paypal') {
-            paymentGateway.processPayPalPayment(amount, app.currentUser.phoneNumber);
-        }
+    // Cleanup method
+    cleanup() {
+        this.currentUser = null;
+        security.logout();
     }
 }
-    
-// Add to PhoneChainApp class
-openAdminPanel() 
-{
-    window.location.href = 'admin.html';
-}
-
-// Add to global functions
-function openAdminPanel() { app.openAdminPanel(); }
 
 // Global functions for HTML onclick handlers
 function login() { app.login(); }
@@ -729,13 +638,17 @@ function hideReceive() { app.hideReceive(); }
 function hideHistory() { app.hideHistory(); }
 function sendMoney() { app.sendMoney(); }
 function addFunds() { app.addFunds(); }
-function switchConnectionMode(mode) { app.switchConnectionMode(mode); }
-function emergencyCleanup() { app.emergencyCleanup(); }
-function emergencyUnlockAll() { app.emergencyUnlockAll(); }
-function runSecurityScan() { app.runSecurityScan(); }
+function openAdminPanel() { app.openAdminPanel(); }
 
 // Initialize app when page loads
 let app;
 document.addEventListener('DOMContentLoaded', () => {
     app = new PhoneChainApp();
+});
+
+// Handle page unload
+window.addEventListener('beforeunload', () => {
+    if (app) {
+        app.cleanup();
+    }
 });

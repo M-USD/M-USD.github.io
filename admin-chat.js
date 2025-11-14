@@ -1,9 +1,10 @@
-// Admin Chat Management System
+// Admin Chat Management System - PRODUCTION READY
 class AdminChat {
     constructor() {
         this.conversations = new Map();
         this.currentConversation = null;
         this.allMessages = [];
+        this.autoRefreshInterval = null;
         this.init();
     }
 
@@ -12,6 +13,7 @@ class AdminChat {
         this.setupEventListeners();
         this.renderConversations();
         this.startAutoRefresh();
+        console.log('✅ Admin Chat initialized');
     }
 
     // Load all messages from users
@@ -66,10 +68,10 @@ class AdminChat {
     // Setup event listeners
     setupEventListeners() {
         // Send message
-        document.getElementById('sendAdminMessage').addEventListener('click', () => this.sendAdminMessage());
+        document.getElementById('sendAdminMessage')?.addEventListener('click', () => this.sendAdminMessage());
         
         // Enter key to send
-        document.getElementById('adminMessageInput').addEventListener('keypress', (e) => {
+        document.getElementById('adminMessageInput')?.addEventListener('keypress', (e) => {
             if (e.key === 'Enter') this.sendAdminMessage();
         });
         
@@ -84,6 +86,7 @@ class AdminChat {
     // Render conversations list
     renderConversations() {
         const container = document.getElementById('conversationsList');
+        if (!container) return;
         
         if (this.conversations.size === 0) {
             container.innerHTML = `
@@ -130,20 +133,22 @@ class AdminChat {
         const noConversationDiv = document.getElementById('noConversation');
         
         if (this.currentConversation) {
-            selectedDiv.style.display = 'block';
-            noConversationDiv.style.display = 'none';
+            if (selectedDiv) selectedDiv.style.display = 'block';
+            if (noConversationDiv) noConversationDiv.style.display = 'none';
             
             this.renderConversationHeader();
             this.renderMessages();
         } else {
-            selectedDiv.style.display = 'none';
-            noConversationDiv.style.display = 'flex';
+            if (selectedDiv) selectedDiv.style.display = 'none';
+            if (noConversationDiv) noConversationDiv.style.display = 'flex';
         }
     }
 
     // Render conversation header
     renderConversationHeader() {
         const header = document.getElementById('conversationHeader');
+        if (!header) return;
+        
         const conv = this.currentConversation;
         
         header.innerHTML = `
@@ -171,6 +176,8 @@ class AdminChat {
     // Render messages
     renderMessages() {
         const container = document.getElementById('adminChatMessages');
+        if (!container) return;
+        
         const messages = this.currentConversation.messages;
         
         // Sort messages by timestamp
@@ -199,6 +206,8 @@ class AdminChat {
     // Send admin message
     sendAdminMessage() {
         const input = document.getElementById('adminMessageInput');
+        if (!input) return;
+        
         const message = input.value.trim();
         
         if (!message || !this.currentConversation) return;
@@ -319,7 +328,7 @@ class AdminChat {
 
     // Auto-refresh conversations
     startAutoRefresh() {
-        setInterval(() => {
+        this.autoRefreshInterval = setInterval(() => {
             this.loadAllMessages();
             this.renderConversations();
             
@@ -387,17 +396,22 @@ class AdminChat {
 
     // Export chat logs
     exportChatLogs() {
-        const dataStr = JSON.stringify(this.allMessages, null, 2);
-        const dataBlob = new Blob([dataStr], { type: 'application/json' });
-        
-        const url = URL.createObjectURL(dataBlob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = `chat-logs-${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
-        URL.revokeObjectURL(url);
+        try {
+            const dataStr = JSON.stringify(this.allMessages, null, 2);
+            const dataBlob = new Blob([dataStr], { type: 'application/json' });
+            
+            const url = URL.createObjectURL(dataBlob);
+            const link = document.createElement('a');
+            link.href = url;
+            link.download = `chat-logs-${new Date().toISOString().split('T')[0]}.json`;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        } catch (error) {
+            console.error('Error exporting chat logs:', error);
+            alert('Error exporting chat logs');
+        }
     }
 
     // Search conversations
@@ -405,6 +419,16 @@ class AdminChat {
         // Implementation for search functionality
         console.log('Searching for:', query);
         // This would filter conversations based on the query
+    }
+
+    // Cleanup method
+    cleanup() {
+        if (this.autoRefreshInterval) {
+            clearInterval(this.autoRefreshInterval);
+            this.autoRefreshInterval = null;
+        }
+        this.conversations.clear();
+        this.allMessages = [];
     }
 }
 

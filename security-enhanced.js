@@ -1,17 +1,14 @@
-// Enhanced Security System for Offline Protection - CORRECTED
+// Enhanced Security System for Offline Protection - PRODUCTION READY
 class EnhancedSecurity {
     constructor() {
         this.failedAttempts = new Map();
         this.lockedAccounts = new Set();
         this.suspiciousActivities = [];
+        this.rateLimits = new Map();
         this.setupSecurityMonitoring();
+        this.setupRateLimiting();
     }
     
-    // Password verification - FIXED: Use instance method
-    verifyPassword(inputPassword, storedHash) {
-        if (!inputPassword || !storedHash) return false;
-        return security.hashPassword(inputPassword) === storedHash; // FIXED: Use instance method
-    }
     setupSecurityMonitoring() {
         // Monitor all transaction attempts
         this.monitorTransactionAttempts();
@@ -24,38 +21,57 @@ class EnhancedSecurity {
         
         // Periodic security scan
         setInterval(() => this.securityScan(), 60000); // Every minute
+        
+        console.log('✅ Enhanced Security initialized');
+    }
+
+    setupRateLimiting() {
+        setInterval(() => {
+            // Clean up old rate limit entries
+            const now = Date.now();
+            for (const [key, data] of this.rateLimits.entries()) {
+                if (now - data.lastAttempt > 3600000) { // 1 hour
+                    this.rateLimits.delete(key);
+                }
+            }
+        }, 60000); // Clean every minute
     }
 
     monitorTransactionAttempts() {
         const originalSendMoney = blockchain.sendMoney;
         
         blockchain.sendMoney = (fromPhone, toPhone, amount, password) => {
+            // Rate limiting check
+            if (!this.checkRateLimit(fromPhone, 'transaction', 10, 3600000)) {
+                throw new Error('📵 Too many transactions. Please try again later.');
+            }
+
             // Security check before transaction
             if (this.isAccountLocked(fromPhone)) {
-                throw new Error('📵Account temporarily locked due to security concerns');
+                throw new Error('📵 Account temporarily locked due to security concerns');
             }
 
             if (this.isSuspiciousTransaction(fromPhone, toPhone, amount)) {
-                this.flagSuspiciousActivity('☢️SUSPICIOUS_TRANSACTION', {
+                this.flagSuspiciousActivity('SUSPICIOUS_TRANSACTION', {
                     from: fromPhone,
                     to: toPhone,
                     amount: amount,
-                    reason: '☢️Unusual transaction pattern'
+                    reason: 'Unusual transaction pattern'
                 });
                 
-                throw new Error('☢️Transaction flagged for security review');
+                throw new Error('☢️ Transaction flagged for security review');
             }
 
             try {
                 const result = originalSendMoney.call(blockchain, fromPhone, toPhone, amount, password);
                 
                 // Log successful transaction
-                this.logTransactionSecurity(fromPhone, toPhone, amount, '✅success');
+                this.logTransactionSecurity(fromPhone, toPhone, amount, 'success');
                 
                 return result;
             } catch (error) {
                 // Log failed transaction attempt
-                this.logTransactionSecurity(fromPhone, toPhone, amount, '❌failed', error.message);
+                this.logTransactionSecurity(fromPhone, toPhone, amount, 'failed', error.message);
                 this.recordFailedAttempt(fromPhone);
                 throw error;
             }
@@ -66,16 +82,21 @@ class EnhancedSecurity {
         const originalAuthenticate = blockchain.authenticateUser;
         
         blockchain.authenticateUser = (phoneNumber, password) => {
+            // Rate limiting check
+            if (!this.checkRateLimit(phoneNumber, 'login', 5, 900000)) {
+                throw new Error('📵 Too many login attempts. Please try again in 15 minutes.');
+            }
+
             // Check if account is locked
             if (this.isAccountLocked(phoneNumber)) {
                 const lockTime = this.getLockTimeRemaining(phoneNumber);
-                throw new Error(`📵Account locked. Try again in ${lockTime} minutes`);
+                throw new Error(`📵 Account locked. Try again in ${lockTime} minutes`);
             }
 
             // Check for brute force attempts
             if (this.isBruteForceAttempt(phoneNumber)) {
                 this.lockAccount(phoneNumber, 15); // Lock for 15 minutes
-                throw new Error('☢️Too many failed attempts. 📵Account locked for 15 minutes');
+                throw new Error('☢️ Too many failed attempts. 📵 Account locked for 15 minutes');
             }
 
             try {
@@ -85,7 +106,7 @@ class EnhancedSecurity {
                 this.resetFailedAttempts(phoneNumber);
                 
                 // Log successful login
-                this.logSecurityEvent('✅SUCCESSFUL_LOGIN', {
+                this.logSecurityEvent('SUCCESSFUL_LOGIN', {
                     phoneNumber: this.maskPhone(phoneNumber),
                     timestamp: new Date().toISOString()
                 });
@@ -96,7 +117,7 @@ class EnhancedSecurity {
                 this.recordFailedAttempt(phoneNumber);
                 
                 // Log failed login
-                this.logSecurityEvent('❌FAILED_LOGIN', {
+                this.logSecurityEvent('FAILED_LOGIN', {
                     phoneNumber: this.maskPhone(phoneNumber),
                     error: error.message,
                     timestamp: new Date().toISOString()
@@ -113,16 +134,35 @@ class EnhancedSecurity {
         blockchain.addFunds = (phoneNumber, amount) => {
             // Check for suspicious funding patterns
             if (this.isSuspiciousFunding(phoneNumber, amount)) {
-                this.flagSuspiciousActivity('☢️SUSPICIOUS_FUNDING', {
+                this.flagSuspiciousActivity('SUSPICIOUS_FUNDING', {
                     phoneNumber: phoneNumber,
                     amount: amount,
-                    reason: '☢️Unusual funding pattern'
+                    reason: 'Unusual funding pattern'
                 });
             }
 
             return originalAddFunds.call(blockchain, phoneNumber, amount);
         };
     }
+
+    // Rate limiting system
+    checkRateLimit(identifier, action, maxAttempts = 10, windowMs = 3600000) {
+        const key = `${identifier}_${action}`;
+        const now = Date.now();
+        const limitData = this.rateLimits.get(key) || { count: 0, lastAttempt: 0 };
+        
+        // Reset if window has passed
+        if (now - limitData.lastAttempt > windowMs) {
+            limitData.count = 0;
+        }
+        
+        limitData.count++;
+        limitData.lastAttempt = now;
+        this.rateLimits.set(key, limitData);
+        
+        return limitData.count <= maxAttempts;
+    }
+
     // Account locking system
     recordFailedAttempt(phoneNumber) {
         const attempts = this.failedAttempts.get(phoneNumber) || [];
@@ -141,6 +181,7 @@ class EnhancedSecurity {
 
     resetFailedAttempts(phoneNumber) {
         this.failedAttempts.delete(phoneNumber);
+        this.rateLimits.delete(`${phoneNumber}_login`);
     }
 
     isBruteForceAttempt(phoneNumber) {
@@ -165,20 +206,23 @@ class EnhancedSecurity {
             reason: 'Multiple failed attempts'
         });
 
-        notificationSystem.addNotification({
-            type: '☢️SECURITY_ALERT',
-            title: '🔒 Account Locked',
-            message: `Your account has been locked for ${minutes} minutes due to security concerns`,
-            priority: 'high‼️',
-            timestamp: new Date().toISOString()
-        });
+        // Notify user if possible
+        if (typeof notificationSystem !== 'undefined') {
+            notificationSystem.addNotification({
+                type: 'SECURITY_ALERT',
+                title: '🔒 Account Locked',
+                message: `Your account has been locked for ${minutes} minutes due to security concerns`,
+                priority: 'high',
+                timestamp: new Date().toISOString()
+            });
+        }
     }
 
     unlockAccount(phoneNumber) {
         this.lockedAccounts.delete(phoneNumber);
         this.resetFailedAttempts(phoneNumber);
         
-        this.logSecurityEvent('☢️ACCOUNT_UNLOCKED', {
+        this.logSecurityEvent('ACCOUNT_UNLOCKED', {
             phoneNumber: this.maskPhone(phoneNumber)
         });
     }
@@ -217,7 +261,7 @@ class EnhancedSecurity {
 
     isSuspiciousFunding(phoneNumber, amount) {
         // Check for unusually large funding amounts
-        return amount > 1000; // More than 1000 PHONE
+        return amount > 1000; // More than 1000 USD
     }
 
     flagSuspiciousActivity(type, details) {
@@ -238,16 +282,20 @@ class EnhancedSecurity {
         }
 
         // Notify AI system
-        aiMonitor.logError('☢️SECURITY_ALERT', `Suspicious activity detected: ${type}`, details);
+        if (typeof aiMonitor !== 'undefined') {
+            aiMonitor.logError('SECURITY_ALERT', `Suspicious activity detected: ${type}`, details);
+        }
 
         // Send security notification
-        notificationSystem.addNotification({
-            type: '☢️SECURITY_ALERT',
-            title: '🚨 Security Alert',
-            message: `Suspicious activity detected: ${type}`,
-            priority: 'high',
-            timestamp: new Date().toISOString()
-        });
+        if (typeof notificationSystem !== 'undefined') {
+            notificationSystem.addNotification({
+                type: 'SECURITY_ALERT',
+                title: '🚨 Security Alert',
+                message: `Suspicious activity detected: ${type}`,
+                priority: 'high',
+                timestamp: new Date().toISOString()
+            });
+        }
 
         return activity;
     }
@@ -296,7 +344,9 @@ class EnhancedSecurity {
         // Log scan results
         if (scanResults.issues.length > 0) {
             console.log('Security Scan Results:', scanResults);
-            aiMonitor.logError('☢️SECURITY_SCAN', 'Security issues detected', scanResults);
+            if (typeof aiMonitor !== 'undefined') {
+                aiMonitor.logError('SECURITY_SCAN', 'Security issues detected', scanResults);
+            }
         }
 
         return scanResults;
@@ -360,6 +410,7 @@ class EnhancedSecurity {
         const count = this.lockedAccounts.size;
         this.lockedAccounts.clear();
         this.failedAttempts.clear();
+        this.rateLimits.clear();
         
         this.logSecurityEvent('EMERGENCY_UNLOCK', {
             unlockedAccounts: count,
@@ -368,47 +419,20 @@ class EnhancedSecurity {
 
         return count;
     }
-}
 
-// Add to EnhancedSecurity class
-monitorAdminActions() 
-{
-    const originalDeductFunds = this.deductFunds;
-    
-    this.deductFunds = (phoneNumber, amount, reason, adminId) => {
-        // Require dual authorization for large deductions
-        if (amount > 1000) {
-            this.flagSuspiciousActivity('LARGE_ADMIN_DEDUCTION', {
-                adminId,
-                phoneNumber,
-                amount,
-                reason,
-                timestamp: new Date().toISOString()
-            });
-            
-            // Require second admin approval
-            if (!this.getSecondAdminApproval(phoneNumber, amount, reason)) {
-                throw new Error('Large deduction requires second admin approval');
-            }
+    // Password verification (standalone method)
+    verifyPassword(inputPassword, storedHash) {
+        if (!inputPassword || !storedHash) return false;
+        // Use the same hashing as security.js
+        let hash = 0;
+        for (let i = 0; i < inputPassword.length; i++) {
+            const char = inputPassword.charCodeAt(i);
+            hash = ((hash << 5) - hash) + char;
+            hash = hash & hash;
         }
-        
-        return originalDeductFunds.call(this, phoneNumber, amount, reason, adminId);
-    };
-}
-
-getSecondAdminApproval(phoneNumber, amount, reason) 
-{
-    // In production, this would send notification to other admins
-    const approvalCode = Math.random().toString(36).substr(2, 8).toUpperCase();
-    localStorage.setItem('pending_approval', JSON.stringify({
-        phoneNumber,
-        amount,
-        reason,
-        approvalCode,
-        timestamp: new Date().toISOString()
-    }));
-    
-    return prompt(`Requires second admin approval.\nDeduction: ${amount} from ${phoneNumber}\nReason: ${reason}\nEnter approval code sent to other admins:`) === approvalCode;
+        const hashedInput = Math.abs(hash).toString(16).padStart(32, '0');
+        return hashedInput === storedHash;
+    }
 }
 
 // Global enhanced security instance

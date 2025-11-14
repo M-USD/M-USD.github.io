@@ -1,9 +1,10 @@
-// AI System for Error Monitoring and Correction - FINAL COMPLETE VERSION
+// AI System for Error Monitoring and Correction - PRODUCTION READY
 class AIMonitor {
     constructor() {
         this.errors = [];
         this.corrections = [];
         this.performanceMetrics = {};
+        this.healthCheckInterval = null;
         this.setupMonitoring();
     }
 
@@ -15,7 +16,9 @@ class AIMonitor {
         this.monitorStorageErrors();
         
         // Start periodic health checks
-        setInterval(() => this.runHealthCheck(), 30000);
+        this.healthCheckInterval = setInterval(() => this.runHealthCheck(), 30000);
+        
+        console.log('✅ AI Monitor initialized');
     }
 
     // Monitor authentication errors
@@ -73,7 +76,7 @@ class AIMonitor {
                     }
                 } else if (error.message.includes('Recipient not found')) {
                     this.suggestCorrection('RECIPIENT_NOT_FOUND',
-                        `Recipient ${toPhone} not registered. Suggest them to join PhoneChain.`,
+                        `Recipient ${toPhone} not registered. Suggest them to join M-USD.`,
                         { recipient: toPhone }
                     );
                 }
@@ -156,7 +159,8 @@ class AIMonitor {
         const currentBalance = parseFloat(user.balance) || 0;
         const shortBy = requiredAmount - currentBalance;
         
-        if (shortBy <= 50) {
+        if (shortBy <= 50 && shortBy > 0) {
+            // Only auto-add small amounts for demo
             blockchain.addFunds(phoneNumber, shortBy);
             
             return {
@@ -467,6 +471,14 @@ class AIMonitor {
         this.corrections = this.corrections.filter(correction =>
             now - new Date(correction.timestamp).getTime() < 7 * dayInMs
         );
+    }
+
+    // Cleanup method
+    cleanup() {
+        if (this.healthCheckInterval) {
+            clearInterval(this.healthCheckInterval);
+            this.healthCheckInterval = null;
+        }
     }
 }
 

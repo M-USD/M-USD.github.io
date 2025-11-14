@@ -1,11 +1,11 @@
-// Real-time Notification System - FIXED VERSION
+// Real-time Notification System - PRODUCTION READY
 class NotificationSystem {
     constructor() {
         this.notifications = [];
         this.isConnected = false;
         this.reconnectAttempts = 0;
         this.maxReconnectAttempts = 5;
-        this.cleanupHandlers = [];
+        this.connectionInterval = null;
         this.setupRealTimeMonitoring();
         this.loadNotifications();
     }
@@ -22,6 +22,8 @@ class NotificationSystem {
         
         // Start cleanup interval
         setInterval(() => this.cleanupOldNotifications(), 60000);
+        
+        console.log('✅ Notification System initialized');
     }
 
     // Monitor for incoming transactions to current user
@@ -85,8 +87,8 @@ class NotificationSystem {
             
             this.addNotification({
                 type: 'SYSTEM',
-                title: '🔗Connection Established',
-                message: '✅Real-time notifications are now active',
+                title: 'Connection Established',
+                message: 'Real-time notifications are now active',
                 priority: 'low',
                 timestamp: new Date().toISOString()
             });
@@ -199,6 +201,7 @@ class NotificationSystem {
     // Play notification sound
     playNotificationSound() {
         try {
+            // Create a simple beep sound using Web Audio API
             const audioContext = new (window.AudioContext || window.webkitAudioContext)();
             const oscillator = audioContext.createOscillator();
             const gainNode = audioContext.createGain();
@@ -231,8 +234,10 @@ class NotificationSystem {
         
         // Update badge in UI
         const badgeElement = document.getElementById('notificationBadge') || this.createBadgeElement();
-        badgeElement.textContent = unreadCount > 0 ? unreadCount : '';
-        badgeElement.style.display = unreadCount > 0 ? 'flex' : 'none';
+        if (badgeElement) {
+            badgeElement.textContent = unreadCount > 0 ? unreadCount : '';
+            badgeElement.style.display = unreadCount > 0 ? 'flex' : 'none';
+        }
     }
 
     // Create badge element if it doesn't exist
@@ -258,21 +263,23 @@ class NotificationSystem {
         // Find notification button or create one
         let notifButton = document.querySelector('[onclick*="showNotifications"]');
         if (!notifButton) {
-            // Add notification button to header
-            const header = document.querySelector('header');
-            if (header) {
-                notifButton = document.createElement('button');
-                notifButton.innerHTML = '🔔';
-                notifButton.onclick = () => this.showNotifications();
-                notifButton.style.cssText = `
-                    background: none;
-                    border: none;
-                    font-size: 1.5em;
-                    cursor: pointer;
-                    position: relative;
-                `;
-                notifButton.appendChild(badge);
-                header.appendChild(notifButton);
+            // Add notification button to header if app exists
+            if (app && app.currentUser) {
+                const header = document.querySelector('header');
+                if (header) {
+                    notifButton = document.createElement('button');
+                    notifButton.innerHTML = '🔔';
+                    notifButton.onclick = () => this.showNotifications();
+                    notifButton.style.cssText = `
+                        background: none;
+                        border: none;
+                        font-size: 1.5em;
+                        cursor: pointer;
+                        position: relative;
+                    `;
+                    notifButton.appendChild(badge);
+                    header.appendChild(notifButton);
+                }
             }
         } else {
             notifButton.style.position = 'relative';
@@ -467,18 +474,11 @@ class NotificationSystem {
 
     // Cleanup method
     cleanup() {
-        clearInterval(this.connectionInterval);
+        if (this.connectionInterval) {
+            clearInterval(this.connectionInterval);
+            this.connectionInterval = null;
+        }
         this.notifications = [];
-        this.cleanupHandlers.forEach(handler => handler());
-        this.cleanupHandlers = [];
-    }
-
-    // Add event listener with cleanup
-    addEventListenerWithCleanup(element, event, handler) {
-        element.addEventListener(event, handler);
-        this.cleanupHandlers.push(() => {
-            element.removeEventListener(event, handler);
-        });
     }
 }
 

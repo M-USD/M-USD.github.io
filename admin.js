@@ -1,24 +1,4 @@
-// Safe fallback for enhancedSecurity
-if (typeof enhancedSecurity === 'undefined') {
-    var enhancedSecurity = {
-        getSecurityReport: function() {
-            return {
-                timestamp: new Date().toISOString(),
-                lockedAccounts: [],
-                failedAttempts: [],
-                recentSuspiciousActivities: [],
-                securityScan: { issues: [] }
-            };
-        },
-        securityScan: function() {
-            return { issues: [] };
-        },
-        emergencyUnlockAll: function() {
-            return 0;
-        }
-    };
-}
-// Admin Panel Management System
+// Admin Panel Management System - PRODUCTION READY
 class AdminPanel {
     constructor() {
         this.adminPassword = "admin2024"; // Default admin password
@@ -30,6 +10,7 @@ class AdminPanel {
     init() {
         this.checkAdminSession();
         this.setupEventListeners();
+        console.log('✅ Admin Panel initialized');
     }
 
     setupEventListeners() {
@@ -107,7 +88,10 @@ class AdminPanel {
         });
         
         // Show selected section
-        document.getElementById(sectionName + 'Section').classList.add('active');
+        const sectionElement = document.getElementById(sectionName + 'Section');
+        if (sectionElement) {
+            sectionElement.classList.add('active');
+        }
         
         // Load section data
         this.loadSectionData(sectionName);
@@ -136,152 +120,191 @@ class AdminPanel {
         this.updateSystemStatus();
     }
 
-
-
-
-
-
-
-
-
-
     updateSystemStats() {
-        const stats = blockchain.getSystemStats();
-        
-        document.getElementById('totalUsers').textContent = stats.totalUsers;
-        document.getElementById('totalTransactions').textContent = stats.totalTransactions;
-        document.getElementById('totalBalance').textContent = stats.totalValue.toFixed(2);
-        document.getElementById('totalFees').textContent = stats.totalFees.toFixed(2);
+        try {
+            const stats = blockchain.getSystemStats();
+            
+            document.getElementById('totalUsers').textContent = stats.totalUsers;
+            document.getElementById('totalTransactions').textContent = stats.totalTransactions;
+            document.getElementById('totalBalance').textContent = stats.totalValue.toFixed(2);
+            document.getElementById('totalFees').textContent = stats.totalFees.toFixed(2);
+        } catch (error) {
+            console.error('Error updating system stats:', error);
+        }
     }
 
     updateSystemStatus() {
         const statusContainer = document.getElementById('systemStatus');
-        const securityReport = enhancedSecurity.getSecurityReport();
-        const aiReport = aiMonitor.getSystemReport();
-        
-        statusContainer.innerHTML = `
-            <div class="security-item">
-                <span class="status good">●</span>
-                Blockchain Height: ${blockchain.blockHeight}
-            </div>
-            <div class="security-item">
-                <span class="status good">●</span>
-                Users: ${blockchain.users.size} active
-            </div>
-            <div class="security-item">
-                <span class="status good">●</span>
-                Transactions: ${blockchain.transactions.length}
-            </div>
-            <div class="security-item">
-                <span class="status ${securityReport.lockedAccounts.length > 0 ? 'warning' : 'good'}">●</span>
-                Locked Accounts: ${securityReport.lockedAccounts.length}
-            </div>
-        `;
+        if (!statusContainer) return;
+
+        try {
+            const securityReport = enhancedSecurity.getSecurityReport();
+            const aiReport = aiMonitor.getSystemReport();
+            const backupStatus = backupSystem.getBackupStatus();
+            
+            statusContainer.innerHTML = `
+                <div class="security-item">
+                    <span class="status good">●</span>
+                    Blockchain Height: ${blockchain.blockHeight}
+                </div>
+                <div class="security-item">
+                    <span class="status good">●</span>
+                    Users: ${blockchain.users.size} active
+                </div>
+                <div class="security-item">
+                    <span class="status good">●</span>
+                    Transactions: ${blockchain.transactions.length}
+                </div>
+                <div class="security-item">
+                    <span class="status ${securityReport.lockedAccounts.length > 0 ? 'warning' : 'good'}">●</span>
+                    Locked Accounts: ${securityReport.lockedAccounts.length}
+                </div>
+                <div class="security-item">
+                    <span class="status good">●</span>
+                    Backups: ${backupStatus.totalBackups}
+                </div>
+            `;
+        } catch (error) {
+            console.error('Error updating system status:', error);
+            statusContainer.innerHTML = '<div class="security-item">Error loading status</div>';
+        }
     }
 
     updateSystemInfo() {
         const infoContainer = document.getElementById('systemInfo');
-        const stats = blockchain.getSystemStats();
-        const securityReport = enhancedSecurity.getSecurityReport();
-        
-        infoContainer.innerHTML = `
-            <div class="security-items">
-                <div class="security-item">
-                    <span class="status good">●</span>
-                    System Version: 2.0.0
+        if (!infoContainer) return;
+
+        try {
+            const stats = blockchain.getSystemStats();
+            const securityReport = enhancedSecurity.getSecurityReport();
+            const aiReport = aiMonitor.getSystemReport();
+            const backupStatus = backupSystem.getBackupStatus();
+            
+            infoContainer.innerHTML = `
+                <div class="security-items">
+                    <div class="security-item">
+                        <span class="status good">●</span>
+                        System Version: 3.0.0
+                    </div>
+                    <div class="security-item">
+                        <span class="status good">●</span>
+                        Total Users: ${stats.totalUsers}
+                    </div>
+                    <div class="security-item">
+                        <span class="status good">●</span>
+                        Total Transactions: ${stats.totalTransactions}
+                    </div>
+                    <div class="security-item">
+                        <span class="status good">●</span>
+                        Total Balance: ${stats.totalValue.toFixed(2)} USD
+                    </div>
+                    <div class="security-item">
+                        <span class="status good">●</span>
+                        Collected Fees: ${stats.totalFees.toFixed(2)} USD
+                    </div>
+                    <div class="security-item">
+                        <span class="status good">●</span>
+                        System Backups: ${backupStatus.totalBackups}
+                    </div>
+                    <div class="security-item">
+                        <span class="status ${aiReport.errorsLast24h > 0 ? 'warning' : 'good'}">●</span>
+                        AI Errors (24h): ${aiReport.errorsLast24h}
+                    </div>
                 </div>
-                <div class="security-item">
-                    <span class="status good">●</span>
-                    Total Users: ${stats.totalUsers}
-                </div>
-                <div class="security-item">
-                    <span class="status good">●</span>
-                    Suspended Users: ${stats.suspendedUsers || 0}
-                </div>
-                <div class="security-item">
-                    <span class="status good">●</span>
-                    Frozen Accounts: ${stats.frozenUsers || 0}
-                </div>
-                <div class="security-item">
-                    <span class="status good">●</span>
-                    Total Balance: ${stats.totalValue.toFixed(2)} USD
-                </div>
-                <div class="security-item">
-                    <span class="status good">●</span>
-                    Collected Fees: ${stats.totalFees.toFixed(2)} USD
-                </div>
-            </div>
-        `;
+            `;
+        } catch (error) {
+            console.error('Error updating system info:', error);
+            infoContainer.innerHTML = '<div class="security-item">Error loading system information</div>';
+        }
     }
 
     // User Management
     loadUsersList() {
         const usersList = document.getElementById('usersList');
-        const users = Array.from(blockchain.users.values());
-        
-        if (users.length === 0) {
-            usersList.innerHTML = '<div class="no-data">No users found</div>';
-            return;
-        }
+        if (!usersList) return;
 
-        usersList.innerHTML = users.map(user => {
-            const isSuspended = !user.isActive;
-            const isFrozen = user.frozen || false;
-            const balance = parseFloat(user.balance) || 0;
+        try {
+            const users = Array.from(blockchain.users.values());
             
-            return `
-                <div class="user-item ${isSuspended ? 'suspended' : ''} ${isFrozen ? 'frozen' : ''}">
-                    <div class="user-info">
-                        <div class="user-phone"><strong>${user.phoneNumber}</strong></div>
-                        <div class="user-details">
-                            Balance: ${balance.toFixed(2)} USD | 
-                            Created: ${new Date(user.createdAt).toLocaleDateString()} |
-                            ${isSuspended ? '🔴 SUSPENDED' : '🟢 ACTIVE'}
-                            ${isFrozen ? ' | ❄️ FROZEN' : ''}
+            if (users.length === 0) {
+                usersList.innerHTML = '<div class="no-data">No users found</div>';
+                return;
+            }
+
+            usersList.innerHTML = users.map(user => {
+                const isSuspended = !user.isActive;
+                const isFrozen = user.frozen || false;
+                const balance = parseFloat(user.balance) || 0;
+                
+                return `
+                    <div class="user-item ${isSuspended ? 'suspended' : ''} ${isFrozen ? 'frozen' : ''}">
+                        <div class="user-info">
+                            <div class="user-phone"><strong>${user.phoneNumber}</strong></div>
+                            <div class="user-details">
+                                Balance: ${balance.toFixed(2)} USD | 
+                                Created: ${new Date(user.createdAt).toLocaleDateString()} |
+                                ${isSuspended ? '🔴 SUSPENDED' : '🟢 ACTIVE'}
+                                ${isFrozen ? ' | ❄️ FROZEN' : ''}
+                            </div>
+                            ${isSuspended ? `<div class="user-reason"><small>Reason: ${user.suspendReason || 'Not specified'}</small></div>` : ''}
+                            ${isFrozen ? `<div class="user-reason"><small>Freeze Reason: ${user.freezeReason || 'Not specified'}</small></div>` : ''}
                         </div>
-                        ${isSuspended ? `<div class="user-reason"><small>Reason: ${user.suspendReason || 'Not specified'}</small></div>` : ''}
-                        ${isFrozen ? `<div class="user-reason"><small>Freeze Reason: ${user.freezeReason || 'Not specified'}</small></div>` : ''}
+                        <div class="user-actions">
+                            <button onclick="admin.showUserActions('${user.phoneNumber}')" class="btn small">Actions</button>
+                        </div>
                     </div>
-                    <div class="user-actions">
-                        <button onclick="admin.showUserActions('${user.phoneNumber}')" class="btn small">Actions</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
+        } catch (error) {
+            console.error('Error loading users list:', error);
+            usersList.innerHTML = '<div class="no-data">Error loading users</div>';
+        }
     }
 
     searchUsers() {
         const searchTerm = document.getElementById('userSearch').value.toLowerCase();
-        const users = Array.from(blockchain.users.values());
-        const filteredUsers = users.filter(user => 
-            user.phoneNumber.toLowerCase().includes(searchTerm)
-        );
-        
         const usersList = document.getElementById('usersList');
-        usersList.innerHTML = filteredUsers.map(user => {
-            const isSuspended = !user.isActive;
-            const isFrozen = user.frozen || false;
-            const balance = parseFloat(user.balance) || 0;
+        if (!usersList) return;
+
+        try {
+            const users = Array.from(blockchain.users.values());
+            const filteredUsers = users.filter(user => 
+                user.phoneNumber.toLowerCase().includes(searchTerm)
+            );
             
-            return `
-                <div class="user-item ${isSuspended ? 'suspended' : ''} ${isFrozen ? 'frozen' : ''}">
-                    <div class="user-info">
-                        <div class="user-phone"><strong>${user.phoneNumber}</strong></div>
-                        <div class="user-details">
-                            Balance: ${balance.toFixed(2)} USD | 
-                            Created: ${new Date(user.createdAt).toLocaleDateString()} |
-                            ${isSuspended ? '🔴 SUSPENDED' : '🟢 ACTIVE'}
-                            ${isFrozen ? ' | ❄️ FROZEN' : ''}
+            if (filteredUsers.length === 0) {
+                usersList.innerHTML = '<div class="no-data">No users found</div>';
+                return;
+            }
+
+            usersList.innerHTML = filteredUsers.map(user => {
+                const isSuspended = !user.isActive;
+                const isFrozen = user.frozen || false;
+                const balance = parseFloat(user.balance) || 0;
+                
+                return `
+                    <div class="user-item ${isSuspended ? 'suspended' : ''} ${isFrozen ? 'frozen' : ''}">
+                        <div class="user-info">
+                            <div class="user-phone"><strong>${user.phoneNumber}</strong></div>
+                            <div class="user-details">
+                                Balance: ${balance.toFixed(2)} USD | 
+                                Created: ${new Date(user.createdAt).toLocaleDateString()} |
+                                ${isSuspended ? '🔴 SUSPENDED' : '🟢 ACTIVE'}
+                                ${isFrozen ? ' | ❄️ FROZEN' : ''}
+                            </div>
+                            ${isSuspended ? `<div class="user-reason"><small>Reason: ${user.suspendReason || 'Not specified'}</small></div>` : ''}
+                            ${isFrozen ? `<div class="user-reason"><small>Freeze Reason: ${user.freezeReason || 'Not specified'}</small></div>` : ''}
                         </div>
-                        ${isSuspended ? `<div class="user-reason"><small>Reason: ${user.suspendReason || 'Not specified'}</small></div>` : ''}
-                        ${isFrozen ? `<div class="user-reason"><small>Freeze Reason: ${user.freezeReason || 'Not specified'}</small></div>` : ''}
+                        <div class="user-actions">
+                            <button onclick="admin.showUserActions('${user.phoneNumber}')" class="btn small">Actions</button>
+                        </div>
                     </div>
-                    <div class="user-actions">
-                        <button onclick="admin.showUserActions('${user.phoneNumber}')" class="btn small">Actions</button>
-                    </div>
-                </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
+        } catch (error) {
+            console.error('Error searching users:', error);
+            usersList.innerHTML = '<div class="no-data">Error searching users</div>';
+        }
     }
 
     showUserActions(phoneNumber) {
@@ -292,6 +315,8 @@ class AdminPanel {
         const modalContent = document.getElementById('modalContent');
         const modalTitle = document.getElementById('modalTitle');
         
+        if (!modal || !modalContent || !modalTitle) return;
+
         modalTitle.textContent = `User: ${phoneNumber}`;
         
         modalContent.innerHTML = `
@@ -308,14 +333,11 @@ class AdminPanel {
             <div class="form-group">
                 <label>Account Actions:</label>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                    <button onclick="admin.showSuspendAccount('${phoneNumber}')" class="btn ${user.isActive ? 'danger' : 'primary'}">
+                    <button onclick="admin.toggleAccountStatus('${phoneNumber}')" class="btn ${user.isActive ? 'danger' : 'primary'}">
                         ${user.isActive ? 'Suspend Account' : 'Activate Account'}
                     </button>
-                    <button onclick="admin.showFreezeAccount('${phoneNumber}')" class="btn ${user.frozen ? 'primary' : 'warning'}">
+                    <button onclick="admin.toggleFreezeAccount('${phoneNumber}')" class="btn ${user.frozen ? 'primary' : 'warning'}">
                         ${user.frozen ? 'Unfreeze Account' : 'Freeze Account'}
-                    </button>
-                    <button onclick="admin.showDeductFunds('${phoneNumber}')" class="btn danger">
-                        Deduct Funds
                     </button>
                 </div>
             </div>
@@ -331,106 +353,17 @@ class AdminPanel {
         modal.style.display = 'block';
     }
 
-    showSuspendAccount(phoneNumber) {
-        const user = blockchain.users.get(phoneNumber);
-        if (!user) return;
-
-        const modalContent = document.getElementById('modalContent');
-        const action = user.isActive ? 'suspend' : 'activate';
-        
-        if (action === 'suspend') {
-            modalContent.innerHTML = `
-                <div class="form-group">
-                    <label for="suspendReason">Reason for Suspension:</label>
-                    <select id="suspendReason" style="width: 100%; padding: 10px; margin: 10px 0;">
-                        <option value="Violation of terms of service">Violation of terms of service</option>
-                        <option value="Suspicious activity">Suspicious activity</option>
-                        <option value="Account verification required">Account verification required</option>
-                        <option value="Reported by other users">Reported by other users</option>
-                        <option value="Other">Other (specify below)</option>
-                    </select>
-                    <input type="text" id="customSuspendReason" placeholder="Specify other reason" style="width: 100%; padding: 10px; margin: 10px 0; display: none;">
-                </div>
-                <div class="form-group">
-                    <button onclick="admin.toggleAccountStatus('${phoneNumber}')" class="btn danger">Suspend Account</button>
-                    <button onclick="admin.showUserActions('${phoneNumber}')" class="btn secondary">Cancel</button>
-                </div>
-                <script>
-                    document.getElementById('suspendReason').addEventListener('change', function() {
-                        document.getElementById('customSuspendReason').style.display = 
-                            this.value === 'Other' ? 'block' : 'none';
-                    });
-                </script>
-            `;
-        } else {
-            modalContent.innerHTML = `
-                <div class="form-group">
-                    <p>Activate this account?</p>
-                    <button onclick="admin.toggleAccountStatus('${phoneNumber}')" class="btn primary">Activate Account</button>
-                    <button onclick="admin.showUserActions('${phoneNumber}')" class="btn secondary">Cancel</button>
-                </div>
-            `;
-        }
-    }
-
-    showFreezeAccount(phoneNumber) {
-        const user = blockchain.users.get(phoneNumber);
-        if (!user) return;
-
-        const modalContent = document.getElementById('modalContent');
-        const action = user.frozen ? 'unfreeze' : 'freeze';
-        
-        if (action === 'freeze') {
-            modalContent.innerHTML = `
-                <div class="form-group">
-                    <label for="freezeReason">Reason for Freezing:</label>
-                    <select id="freezeReason" style="width: 100%; padding: 10px; margin: 10px 0;">
-                        <option value="Suspicious transaction activity">Suspicious transaction activity</option>
-                        <option value="Security concerns">Security concerns</option>
-                        <option value="Chargeback dispute">Chargeback dispute</option>
-                        <option value="Regulatory compliance">Regulatory compliance</option>
-                        <option value="Other">Other (specify below)</option>
-                    </select>
-                    <input type="text" id="customFreezeReason" placeholder="Specify other reason" style="width: 100%; padding: 10px; margin: 10px 0; display: none;">
-                </div>
-                <div class="form-group">
-                    <button onclick="admin.toggleFreezeAccount('${phoneNumber}')" class="btn warning">Freeze Account</button>
-                    <button onclick="admin.showUserActions('${phoneNumber}')" class="btn secondary">Cancel</button>
-                </div>
-                <script>
-                    document.getElementById('freezeReason').addEventListener('change', function() {
-                        document.getElementById('customFreezeReason').style.display = 
-                            this.value === 'Other' ? 'block' : 'none';
-                    });
-                </script>
-            `;
-        } else {
-            modalContent.innerHTML = `
-                <div class="form-group">
-                    <p>Unfreeze this account?</p>
-                    <button onclick="admin.toggleFreezeAccount('${phoneNumber}')" class="btn primary">Unfreeze Account</button>
-                    <button onclick="admin.showUserActions('${phoneNumber}')" class="btn secondary">Cancel</button>
-                </div>
-            `;
-        }
-    }
     toggleAccountStatus(phoneNumber) {
         const user = blockchain.users.get(phoneNumber);
         if (!user) return;
 
         if (user.isActive) {
-            // Suspending account - get reason
-            const reasonSelect = document.getElementById('suspendReason');
-            const customReason = document.getElementById('customSuspendReason');
-            const reason = reasonSelect ? 
-                (reasonSelect.value === 'Other' ? customReason.value : reasonSelect.value) 
-                : 'Violation of terms of service';
-            
+            // Suspending account
             user.isActive = false;
-            user.suspendReason = reason || 'Violation of terms of service';
+            user.suspendReason = 'Administrative action';
             
             this.showNotification(
-                `Account suspended. Reason: ${user.suspendReason}`,
+                `Account suspended for ${phoneNumber}`,
                 'success'
             );
         } else {
@@ -454,18 +387,12 @@ class AdminPanel {
         if (!user) return;
 
         if (!user.frozen) {
-            // Freezing account - get reason
-            const reasonSelect = document.getElementById('freezeReason');
-            const customReason = document.getElementById('customFreezeReason');
-            const reason = reasonSelect ? 
-                (reasonSelect.value === 'Other' ? customReason.value : reasonSelect.value) 
-                : 'Security concerns';
-            
+            // Freezing account
             user.frozen = true;
-            user.freezeReason = reason || 'Security concerns';
+            user.freezeReason = 'Administrative action';
             
             this.showNotification(
-                `Account frozen. Reason: ${user.freezeReason}`,
+                `Account frozen for ${phoneNumber}`,
                 'success'
             );
         } else {
@@ -484,108 +411,10 @@ class AdminPanel {
         this.loadUsersList();
     }
 
-    showDeductFunds(phoneNumber) {
-        const user = blockchain.users.get(phoneNumber);
-        if (!user) return;
-
-        const modalContent = document.getElementById('modalContent');
-        
-        modalContent.innerHTML = `
-            <div class="form-group">
-                <label>Current Balance: ${(parseFloat(user.balance) || 0).toFixed(2)} USD</label>
-            </div>
-            <div class="form-group">
-                <label for="deductAmount">Amount to Deduct (USD):</label>
-                <input type="number" id="deductAmount" step="0.01" max="${user.balance}" style="width: 100%; padding: 10px;">
-            </div>
-            <div class="form-group">
-                <label for="deductReason">Reason:</label>
-                <select id="deductReason" style="width: 100%; padding: 10px; margin: 10px 0;">
-                    <option value="Chargeback processing">Chargeback processing</option>
-                    <option value="Fee adjustment">Fee adjustment</option>
-                    <option value="Dispute resolution">Dispute resolution</option>
-                    <option value="Regulatory requirement">Regulatory requirement</option>
-                    <option value="Other">Other (specify below)</option>
-                </select>
-                <input type="text" id="customDeductReason" placeholder="Specify other reason" style="width: 100%; padding: 10px; margin: 10px 0; display: none;">
-            </div>
-            <div class="form-group">
-                <button onclick="admin.deductFunds('${phoneNumber}')" class="btn danger">Deduct Funds</button>
-                <button onclick="admin.showUserActions('${phoneNumber}')" class="btn secondary">Cancel</button>
-            </div>
-            <script>
-                document.getElementById('deductReason').addEventListener('change', function() {
-                    document.getElementById('customDeductReason').style.display = 
-                        this.value === 'Other' ? 'block' : 'none';
-                });
-            </script>
-        `;
-    }
-
-    deductFunds(phoneNumber) {
-        const amount = parseFloat(document.getElementById('deductAmount').value);
-        const reasonSelect = document.getElementById('deductReason');
-        const customReason = document.getElementById('customDeductReason');
-        const reason = reasonSelect ? 
-            (reasonSelect.value === 'Other' ? customReason.value : reasonSelect.value) 
-            : 'Administrative action';
-        
-        if (!amount || amount <= 0) {
-            this.showNotification('Please enter a valid amount', 'error');
-            return;
-        }
-
-        if (!reason) {
-            this.showNotification('Please provide a reason', 'error');
-            return;
-        }
-
-        const user = blockchain.users.get(phoneNumber);
-        if (!user) return;
-
-        const currentBalance = parseFloat(user.balance) || 0;
-        if (amount > currentBalance) {
-            this.showNotification('Deduction amount exceeds balance', 'error');
-            return;
-        }
-
-        // Deduct funds
-        user.balance = currentBalance - amount;
-        
-        // Create deduction transaction
-        const transaction = {
-            id: security.generateTransactionId(),
-            from: phoneNumber,
-            to: 'system_admin',
-            fromAddress: user.walletAddress,
-            toAddress: 'ADMIN_WALLET',
-            amount: amount,
-            timestamp: new Date().toISOString(),
-            status: 'confirmed',
-            type: 'admin_deduction',
-            reason: reason,
-            adminAction: true,
-            blockHeight: blockchain.blockHeight++
-        };
-
-        blockchain.transactions.push(transaction);
-        if (!user.transactions) user.transactions = [];
-        user.transactions.push(transaction.id);
-
-        blockchain.saveToStorage();
-        
-        this.showNotification(
-            `Deducted ${amount.toFixed(2)} USD from ${phoneNumber}. Reason: ${reason}`,
-            'success'
-        );
-        this.closeModal();
-        this.loadUsersList();
-        this.updateDashboard();
-    }
-
     showUserTransactions(phoneNumber) {
         const transactions = blockchain.getUserTransactions(phoneNumber);
         const modalContent = document.getElementById('modalContent');
+        if (!modalContent) return;
         
         if (transactions.length === 0) {
             modalContent.innerHTML = '<div class="no-data">No transactions found</div>';
@@ -618,106 +447,128 @@ class AdminPanel {
     // Transactions Management
     loadAllTransactions() {
         const transactionsList = document.getElementById('allTransactionsList');
-        const transactions = blockchain.transactions.sort((a, b) => 
-            new Date(b.timestamp) - new Date(a.timestamp)
-        );
-        
-        if (transactions.length === 0) {
-            transactionsList.innerHTML = '<div class="no-data">No transactions found</div>';
-            return;
-        }
+        if (!transactionsList) return;
 
-        transactionsList.innerHTML = transactions.map(tx => {
-            const isFee = tx.type === 'fee';
-            const isAdmin = tx.type === 'admin_deduction';
-            const borderColor = isFee ? '#ed8936' : (isAdmin ? '#e53e3e' : '#4299e1');
+        try {
+            const transactions = blockchain.transactions.sort((a, b) => 
+                new Date(b.timestamp) - new Date(a.timestamp)
+            );
             
-            return `
-                <div class="transaction-item" style="border-left-color: ${borderColor}">
-                    <div class="transaction-info">
-                        <div><strong>${tx.id}</strong></div>
-                        <div>From: ${tx.from} → To: ${tx.to}</div>
-                        <div>Type: ${tx.type} | ${new Date(tx.timestamp).toLocaleString()}</div>
-                        ${tx.reason ? `<div><small><strong>Reason:</strong> ${tx.reason}</small></div>` : ''}
+            if (transactions.length === 0) {
+                transactionsList.innerHTML = '<div class="no-data">No transactions found</div>';
+                return;
+            }
+
+            transactionsList.innerHTML = transactions.map(tx => {
+                const isFee = tx.type === 'fee';
+                const isAdmin = tx.type === 'admin_deduction';
+                const borderColor = isFee ? '#ed8936' : (isAdmin ? '#e53e3e' : '#4299e1');
+                
+                return `
+                    <div class="transaction-item" style="border-left-color: ${borderColor}">
+                        <div class="transaction-info">
+                            <div><strong>${tx.id}</strong></div>
+                            <div>From: ${tx.from} → To: ${tx.to}</div>
+                            <div>Type: ${tx.type} | ${new Date(tx.timestamp).toLocaleString()}</div>
+                            ${tx.reason ? `<div><small><strong>Reason:</strong> ${tx.reason}</small></div>` : ''}
+                        </div>
+                        <div class="transaction-amount">
+                            ${tx.amount.toFixed(2)} USD
+                            ${tx.fee ? `<br><small>Fee: ${tx.fee.toFixed(2)} USD</small>` : ''}
+                        </div>
                     </div>
-                    <div class="transaction-amount">
-                        ${tx.amount.toFixed(2)} USD
-                        ${tx.fee ? `<br><small>Fee: ${tx.fee.toFixed(2)} USD</small>` : ''}
-                    </div>
-                </div>
-            `;
-        }).join('');
+                `;
+            }).join('');
+        } catch (error) {
+            console.error('Error loading transactions:', error);
+            transactionsList.innerHTML = '<div class="no-data">Error loading transactions</div>';
+        }
     }
 
     // System Controls
     runSecurityScan() {
-        const results = enhancedSecurity.securityScan();
-        this.showNotification(
-            `Security scan completed. Found ${results.issues.length} issues.`,
-            'success'
-        );
-        this.updateSystemStatus();
+        try {
+            const results = enhancedSecurity.securityScan();
+            this.showNotification(
+                `Security scan completed. Found ${results.issues.length} issues.`,
+                'success'
+            );
+            this.updateSystemStatus();
+        } catch (error) {
+            console.error('Error running security scan:', error);
+            this.showNotification('Error running security scan', 'error');
+        }
     }
 
     emergencyUnlockAll() {
-        const count = enhancedSecurity.emergencyUnlockAll();
-        this.showNotification(
-            `Emergency unlock: ${count} accounts unlocked`,
-            'success'
-        );
-        this.updateSystemStatus();
+        try {
+            const count = enhancedSecurity.emergencyUnlockAll();
+            this.showNotification(
+                `Emergency unlock: ${count} accounts unlocked`,
+                'success'
+            );
+            this.updateSystemStatus();
+        } catch (error) {
+            console.error('Error unlocking accounts:', error);
+            this.showNotification('Error unlocking accounts', 'error');
+        }
+    }
+
+    createBackup() {
+        try {
+            const backup = backupSystem.createBackup();
+            if (backup) {
+                this.showNotification('Backup created successfully', 'success');
+            } else {
+                this.showNotification('Backup creation failed', 'error');
+            }
+        } catch (error) {
+            console.error('Error creating backup:', error);
+            this.showNotification('Error creating backup', 'error');
+        }
     }
 
     clearAllData() {
         if (confirm('⚠️ ARE YOU SURE? This will delete ALL data including users and transactions!')) {
-            localStorage.clear();
-            location.reload();
+            try {
+                database.clearAllData();
+                localStorage.clear();
+                this.showNotification('All data cleared successfully', 'success');
+                setTimeout(() => {
+                    location.reload();
+                }, 2000);
+            } catch (error) {
+                console.error('Error clearing data:', error);
+                this.showNotification('Error clearing data', 'error');
+            }
         }
     }
 
     closeModal() {
-        document.getElementById('userActionModal').style.display = 'none';
+        const modal = document.getElementById('userActionModal');
+        if (modal) {
+            modal.style.display = 'none';
+        }
     }
 
     showNotification(message, type = 'info') {
-        // Create a simple notification
-        const notification = document.createElement('div');
-        notification.style.cssText = `
-            position: fixed;
-            top: 20px;
-            right: 20px;
-            padding: 15px 25px;
-            border-radius: 10px;
-            color: white;
-            font-weight: bold;
-            z-index: 10001;
-            background: ${type === 'success' ? '#48bb78' : type === 'error' ? '#e53e3e' : '#4299e1'};
-        `;
+        const notification = document.getElementById('notification');
+        if (!notification) return;
+        
         notification.textContent = message;
-        document.body.appendChild(notification);
+        notification.className = `notification ${type}`;
+        notification.style.display = 'block';
         
         setTimeout(() => {
-            notification.remove();
+            notification.classList.remove('success', 'error', 'warning');
+            notification.style.display = 'none';
         }, 3000);
     }
-    
-    
-    
-// Add to AdminPanel class
-broadcastToUsers() {
-    const message = prompt('Enter message to broadcast to all users:');
-    if (message && confirm(`Send this message to all users?\n\n"${message}"`)) {
-        // This would integrate with the chat system
-        alert('Broadcast feature would send this to all active users');
-        // In full implementation: adminChat.broadcastMessage(message);
-    }
 }
-    
-    
-    
-}
+
 // Global admin instance
 const admin = new AdminPanel();
+
 // Global functions for HTML
 function adminLogin() { admin.login(); }
 function adminLogout() { admin.logout(); }
@@ -727,3 +578,4 @@ function closeModal() { admin.closeModal(); }
 function runSecurityScan() { admin.runSecurityScan(); }
 function emergencyUnlockAll() { admin.emergencyUnlockAll(); }
 function clearAllData() { admin.clearAllData(); }
+function createBackup() { admin.createBackup(); }

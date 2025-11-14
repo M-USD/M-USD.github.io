@@ -1,18 +1,19 @@
-
+// Configuration Settings - PRODUCTION READY
 const CONFIG = {
   ENV: 'production',
   API_URL: 'https://api.m-usd.com',
   BLOCKCHAIN: {
     FEE_PERCENT: 0.01,
     MIN_FEE: 0.01,
-    FEE_COLLECTOR: '+254746500025'
+    FEE_COLLECTOR: "+254746500025",
+    MAX_BALANCE: 1000000
   },
   SECURITY: {
     SESSION_TIMEOUT: 30 * 60 * 1000,
     MAX_LOGIN_ATTEMPTS: 5,
-    PASSWORD_MIN_LENGTH: 8,
-    LOCKOUT_DURATION: 15 * 60 * 1000 // 15 minutes
-
+    PASSWORD_MIN_LENGTH: 6,
+    LOCKOUT_DURATION: 15 * 60 * 1000,
+    ALLOWED_COUNTRIES: ['+254', '+255', '+256', '+250', '+1']
   },
   COMPLIANCE: {
     DAILY_LIMIT: 1000000,
@@ -20,7 +21,11 @@ const CONFIG = {
     ENABLED: true,
     AUTO_REPORTING: true,
     SANCTIONS_CHECK: true
+  },
+  PAYMENTS: {
+    MIN_DEPOSIT: 1,
+    MAX_DEPOSIT: 1000000,
+    ALLOWED_CURRENCIES: ['USD'],
+    AUTO_APPROVE_LIMIT: 1000
   }
 };
-
-

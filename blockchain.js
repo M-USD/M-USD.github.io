@@ -1,4 +1,4 @@
-// Blockchain and Wallet Simulation - WITH COMPLIANCE INTEGRATION
+// Blockchain and Wallet Simulation - PRODUCTION READY
 class PhoneBlockchain {
     constructor() {
         this.users = new Map();
@@ -35,11 +35,23 @@ class PhoneBlockchain {
     // Register new user with phone number
     registerUser(phoneNumber, password) {
         if (!phoneNumber || !password) {
-            throw new Error('📵Phone number and password are required');
+            throw new Error('📵 Phone number and password are required');
+        }
+
+        // Sanitize inputs
+        phoneNumber = security.sanitizeInput(phoneNumber, 'phone');
+        password = security.sanitizeInput(password);
+
+        if (!security.validatePhoneNumber(phoneNumber)) {
+            throw new Error('📵 Please enter a valid phone number');
+        }
+
+        if (!security.validatePassword(password)) {
+            throw new Error(`📵 Password must be at least ${security.PASSWORD_MIN_LENGTH} characters`);
         }
 
         if (this.users.has(phoneNumber)) {
-            throw new Error('❌Phone number already registered');
+            throw new Error('❌ Phone number already registered');
         }
 
         const walletAddress = security.generateWalletAddress(phoneNumber);
@@ -69,24 +81,24 @@ class PhoneBlockchain {
         console.log('Authenticating:', phoneNumber);
         
         if (!phoneNumber || !password) {
-            throw new Error('📵Phone number and password are required');
+            throw new Error('📵 Phone number and password are required');
         }
 
         const user = this.users.get(phoneNumber);
         if (!user) {
-            throw new Error('❌User not found. Please register first.');
+            throw new Error('❌ User not found. Please register first.');
         }
 
         // Check if account is suspended
         if (!user.isActive) {
-            throw new Error(`☢️Account suspended. Reason: ${user.suspendReason || 'Violation of terms of service'}`);
+            throw new Error(`☢️ Account suspended. Reason: ${user.suspendReason || 'Violation of terms of service'}`);
         }
 
         const isValid = security.verifyPassword(password, user.passwordHash);
-        console.log('✅Password valid:', isValid);
+        console.log('✅ Password valid:', isValid);
         
         if (!isValid) {
-            throw new Error('❌Invalid password');
+            throw new Error('❌ Invalid password');
         }
 
         // Ensure balance is a number
@@ -102,52 +114,60 @@ class PhoneBlockchain {
         return parseFloat(user.balance) || 0;
     }
 
-    // Send money to another phone number - WITH COMPLIANCE CHECK
+    // Send money to another phone number
     sendMoney(fromPhone, toPhone, amount, password) {
         console.log('Sending money:', { fromPhone, toPhone, amount });
         
         if (!fromPhone || !toPhone || !amount || !password) {
-            throw new Error('☢️All fields are required');
+            throw new Error('☢️ All fields are required');
         }
 
+        // Sanitize inputs
+        fromPhone = security.sanitizeInput(fromPhone, 'phone');
+        toPhone = security.sanitizeInput(toPhone, 'phone');
+        amount = parseFloat(security.sanitizeInput(amount.toString(), 'amount'));
+
         if (amount <= 0) {
-            throw new Error('☢️Amount must be positive');
+            throw new Error('☢️ Amount must be positive');
         }
 
         const fromUser = this.users.get(fromPhone);
         const toUser = this.users.get(toPhone);
 
         if (!fromUser) {
-            throw new Error('☢️Sender account not found');
+            throw new Error('☢️ Sender account not found');
         }
 
         if (!toUser) {
-            throw new Error('☢️Recipient account not found');
+            throw new Error('☢️ Recipient account not found');
         }
 
         // Check if sender account is frozen
         if (fromUser.frozen) {
-            throw new Error(`☢️Account frozen. Reason: ${fromUser.freezeReason || 'Security concerns'}. Contact support.`);
+            throw new Error(`☢️ Account frozen. Reason: ${fromUser.freezeReason || 'Security concerns'}. Contact support.`);
         }
 
         // Check if sender account is suspended
         if (!fromUser.isActive) {
-            throw new Error(`☢️Account suspended. Reason: ${user.suspendReason || 'Violation of terms of service'}`);
+            throw new Error(`☢️ Account suspended. Reason: ${fromUser.suspendReason || 'Violation of terms of service'}`);
         }
 
         // Check if recipient account is suspended
         if (!toUser.isActive) {
-            throw new Error('☢️Recipient account is suspended');
+            throw new Error('☢️ Recipient account is suspended');
         }
 
         if (fromPhone === toPhone) {
-            throw new Error('☢️Cannot send to yourself');
+            throw new Error('☢️ Cannot send to yourself');
         }
 
         // Verify sender's password
         if (!security.verifyPassword(password, fromUser.passwordHash)) {
-            throw new Error('☢️Invalid transaction password');
+            throw new Error('☢️ Invalid transaction password');
         }
+
+        // Validate transaction limits
+        this.validateTransactionLimits(fromPhone, amount);
 
         // COMPLIANCE CHECK - Integrate regulatory compliance
         if (typeof compliance !== 'undefined') {
@@ -160,13 +180,9 @@ class PhoneBlockchain {
             });
             
             if (!complianceCheck) {
-                throw new Error('☢️Transaction blocked by compliance rules');
+                throw new Error('☢️ Transaction blocked by compliance rules');
             }
         }
-
-
-
-
 
         // Calculate transaction fee
         const transactionFee = security.calculateTransactionFee(amount);
@@ -182,6 +198,24 @@ class PhoneBlockchain {
 
         // Process transaction
         return this.processTransactionWithFee(fromPhone, toPhone, amount, transactionFee);
+    }
+
+    // Validate transaction limits
+    validateTransactionLimits(fromPhone, amount) {
+        const dailyTotal = this.getDailyTotal(fromPhone);
+        const monthlyTotal = this.getMonthlyTotal(fromPhone);
+        
+        // Single transaction limit
+        if (amount > CONFIG.COMPLIANCE.TRANSACTION_LIMIT) {
+            throw new Error(`Transaction exceeds single transaction limit of ${CONFIG.COMPLIANCE.TRANSACTION_LIMIT} USD`);
+        }
+        
+        // Daily limit
+        if (dailyTotal + amount > CONFIG.COMPLIANCE.DAILY_LIMIT) {
+            throw new Error(`Transaction exceeds daily limit of ${CONFIG.COMPLIANCE.DAILY_LIMIT} USD`);
+        }
+        
+        return true;
     }
 
     // Process transaction with fee
@@ -318,17 +352,17 @@ class PhoneBlockchain {
     addFunds(phoneNumber, amount) {
         const user = this.users.get(phoneNumber);
         if (!user) {
-            throw new Error('📵User not found');
+            throw new Error('📵 User not found');
         }
 
         // Check if account is frozen
         if (user.frozen) {
-            throw new Error(`☢️Account frozen. Reason: ${user.freezeReason || 'Security concerns'}. Cannot add funds.`);
+            throw new Error(`☢️ Account frozen. Reason: ${user.freezeReason || 'Security concerns'}. Cannot add funds.`);
         }
 
         // Check if account is suspended
         if (!user.isActive) {
-            throw new Error(`☢️Account suspended. Reason: ${user.suspendReason || 'Violation of terms of service'}. Cannot add funds.`);
+            throw new Error(`☢️ Account suspended. Reason: ${user.suspendReason || 'Violation of terms of service'}. Cannot add funds.`);
         }
 
         user.balance = (parseFloat(user.balance) || 0) + parseFloat(amount);
@@ -360,6 +394,29 @@ class PhoneBlockchain {
         return this.users.has(phoneNumber);
     }
 
+    // Get daily total for a user
+    getDailyTotal(phoneNumber) {
+        const userTxs = this.getUserTransactions(phoneNumber);
+        const today = new Date().toDateString();
+        const todayTxs = userTxs.filter(tx =>
+            new Date(tx.timestamp).toDateString() === today && tx.from === phoneNumber
+        );
+        
+        return todayTxs.reduce((sum, tx) => sum + tx.amount, 0);
+    }
+
+    // Get monthly total for a user
+    getMonthlyTotal(phoneNumber) {
+        const userTxs = this.getUserTransactions(phoneNumber);
+        const now = new Date();
+        const monthStart = new Date(now.getFullYear(), now.getMonth(), 1);
+        const monthTxs = userTxs.filter(tx =>
+            new Date(tx.timestamp) >= monthStart && tx.from === phoneNumber
+        );
+        
+        return monthTxs.reduce((sum, tx) => sum + tx.amount, 0);
+    }
+
     // Storage management WITH BACKUP INTEGRATION
     saveToStorage() {
         try {
@@ -376,7 +433,7 @@ class PhoneBlockchain {
                 backupSystem.createBackup();
             }
         } catch (error) {
-            console.error('📵Failed to save data:', error);
+            console.error('📵 Failed to save data:', error);
         }
     }
 
@@ -388,10 +445,10 @@ class PhoneBlockchain {
                 this.users = new Map(parsed.users);
                 this.transactions = parsed.transactions || [];
                 this.blockHeight = parsed.blockHeight || 0;
-                console.log('✅Data loaded from storage. Users:', this.users.size);
+                console.log('✅ Data loaded from storage. Users:', this.users.size);
             }
         } catch (error) {
-            console.error('❌Failed to load data:', error);
+            console.error('❌ Failed to load data:', error);
             this.users = new Map();
             this.transactions = [];
             this.blockHeight = 0;

@@ -1,50 +1,36 @@
-// Backup and Disaster Recovery System - FIXED
+// Backup and Disaster Recovery System - PRODUCTION READY
 class BackupSystem {
   constructor() {
     this.backupInterval = 4 * 60 * 60 * 1000; // 4 hours
     this.maxBackups = 168; // 1 week of hourly backups
     this.startBackupSchedule();
+    this.setupBackupTriggers();
   }
-  
-// Add automatic backup triggers
-setupBackupTriggers() {
-  // Backup before any critical operation
-  const criticalMethods = ['sendMoney', 'addFunds', 'registerUser'];
-  
-  criticalMethods.forEach(method => {
-    const original = blockchain[method];
-    blockchain[method] = function(...args) {
-      backupSystem.createBackup();
-      return original.apply(this, args);
-    };
-  });
-}
-
-// Add export/import functionality
-exportUserData(phoneNumber) {
-  const user = blockchain.users.get(phoneNumber);
-  const transactions = blockchain.getUserTransactions(phoneNumber);
-  
-  return {
-    user: {
-      phoneNumber: user.phoneNumber,
-      walletAddress: user.walletAddress,
-      balance: user.balance,
-      createdAt: user.createdAt
-    },
-    transactions,
-    exportDate: new Date().toISOString(),
-    version: '1.0'
-  };
-}
-  
   
   startBackupSchedule() {
     // Regular backups
     setInterval(() => this.createBackup(), this.backupInterval);
     
-    // Backup before critical operations
-    this.monitorCriticalOperations();
+    // Initial backup
+    setTimeout(() => this.createBackup(), 5000);
+    
+    console.log('✅ Backup system initialized');
+  }
+  
+  // Add automatic backup triggers
+  setupBackupTriggers() {
+    // Backup before any critical operation
+    const criticalMethods = ['sendMoney', 'addFunds', 'registerUser'];
+    
+    criticalMethods.forEach(method => {
+      const original = blockchain[method];
+      if (original) {
+        blockchain[method] = function(...args) {
+          backupSystem.createBackup();
+          return original.apply(this, args);
+        };
+      }
+    });
   }
   
   createBackup() {
@@ -64,11 +50,12 @@ exportUserData(phoneNumber) {
       this.saveBackup(backup);
       this.cleanupOldBackups();
       
-      console.log('✅Backup created successfully');
+      console.log('✅ Backup created successfully');
       return backup;
     } catch (error) {
-      console.error('📵Backup failed:', error);
+      console.error('📵 Backup failed:', error);
       this.alertBackupFailure(error);
+      return null;
     }
   }
   
@@ -91,11 +78,11 @@ exportUserData(phoneNumber) {
     const backup = backups.find(b => b.timestamp === backupTimestamp);
     
     if (!backup) {
-      throw new Error('📵Backup not found');
+      throw new Error('📵 Backup not found');
     }
     
     if (!this.verifyBackup(backup)) {
-      throw new Error('📵Backup verification failed');
+      throw new Error('📵 Backup verification failed');
     }
     
     // Restore data
@@ -105,6 +92,7 @@ exportUserData(phoneNumber) {
     
     blockchain.saveToStorage();
     
+    console.log('✅ Backup restored successfully');
     return true;
   }
   
@@ -112,8 +100,14 @@ exportUserData(phoneNumber) {
     return backup.checksum === this.generateChecksum(backup.data);
   }
   
-  generateChecksum(data) {
-    const str = JSON.stringify(data);
+  generateChecksum(data = null) {
+    const targetData = data || {
+      users: Array.from(blockchain.users.entries()),
+      transactions: blockchain.transactions,
+      blockHeight: blockchain.blockHeight
+    };
+    
+    const str = JSON.stringify(targetData);
     let hash = 0;
     for (let i = 0; i < str.length; i++) {
       const char = str.charCodeAt(i);
@@ -134,18 +128,13 @@ exportUserData(phoneNumber) {
     };
   }
   
-  monitorCriticalOperations() {
-    // Backup will be created by individual operations as needed
-    console.log('✅Backup system monitoring started');
-  }
-  
   alertBackupFailure(error) {
     // Notify administrators
     if (typeof notificationSystem !== 'undefined') {
       notificationSystem.addNotification({
         type: 'SYSTEM_ALERT',
         title: 'Backup Failed',
-        message: `📵Automatic backup failed: ${error.message}`,
+        message: `📵 Automatic backup failed: ${error.message}`,
         priority: 'high',
         timestamp: new Date().toISOString()
       });
@@ -165,22 +154,55 @@ exportUserData(phoneNumber) {
   }
   
   importData(jsonData) {
-    const data = JSON.parse(jsonData);
-    
-    // Validate data structure
-    if (!data.users || !data.transactions) {
-      throw new Error('Invalid data format');
+    try {
+      const data = JSON.parse(jsonData);
+      
+      // Validate data structure
+      if (!data.users || !data.transactions) {
+        throw new Error('Invalid data format');
+      }
+      
+      // Create backup before import
+      this.createBackup();
+      
+      // Import data
+      blockchain.users = new Map(data.users);
+      blockchain.transactions = data.transactions;
+      blockchain.saveToStorage();
+      
+      console.log('✅ Data imported successfully');
+      return true;
+    } catch (error) {
+      console.error('❌ Data import failed:', error);
+      throw error;
     }
-    
-    // Create backup before import
-    this.createBackup();
-    
-    // Import data
-    blockchain.users = new Map(data.users);
-    blockchain.transactions = data.transactions;
-    blockchain.saveToStorage();
-    
-    return true;
+  }
+  
+  // Get backup status
+  getBackupStatus() {
+    const backups = JSON.parse(localStorage.getItem('system_backups') || '[]');
+    return {
+      totalBackups: backups.length,
+      lastBackup: backups.length > 0 ? backups[backups.length - 1].timestamp : null,
+      nextBackup: new Date(Date.now() + this.backupInterval).toISOString()
+    };
+  }
+  
+  // Emergency recovery
+  emergencyRecovery() {
+    try {
+      const backups = JSON.parse(localStorage.getItem('system_backups') || '[]');
+      if (backups.length === 0) {
+        throw new Error('No backups available for recovery');
+      }
+      
+      // Use the most recent backup
+      const latestBackup = backups[backups.length - 1];
+      return this.restoreBackup(latestBackup.timestamp);
+    } catch (error) {
+      console.error('❌ Emergency recovery failed:', error);
+      throw error;
+    }
   }
 }
 

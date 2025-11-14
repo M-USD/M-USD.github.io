@@ -1,4 +1,4 @@
-// Real-time Chat System for User-Admin Communication
+// Real-time Chat System for User-Admin Communication - PRODUCTION READY
 class ChatSystem {
     constructor() {
         this.messages = [];
@@ -7,6 +7,7 @@ class ChatSystem {
         this.isOpen = false;
         this.unreadCount = 0;
         this.adminOnline = false;
+        this.typingInterval = null;
         this.setupChat();
         this.loadMessages();
         this.simulateAdminPresence();
@@ -16,6 +17,8 @@ class ChatSystem {
         this.createChatWidget();
         this.setupEventListeners();
         this.startHeartbeat();
+        
+        console.log('✅ Chat System initialized');
     }
 
     // Create chat widget UI
@@ -83,7 +86,7 @@ class ChatSystem {
         chatWindow.innerHTML = `
             <div class="chat-header" style="background: linear-gradient(135deg, #667eea, #764ba2); color: white; padding: 20px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <h3 style="margin: 0; font-size: 16px;">💬Live  Support Chat</h3>
+                    <h3 style="margin: 0; font-size: 16px;">💬 Live Support Chat</h3>
                     <div id="adminStatus" style="font-size: 12px; opacity: 0.9;">Connecting...</div>
                 </div>
                 <button id="closeChat" style="background: none; border: none; color: white; font-size: 20px; cursor: pointer;">×</button>
@@ -170,8 +173,14 @@ class ChatSystem {
         input.value = '';
         this.scrollToBottom();
 
+        // Show typing indicator
+        this.showTypingIndicator();
+
         // Simulate admin response
-        setTimeout(() => this.generateAdminResponse(message), 1000 + Math.random() * 2000);
+        setTimeout(() => {
+            this.hideTypingIndicator();
+            this.generateAdminResponse(message);
+        }, 1000 + Math.random() * 2000);
     }
 
     // Add message to chat
@@ -231,6 +240,39 @@ class ChatSystem {
         messageElement.appendChild(bubble);
         messageElement.appendChild(time);
         messagesContainer.appendChild(messageElement);
+    }
+
+    // Show typing indicator
+    showTypingIndicator() {
+        const messagesContainer = document.getElementById('chatMessages');
+        const typingIndicator = document.createElement('div');
+        typingIndicator.id = 'typingIndicator';
+        typingIndicator.innerHTML = `
+            <div class="typing-indicator">
+                <span>Admin is typing</span>
+                <div class="typing-dots">
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                    <div class="typing-dot"></div>
+                </div>
+            </div>
+        `;
+        typingIndicator.style.cssText = `
+            margin-bottom: 15px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+        `;
+        messagesContainer.appendChild(typingIndicator);
+        this.scrollToBottom();
+    }
+
+    // Hide typing indicator
+    hideTypingIndicator() {
+        const typingIndicator = document.getElementById('typingIndicator');
+        if (typingIndicator) {
+            typingIndicator.remove();
+        }
     }
 
     // Generate simulated admin response
@@ -314,7 +356,9 @@ class ChatSystem {
     scrollToBottom() {
         const messagesContainer = document.getElementById('chatMessages');
         setTimeout(() => {
-            messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            if (messagesContainer) {
+                messagesContainer.scrollTop = messagesContainer.scrollHeight;
+            }
         }, 100);
     }
 
@@ -329,14 +373,7 @@ class ChatSystem {
         // Random online/offline status
         this.adminOnline = Math.random() > 0.3; // 70% chance online
         
-        const statusElement = document.getElementById('adminStatus');
-        if (statusElement) {
-            if (this.adminOnline) {
-                statusElement.innerHTML = '🟢 Online - Typically replies instantly';
-            } else {
-                statusElement.innerHTML = '🔴 Offline - We will reply within 1 hour';
-            }
-        }
+        this.updateAdminStatus();
 
         // Random status changes
         setInterval(() => {
@@ -407,6 +444,8 @@ class ChatSystem {
         const messagesContainer = document.getElementById('chatMessages');
         const welcomeMessage = document.getElementById('welcomeMessage');
         
+        if (!messagesContainer) return;
+        
         messagesContainer.innerHTML = '';
         if (welcomeMessage) {
             messagesContainer.appendChild(welcomeMessage);
@@ -437,6 +476,15 @@ class ChatSystem {
                 read: this.isOpen
             });
         }, 500);
+    }
+
+    // Cleanup method
+    cleanup() {
+        if (this.typingInterval) {
+            clearInterval(this.typingInterval);
+            this.typingInterval = null;
+        }
+        this.messages = [];
     }
 }
 
