@@ -1,0 +1,1027 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>📱M-USD</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --primary: #00a651;
+            --secondary: #00a651;
+            --dark: #333;
+            --light: #f5f5f5;
+            --danger: #e74c3c;
+            --success: #2ecc71;
+            --warning: #f39c12;
+            --info: #3498db;
+        }
+
+        body {
+            background-color: #f0f2f5;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .app-header {
+            background: linear-gradient(to right, var(--primary), var(--secondary));
+            color: white;
+            padding: 15px 0;
+            text-align: center;
+            border-radius: 0 0 20px 20px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .app-header h1 {
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+        }
+
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .nav-tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .nav-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .nav-tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .balance-card {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            text-align: center;
+            padding: 20px;
+            border-radius: 12px;
+            margin: 20px 0;
+        }
+
+        .balance-amount {
+            font-size: 32px;
+            font-weight: 700;
+            margin: 10px 0;
+        }
+
+        .transaction-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .transaction-details {
+            flex: 1;
+        }
+
+        .transaction-amount {
+            font-weight: 600;
+        }
+
+        .transaction-positive {
+            color: var(--success);
+        }
+
+        .transaction-negative {
+            color: var(--danger);
+        }
+
+        .transaction-fee {
+            color: var(--warning);
+            font-size: 12px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+
+        .menu-item {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .menu-item:hover {
+            transform: translateY(-5px);
+        }
+
+        .menu-icon {
+            font-size: 24px;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .admin-panel {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+
+        .admin-section {
+            margin-bottom: 30px;
+        }
+
+        .admin-section h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-item, .transaction-admin-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 12px 0;
+            border-bottom: 1px solid #eee;
+        }
+
+        .user-actions {
+            display: flex;
+            gap: 10px;
+        }
+
+        .action-btn {
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+        }
+
+        .action-btn.suspend {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .action-btn.block {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .action-btn.recover {
+            background-color: var(--info);
+            color: white;
+        }
+
+        .status-badge {
+            padding: 3px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .status-active {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .status-suspended {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .status-blocked {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 500;
+            z-index: 1000;
+            opacity: 0;
+            transform: translateX(100%);
+            transition: all 0.3s ease;
+        }
+
+        .notification.show {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .notification.success {
+            background-color: var(--success);
+        }
+
+        .notification.error {
+            background-color: var(--danger);
+        }
+
+        .notification.info {
+            background-color: var(--info);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .logo-icon {
+            font-size: 28px;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            color: #777;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app-header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-money-bill-wave logo-icon"></i>
+                <h1>🇺🇸M-USD</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Login/Register Screen -->
+        <div id="auth-screen" class="card">
+            <h2>  🌟🌟Welcome to M-USD🌟🌟</h2>
+            <p>Please login or register to continue</p>
+            
+            <div class="nav-tabs">
+                <div class="nav-tab active" id="login-tab">Login</div>
+                <div class="nav-tab" id="register-tab">Register</div>
+            </div>
+            
+            <div id="login-form">
+                <div class="form-group">
+                    <label for="login-phone">Phone Number</label>
+                    <input type="tel" id="login-phone" class="form-control" placeholder="07XXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label for="login-pin">PIN</label>
+                    <input type="password" id="login-pin" class="form-control" placeholder="4-digit PIN" maxlength="4">
+                </div>
+                <button class="btn btn-primary" id="login-btn">Login</button>
+            </div>
+            
+            <div id="register-form" class="hidden">
+                <div class="form-group">
+                    <label for="register-phone">Phone Number</label>
+                    <input type="tel" id="register-phone" class="form-control" placeholder="07XXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label for="register-pin">Create PIN</label>
+                    <input type="password" id="register-pin" class="form-control" placeholder="4-digit PIN" maxlength="4">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-pin">Confirm PIN</label>
+                    <input type="password" id="confirm-pin" class="form-control" placeholder="Confirm PIN" maxlength="4">
+                </div>
+                <button class="btn btn-primary" id="register-btn">Register</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="hidden">
+            <div class="balance-card">
+                <p>Your Balance</p>
+                <div class="balance-amount" id="user-balance">USD 0.00</div>
+                <p id="user-phone"></p>
+            </div>
+            
+            <div class="menu-grid">
+                <div class="menu-item" id="deposit-btn">
+                    <div class="menu-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div>Deposit</div>
+                </div>
+                <div class="menu-item" id="send-money-btn">
+                    <div class="menu-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <div>Send Money</div>
+                </div>
+                <div class="menu-item" id="transactions-btn">
+                    <div class="menu-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <div>Transactions</div>
+                </div>
+                <div class="menu-item" id="admin-btn">
+                    <div class="menu-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div>Admin</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-outline" id="logout-btn">Logout</button>
+        </div>
+
+        <!-- Deposit Screen -->
+        <div id="deposit-screen" class="card hidden">
+            <h2>Deposit Funds</h2>
+            <div class="form-group">
+                <label for="deposit-amount">Amount (USD)</label>
+                <input type="number" id="deposit-amount" class="form-control" placeholder="Enter amount">
+            </div>
+            <button class="btn btn-primary" id="confirm-deposit">Deposit</button>
+            <button class="btn btn-outline" id="back-from-deposit">Back</button>
+        </div>
+
+        <!-- Send Money Screen -->
+        <div id="send-money-screen" class="card hidden">
+            <h2>Send Money</h2>
+            <div class="form-group">
+                <label for="recipient-phone">Recipient Phone Number</label>
+                <input type="tel" id="recipient-phone" class="form-control" placeholder="07XXXXXXXX">
+            </div>
+            <div class="form-group">
+                <label for="send-amount">Amount (USD)</label>
+                <input type="number" id="send-amount" class="form-control" placeholder="Enter amount">
+            </div>
+            <div class="form-group">
+                <p>Transaction Fee (1%): <span id="transaction-fee">USD 0.00</span></p>
+                <p>Total Deducted: <span id="total-deducted">USD 0.00</span></p>
+            </div>
+            <button class="btn btn-primary" id="confirm-send">Send Money</button>
+            <button class="btn btn-outline" id="back-from-send">Back</button>
+        </div>
+
+        <!-- Transactions Screen -->
+        <div id="transactions-screen" class="card hidden">
+            <h2>Transaction History</h2>
+            <div id="transactions-list">
+                <!-- Transactions will be populated here -->
+            </div>
+            <button class="btn btn-outline" id="back-from-transactions">Back</button>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="admin-panel hidden">
+            <h2>Admin Panel</h2>
+            
+            <div class="admin-section">
+                <h3>All Users</h3>
+                <div id="users-list">
+                    <!-- Users will be populated here -->
+                </div>
+            </div>
+            
+            <div class="admin-section">
+                <h3>All Transactions</h3>
+                <div id="admin-transactions-list">
+                    <!-- All transactions will be populated here -->
+                </div>
+            </div>
+            
+            <button class="btn btn-outline" id="back-from-admin">Back to Dashboard</button>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <div class="footer">
+        <p>🇺🇸M-USD &copy; 2026 | Transparent•Simple•Honest</p>
+    </div>
+
+    <script>
+        // Data Storage
+        let users = JSON.parse(localStorage.getItem('mpesaUsers')) || [];
+        let transactions = JSON.parse(localStorage.getItem('mpesaTransactions')) || [];
+        let currentUser = null;
+        let adminAccount = {
+            phone: '0700000000',
+            pin: '0000',
+            balance: 0,
+            isAdmin: true
+        };
+
+        // Initialize admin account if not exists
+        if (!users.find(u => u.phone === adminAccount.phone)) {
+            users.push(adminAccount);
+            localStorage.setItem('mpesaUsers', JSON.stringify(users));
+        }
+
+        // DOM Elements
+        const authScreen = document.getElementById('auth-screen');
+        const dashboardScreen = document.getElementById('dashboard-screen');
+        const depositScreen = document.getElementById('deposit-screen');
+        const sendMoneyScreen = document.getElementById('send-money-screen');
+        const transactionsScreen = document.getElementById('transactions-screen');
+        const adminPanel = document.getElementById('admin-panel');
+        
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        const depositBtn = document.getElementById('deposit-btn');
+        const sendMoneyBtn = document.getElementById('send-money-btn');
+        const transactionsBtn = document.getElementById('transactions-btn');
+        const adminBtn = document.getElementById('admin-btn');
+        
+        const confirmDeposit = document.getElementById('confirm-deposit');
+        const backFromDeposit = document.getElementById('back-from-deposit');
+        
+        const confirmSend = document.getElementById('confirm-send');
+        const backFromSend = document.getElementById('back-from-send');
+        
+        const backFromTransactions = document.getElementById('back-from-transactions');
+        const backFromAdmin = document.getElementById('back-from-admin');
+        
+        const userBalance = document.getElementById('user-balance');
+        const userPhone = document.getElementById('user-phone');
+        const transactionsList = document.getElementById('transactions-list');
+        const usersList = document.getElementById('users-list');
+        const adminTransactionsList = document.getElementById('admin-transactions-list');
+        
+        const sendAmount = document.getElementById('send-amount');
+        const recipientPhone = document.getElementById('recipient-phone');
+        const transactionFee = document.getElementById('transaction-fee');
+        const totalDeducted = document.getElementById('total-deducted');
+        
+        const notification = document.getElementById('notification');
+
+        // Event Listeners
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+        });
+
+        registerTab.addEventListener('click', () => {
+            registerTab.classList.add('active');
+            loginTab.classList.remove('active');
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+        });
+
+        loginBtn.addEventListener('click', handleLogin);
+        registerBtn.addEventListener('click', handleRegister);
+        logoutBtn.addEventListener('click', handleLogout);
+
+        depositBtn.addEventListener('click', showDepositScreen);
+        sendMoneyBtn.addEventListener('click', showSendMoneyScreen);
+        transactionsBtn.addEventListener('click', showTransactionsScreen);
+        adminBtn.addEventListener('click', showAdminPanel);
+
+        confirmDeposit.addEventListener('click', handleDeposit);
+        backFromDeposit.addEventListener('click', () => showScreen(dashboardScreen));
+
+        confirmSend.addEventListener('click', handleSendMoney);
+        backFromSend.addEventListener('click', () => showScreen(dashboardScreen));
+
+        backFromTransactions.addEventListener('click', () => showScreen(dashboardScreen));
+        backFromAdmin.addEventListener('click', () => showScreen(dashboardScreen));
+
+        sendAmount.addEventListener('input', updateTransactionDetails);
+        recipientPhone.addEventListener('input', updateTransactionDetails);
+
+        // Functions
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function showScreen(screen) {
+            authScreen.classList.add('hidden');
+            dashboardScreen.classList.add('hidden');
+            depositScreen.classList.add('hidden');
+            sendMoneyScreen.classList.add('hidden');
+            transactionsScreen.classList.add('hidden');
+            adminPanel.classList.add('hidden');
+            
+            screen.classList.remove('hidden');
+        }
+
+        function handleLogin() {
+            const phone = document.getElementById('login-phone').value;
+            const pin = document.getElementById('login-pin').value;
+            
+            if (!phone || !pin) {
+                showNotification('Please enter phone number and PIN', 'error');
+                return;
+            }
+            
+            const user = users.find(u => u.phone === phone && u.pin === pin);
+            
+            if (!user) {
+                showNotification('Invalid phone number or PIN', 'error');
+                return;
+            }
+            
+            if (user.isSuspended) {
+                showNotification('Your account has been suspended. Contact support.', 'error');
+                return;
+            }
+            
+            if (user.isBlocked) {
+                showNotification('Your account has been blocked. Contact support.', 'error');
+                return;
+            }
+            
+            currentUser = user;
+            updateDashboard();
+            showScreen(dashboardScreen);
+            showNotification('Login successful!', 'success');
+        }
+
+        function handleRegister() {
+            const phone = document.getElementById('register-phone').value;
+            const pin = document.getElementById('register-pin').value;
+            const confirmPin = document.getElementById('confirm-pin').value;
+            
+            if (!phone || !pin || !confirmPin) {
+                showNotification('Please fill all fields', 'error');
+                return;
+            }
+            
+            if (pin !== confirmPin) {
+                showNotification('PINs do not match', 'error');
+                return;
+            }
+            
+            if (pin.length !== 4) {
+                showNotification('PIN must be 4 digits', 'error');
+                return;
+            }
+            
+            if (users.find(u => u.phone === phone)) {
+                showNotification('Phone number already registered', 'error');
+                return;
+            }
+            
+            const newUser = {
+                phone,
+                pin,
+                balance: 0,
+                isAdmin: false,
+                isSuspended: false,
+                isBlocked: false
+            };
+            
+            users.push(newUser);
+            localStorage.setItem('mpesaUsers', JSON.stringify(users));
+            
+            showNotification('Registration successful! Please login.', 'success');
+            loginTab.click();
+            
+            // Clear form
+            document.getElementById('register-phone').value = '';
+            document.getElementById('register-pin').value = '';
+            document.getElementById('confirm-pin').value = '';
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            showScreen(authScreen);
+            showNotification('Logged out successfully', 'info');
+        }
+
+        function updateDashboard() {
+            if (!currentUser) return;
+            
+            userBalance.textContent = `USD ${currentUser.balance.toFixed(2)}`;
+            userPhone.textContent = currentUser.phone;
+            
+            // Only show admin button for admin users
+            adminBtn.style.display = currentUser.isAdmin ? 'block' : 'none';
+        }
+
+        function showDepositScreen() {
+            showScreen(depositScreen);
+            document.getElementById('deposit-amount').value = '';
+        }
+
+        function handleDeposit() {
+            const amount = parseFloat(document.getElementById('deposit-amount').value);
+            
+            if (!amount || amount <= 0) {
+                showNotification('Please enter a valid amount', 'error');
+                return;
+            }
+            
+            // Update user balance
+            currentUser.balance += amount;
+            
+            // Record transaction
+            const transaction = {
+                id: Date.now(),
+                from: 'DEPOSIT',
+                to: currentUser.phone,
+                amount: amount,
+                fee: 0,
+                type: 'deposit',
+                date: new Date().toISOString()
+            };
+            
+            transactions.push(transaction);
+            
+            // Update storage
+            localStorage.setItem('mpesaUsers', JSON.stringify(users));
+            localStorage.setItem('mpesaTransactions', JSON.stringify(transactions));
+            
+            updateDashboard();
+            showScreen(dashboardScreen);
+            showNotification(`Deposit of USD ${amount.toFixed(2)} successful!`, 'success');
+        }
+
+        function showSendMoneyScreen() {
+            showScreen(sendMoneyScreen);
+            document.getElementById('recipient-phone').value = '';
+            document.getElementById('send-amount').value = '';
+            updateTransactionDetails();
+        }
+
+        function updateTransactionDetails() {
+            const amount = parseFloat(sendAmount.value) || 0;
+            const fee = amount * 0.01; // 1% transaction fee
+            const total = amount + fee;
+            
+            transactionFee.textContent = `USD ${fee.toFixed(2)}`;
+            totalDeducted.textContent = `USD ${total.toFixed(2)}`;
+        }
+
+        function handleSendMoney() {
+            const recipient = document.getElementById('recipient-phone').value;
+            const amount = parseFloat(document.getElementById('send-amount').value);
+            
+            if (!recipient || !amount || amount <= 0) {
+                showNotification('Please enter valid recipient and amount', 'error');
+                return;
+            }
+            
+            if (recipient === currentUser.phone) {
+                showNotification('Cannot send money to yourself', 'error');
+                return;
+            }
+            
+            const recipientUser = users.find(u => u.phone === recipient);
+            
+            if (!recipientUser) {
+                showNotification('Recipient not found', 'error');
+                return;
+            }
+            
+            if (recipientUser.isSuspended || recipientUser.isBlocked) {
+                showNotification('Recipient account is not active', 'error');
+                return;
+            }
+            
+            const fee = amount * 0.01; // 1% transaction fee
+            const total = amount + fee;
+            
+            if (currentUser.balance < total) {
+                showNotification('Insufficient balance', 'error');
+                return;
+            }
+            
+            // Update balances
+            currentUser.balance -= total;
+            recipientUser.balance += amount;
+            
+            // Add fee to admin account
+            const adminUser = users.find(u => u.isAdmin);
+            if (adminUser) {
+                adminUser.balance += fee;
+            }
+            
+            // Record transaction
+            const transaction = {
+                id: Date.now(),
+                from: currentUser.phone,
+                to: recipient,
+                amount: amount,
+                fee: fee,
+                type: 'send',
+                date: new Date().toISOString()
+            };
+            
+            transactions.push(transaction);
+            
+            // Update storage
+            localStorage.setItem('mpesaUsers', JSON.stringify(users));
+            localStorage.setItem('mpesaTransactions', JSON.stringify(transactions));
+            
+            updateDashboard();
+            showScreen(dashboardScreen);
+            showNotification(`Sent USD ${amount.toFixed(2)} to ${recipient}`, 'success');
+        }
+
+        function showTransactionsScreen() {
+            showScreen(transactionsScreen);
+            displayUserTransactions();
+        }
+
+        function displayUserTransactions() {
+            if (!currentUser) return;
+            
+            const userTransactions = transactions.filter(
+                t => t.from === currentUser.phone || t.to === currentUser.phone
+            );
+            
+            userTransactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            transactionsList.innerHTML = '';
+            
+            if (userTransactions.length === 0) {
+                transactionsList.innerHTML = '<p>No transactions found</p>';
+                return;
+            }
+            
+            userTransactions.forEach(transaction => {
+                const transactionEl = document.createElement('div');
+                transactionEl.className = 'transaction-item';
+                
+                const isSent = transaction.from === currentUser.phone;
+                const amountClass = isSent ? 'transaction-negative' : 'transaction-positive';
+                const amountPrefix = isSent ? '-' : '+';
+                
+                transactionEl.innerHTML = `
+                    <div class="transaction-details">
+                        <div>${isSent ? `To: ${transaction.to}` : `From: ${transaction.from}`}</div>
+                        <div class="transaction-date">${new Date(transaction.date).toLocaleString()}</div>
+                        ${transaction.fee > 0 ? `<div class="transaction-fee">Fee: USD ${transaction.fee.toFixed(2)}</div>` : ''}
+                    </div>
+                    <div class="transaction-amount ${amountClass}">
+                        ${amountPrefix}USD ${transaction.amount.toFixed(2)}
+                    </div>
+                `;
+                
+                transactionsList.appendChild(transactionEl);
+            });
+        }
+
+        function showAdminPanel() {
+            if (!currentUser || !currentUser.isAdmin) {
+                showNotification('Access denied', 'error');
+                return;
+            }
+            
+            showScreen(adminPanel);
+            displayAllUsers();
+            displayAllTransactions();
+        }
+
+        function displayAllUsers() {
+            usersList.innerHTML = '';
+            
+            users.forEach(user => {
+                if (user.isAdmin) return; // Skip admin account from list
+                
+                const userEl = document.createElement('div');
+                userEl.className = 'user-item';
+                
+                let statusClass = 'status-active';
+                let statusText = 'Active';
+                
+                if (user.isBlocked) {
+                    statusClass = 'status-blocked';
+                    statusText = 'Blocked';
+                } else if (user.isSuspended) {
+                    statusClass = 'status-suspended';
+                    statusText = 'Suspended';
+                }
+                
+                userEl.innerHTML = `
+                    <div>
+                        <div>${user.phone}</div>
+                        <div>Balance: USD ${user.balance.toFixed(2)}</div>
+                    </div>
+                    <div>
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                        <div class="user-actions">
+                            <button class="action-btn suspend" data-phone="${user.phone}">Suspend</button>
+                            <button class="action-btn block" data-phone="${user.phone}">Block</button>
+                            <button class="action-btn recover" data-phone="${user.phone}">Recover Funds</button>
+                        </div>
+                    </div>
+                `;
+                
+                usersList.appendChild(userEl);
+            });
+            
+            // Add event listeners to action buttons
+            document.querySelectorAll('.action-btn.suspend').forEach(btn => {
+                btn.addEventListener('click', () => handleSuspendUser(btn.dataset.phone));
+            });
+            
+            document.querySelectorAll('.action-btn.block').forEach(btn => {
+                btn.addEventListener('click', () => handleBlockUser(btn.dataset.phone));
+            });
+            
+            document.querySelectorAll('.action-btn.recover').forEach(btn => {
+                btn.addEventListener('click', () => handleRecoverFunds(btn.dataset.phone));
+            });
+        }
+
+        function displayAllTransactions() {
+            adminTransactionsList.innerHTML = '';
+            
+            const sortedTransactions = [...transactions].sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            if (sortedTransactions.length === 0) {
+                adminTransactionsList.innerHTML = '<p>No transactions found</p>';
+                return;
+            }
+            
+            sortedTransactions.forEach(transaction => {
+                const transactionEl = document.createElement('div');
+                transactionEl.className = 'transaction-admin-item';
+                
+                transactionEl.innerHTML = `
+                    <div>
+                        <div>From: ${transaction.from} → To: ${transaction.to}</div>
+                        <div>Date: ${new Date(transaction.date).toLocaleString()}</div>
+                        <div>Type: ${transaction.type}</div>
+                    </div>
+                    <div>
+                        <div>Amount: USD ${transaction.amount.toFixed(2)}</div>
+                        ${transaction.fee > 0 ? `<div>Fee: USD ${transaction.fee.toFixed(2)}</div>` : ''}
+                    </div>
+                `;
+                
+                adminTransactionsList.appendChild(transactionEl);
+            });
+        }
+
+        function handleSuspendUser(phone) {
+            const user = users.find(u => u.phone === phone);
+            if (user) {
+                user.isSuspended = !user.isSuspended;
+                user.isBlocked = false; // Can't be both suspended and blocked
+                localStorage.setItem('mpesaUsers', JSON.stringify(users));
+                displayAllUsers();
+                showNotification(`User ${user.isSuspended ? 'suspended' : 'activated'}`, 'info');
+            }
+        }
+
+        function handleBlockUser(phone) {
+            const user = users.find(u => u.phone === phone);
+            if (user) {
+                user.isBlocked = !user.isBlocked;
+                user.isSuspended = false; // Can't be both suspended and blocked
+                localStorage.setItem('mpesaUsers', JSON.stringify(users));
+                displayAllUsers();
+                showNotification(`User ${user.isBlocked ? 'blocked' : 'activated'}`, 'info');
+            }
+        }
+
+        function handleRecoverFunds(phone) {
+            const user = users.find(u => u.phone === phone);
+            if (user && user.balance > 0) {
+                const amount = user.balance;
+                
+                // Add to admin account
+                const adminUser = users.find(u => u.isAdmin);
+                if (adminUser) {
+                    adminUser.balance += amount;
+                }
+                
+                // Record transaction
+                const transaction = {
+                    id: Date.now(),
+                    from: user.phone,
+                    to: 'ADMIN',
+                    amount: amount,
+                    fee: 0,
+                    type: 'recovery',
+                    date: new Date().toISOString()
+                };
+                
+                transactions.push(transaction);
+                
+                // Reset user balance
+                user.balance = 0;
+                
+                // Update storage
+                localStorage.setItem('mpesaUsers', JSON.stringify(users));
+                localStorage.setItem('mpesaTransactions', JSON.stringify(transactions));
+                
+                displayAllUsers();
+                displayAllTransactions();
+                showNotification(`Recovered USD ${amount.toFixed(2)} from ${user.phone}`, 'success');
+            } else {
+                showNotification('No funds to recover', 'info');
+            }
+        }
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', () => {
+            showScreen(authScreen);
+        });
+    </script>
+</body>
+</html>
