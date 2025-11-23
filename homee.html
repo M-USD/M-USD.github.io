@@ -5,1594 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📱M-USD</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-</head>
-<body>
-    <div class="app-header">
-        <div class="container">
-            <div class="logo">
-                <i class="fas fa-money-bill-wave logo-icon"></i>
-                <h1>🇺🇸M-USD</h1>
-            </div>
-        </div>
-    </div>
-
-    <div class="container">
-        <!-- Login/Register Screen -->
-        <div id="auth-screen" class="card">
-            <h2>Welcome to M-USD</h2>
-            <p>Please login or register to continue</p>
-            
-            <div class="nav-tabs">
-                <div class="nav-tab active" id="login-tab">Login</div>
-                <div class="nav-tab" id="register-tab">Register</div>
-            </div>
-            
-            <div id="login-form">
-                <div class="form-group">
-                    <label for="login-phone">Phone Number</label>
-                    <input type="tel" id="login-phone" class="form-control" placeholder="07XXXXXXXX">
-                </div>
-                <div class="form-group">
-                    <label for="login-pin">PIN</label>
-                    <input type="password" id="login-pin" class="form-control" placeholder="4-digit PIN" maxlength="4">
-                </div>
-                <button class="btn btn-primary" id="login-btn">Login</button>
-            </div>
-            
-            <div id="register-form" class="hidden">
-                <div class="form-group">
-                    <label for="register-phone">Phone Number</label>
-                    <input type="tel" id="register-phone" class="form-control" placeholder="07XXXXXXXX">
-                </div>
-                <div class="form-group">
-                    <label for="register-pin">Create PIN</label>
-                    <input type="password" id="register-pin" class="form-control" placeholder="4-digit PIN" maxlength="4">
-                </div>
-                <div class="form-group">
-                    <label for="confirm-pin">Confirm PIN</label>
-                    <input type="password" id="confirm-pin" class="form-control" placeholder="Confirm PIN" maxlength="4">
-                </div>
-                <button class="btn btn-primary" id="register-btn">Register</button>
-            </div>
-        </div>
-
-        <!-- Dashboard Screen -->
-        <div id="dashboard-screen" class="hidden">
-            <div class="balance-card">
-                <p>Your Balance</p>
-                <div class="balance-amount" id="user-balance">USD 0.00</div>
-                <p id="user-phone"></p>
-            </div>
-            
-            <div class="menu-grid">
-                <div class="menu-item" id="deposit-btn">
-                    <div class="menu-icon">
-                        <i class="fas fa-money-bill-wave"></i>
-                    </div>
-                    <div>Deposit</div>
-                </div>
-                <div class="menu-item" id="send-money-btn">
-                    <div class="menu-icon">
-                        <i class="fas fa-paper-plane"></i>
-                    </div>
-                    <div>Send Money</div>
-                </div>
-                <div class="menu-item" id="transactions-btn">
-                    <div class="menu-icon">
-                        <i class="fas fa-history"></i>
-                    </div>
-                    <div>Transactions</div>
-                </div>
-                <div class="menu-item" id="admin-btn">
-                    <div class="menu-icon">
-                        <i class="fas fa-cog"></i>
-                    </div>
-                    <div>Admin</div>
-                </div>
-            </div>
-            
-            <button class="btn btn-outline" id="logout-btn">Logout</button>
-        </div>
-
-        <!-- Deposit Screen -->
-        <div id="deposit-screen" class="card hidden">
-            <h2>Deposit Method coming soon</h2>
-            <div class="form-group">
-                <label for="deposit-amount">Enter Amount (USD)</label>
-                
-            </div>
-            <div class="form-group">
-                <p>Minimum deposit: $5.00</p>
-                <p>Maximum deposit: $10,000.00</p>
-            </div>
-            <button class="btn btn-primary" id="confirm-deposit">Continue to Payment</button>
-            <button class="btn btn-outline" id="back-from-deposit">Back</button>
-        </div>
-
-        <!-- Send Money Screen -->
-        <div id="send-money-screen" class="card hidden">
-            <h2>Send Money</h2>
-            <div class="form-group">
-                <label for="recipient-phone">Recipient Phone Number</label>
-                <input type="tel" id="recipient-phone" class="form-control" placeholder="07XXXXXXXX">
-            </div>
-            <div class="form-group">
-                <label for="send-amount">Amount (USD)</label>
-                <input type="number" id="send-amount" class="form-control" placeholder="Enter amount">
-            </div>
-            <div class="form-group">
-                <p>Transaction Fee (1%): <span id="transaction-fee">USD 0.00</span></p>
-                <p>Total Deducted: <span id="total-deducted">USD 0.00</span></p>
-            </div>
-            <button class="btn btn-primary" id="confirm-send">Send Money</button>
-            <button class="btn btn-outline" id="back-from-send">Back</button>
-        </div>
-
-        <!-- Transactions Screen -->
-        <div id="transactions-screen" class="card hidden">
-            <h2>Transaction History</h2>
-            <div id="transactions-list">
-                <!-- Transactions will be populated here -->
-            </div>
-            <button class="btn btn-outline" id="back-from-transactions">Back</button>
-        </div>
-
-        <!-- Admin Panel -->
-        <div id="admin-panel" class="admin-panel hidden">
-            <h2>Admin Panel</h2>
-            
-            <div class="admin-section">
-                <h3>All Users</h3>
-                <div id="users-list">
-                    <!-- Users will be populated here -->
-                </div>
-            </div>
-            
-            <div class="admin-section">
-                <h3>All Transactions</h3>
-                <div id="admin-transactions-list">
-                    <!-- All transactions will be populated here -->
-                </div>
-            </div>
-            
-            <button class="btn btn-outline" id="back-from-admin">Back to Dashboard</button>
-        </div>
-
-        <!-- Loading Indicator -->
-        <div id="loading-screen" class="card hidden">
-            <div class="loading">
-                <div class="spinner"></div>
-                <p>Loading...</p>
-            </div>
-        </div>
-    </div>
-
-    <!-- Notification -->
-    <div id="notification" class="notification"></div>
-
-    <div class="footer">
-        <p>🇺🇸M-USD &copy; 2026 | Transparent•Simple•Honest</p>
-    </div>
-
-    <!-- Embedded Payment Gateway Script -->
-    <script>
-        // Payment Gateway Configuration
-        const CONFIG = {
-            PAYMENTS: {
-                MIN_DEPOSIT: 5,
-                MAX_DEPOSIT: 10000
-            }
-        };
-
-        // Mock blockchain integration
-        const blockchain = {
-            addFunds: function(phoneNumber, amount) {
-                console.log(`Adding ${amount} to ${phoneNumber}`);
-                return true;
-            }
-        };
-
-        class PaymentGateway {
-            constructor() {
-                this.initialized = false;
-                this.pendingTransactions = new Map();
-                this.init();
-            }
-
-            init() {
-                this.initialized = true;
-                this.loadPendingTransactions();
-                console.log('✅ Payment gateway initialized');
-            }
-
-            loadPendingTransactions() {
-                try {
-                    const pending = localStorage.getItem('pending_payments');
-                    if (pending) {
-                        this.pendingTransactions = new Map(JSON.parse(pending));
-                    }
-                } catch (error) {
-                    console.error('Failed to load pending transactions:', error);
-                }
-            }
-
-            savePendingTransactions() {
-                try {
-                    localStorage.setItem('pending_payments', JSON.stringify(Array.from(this.pendingTransactions.entries())));
-                } catch (error) {
-                    console.error('Failed to save pending transactions:', error);
-                }
-            }
-
-            // Show payment methods - FIXED VERSION
-            showPaymentMethods(amount) {
-                console.log('showPaymentMethods called with amount:', amount);
-                
-                // Check if user is logged in
-                if (!window.app || !window.app.currentUser) {
-                    this.showNotification('Please login first', 'error');
-                    return false;
-                }
-
-                if (!amount || amount <= 0) {
-                    this.showNotification('Please enter a valid amount', 'error');
-                    return false;
-                }
-
-                if (amount < CONFIG.PAYMENTS.MIN_DEPOSIT) {
-                    this.showNotification(`Minimum deposit is $${CONFIG.PAYMENTS.MIN_DEPOSIT}`, 'error');
-                    return false;
-                }
-
-                if (amount > CONFIG.PAYMENTS.MAX_DEPOSIT) {
-                    this.showNotification(`Maximum deposit is $${CONFIG.PAYMENTS.MAX_DEPOSIT.toLocaleString()}`, 'error');
-                    return false;
-                }
-
-                this.createPaymentModal(amount);
-                return true;
-            }
-
-            // Create payment modal
-            createPaymentModal(amount) {
-                const modal = document.createElement('div');
-                modal.id = 'paymentModal';
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.8);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 10000;
-                `;
-
-                modal.innerHTML = `
-                    <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%;">
-                        <h2>💳 Deposit $${amount.toFixed(2)} USD</h2>
-                        <p style="text-align: center; margin: 15px 0; color: #666;">
-                            Add funds to your M-USD account: <strong>${window.app.currentUser.phone}</strong>
-                        </p>
-                        
-                        <div style="display: grid; gap: 12px; margin: 20px 0;">
-                            <button onclick="window.paymentGateway.processCardPayment(${amount})" 
-                                    style="background: #635bff; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 10px;">
-                                <span>💳</span> Credit/Debit Card
-                            </button>
-                            
-                            <button onclick="window.paymentGateway.processPayPal(${amount})" 
-                                    style="background: #0070ba; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 10px;">
-                                <span>📊</span> PayPal
-                            </button>
-                            
-                            <button onclick="window.paymentGateway.processBankTransfer(${amount})" 
-                                    style="background: #38a169; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 10px;">
-                                <span>🏦</span> Bank Transfer
-                            </button>
-                            
-                            <button onclick="window.paymentGateway.processCrypto(${amount})" 
-                                    style="background: #f59e0b; color: white; border: none; padding: 15px; border-radius: 10px; cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 10px;">
-                                <span>₿</span> Crypto
-                            </button>
-                        </div>
-                        
-                        <div style="background: #f8f9fa; padding: 15px; border-radius: 8px; margin: 15px 0;">
-                            <p style="margin: 0; font-size: 14px; color: #666;">
-                                💰 <strong>Instant processing</strong> for card and PayPal. Bank transfers take 1-2 business days.
-                            </p>
-                        </div>
-                        
-                        <button onclick="window.paymentGateway.closeModal()" 
-                                style="background: #718096; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; width: 100%;">
-                            Cancel
-                        </button>
-                    </div>
-                `;
-
-                document.body.appendChild(modal);
-            }
-
-            // Process card payment
-            async processCardPayment(amount) {
-                this.showProcessingModal('Card Payment', amount);
-                
-                setTimeout(() => {
-                    this.closeModal();
-                    this.showCardPaymentForm(amount);
-                }, 1000);
-            }
-
-            // Show card payment form
-            showCardPaymentForm(amount) {
-                const modal = document.createElement('div');
-                modal.id = 'cardPaymentModal';
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.8);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 10001;
-                `;
-
-                modal.innerHTML = `
-                    <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%;">
-                        <h2>💳 Card Payment - $${amount.toFixed(2)}</h2>
-                        
-                        <div style="margin: 20px 0;">
-                            <div style="margin-bottom: 15px;">
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Card Number</label>
-                                <input type="text" id="cardNumber" placeholder="1234 5678 9012 3456" 
-                                       style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 16px;"
-                                       maxlength="19">
-                            </div>
-                            
-                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                                <div>
-                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">Expiry Date</label>
-                                    <input type="text" id="expiryDate" placeholder="MM/YY" 
-                                           style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;"
-                                           maxlength="5">
-                                </div>
-                                <div>
-                                    <label style="display: block; margin-bottom: 5px; font-weight: bold;">CVV</label>
-                                    <input type="text" id="cvv" placeholder="123" 
-                                           style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;"
-                                           maxlength="4">
-                                </div>
-                            </div>
-                            
-                            <div style="margin-top: 15px;">
-                                <label style="display: block; margin-bottom: 5px; font-weight: bold;">Name on Card</label>
-                                <input type="text" id="cardName" placeholder="John Doe" 
-                                       style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px;">
-                            </div>
-                        </div>
-                        
-                        <button onclick="window.paymentGateway.submitCardPayment(${amount})" 
-                                style="background: #48bb78; color: white; border: none; padding: 15px; border-radius: 8px; cursor: pointer; width: 100%; font-size: 16px; font-weight: bold;">
-                            Pay $${amount.toFixed(2)}
-                        </button>
-                        
-                        <button onclick="window.paymentGateway.closeModal()" 
-                                style="background: none; border: none; color: #718096; padding: 10px; cursor: pointer; width: 100%; margin-top: 10px;">
-                            ← Back
-                        </button>
-                    </div>
-                `;
-
-                document.body.appendChild(modal);
-                
-                // Add input formatting
-                const cardNumberInput = document.getElementById('cardNumber');
-                if (cardNumberInput) {
-                    cardNumberInput.addEventListener('input', function(e) {
-                        let value = e.target.value.replace(/\s+/g, '').replace(/[^0-9]/gi, '');
-                        let matches = value.match(/\d{4,16}/g);
-                        let match = matches && matches[0] || '';
-                        let parts = [];
-                        for (let i = 0; i < match.length; i += 4) {
-                            parts.push(match.substring(i, i + 4));
-                        }
-                        if (parts.length) {
-                            e.target.value = parts.join(' ');
-                        } else {
-                            e.target.value = value;
-                        }
-                    });
-                }
-
-                // Format expiry date input
-                const expiryInput = document.getElementById('expiryDate');
-                if (expiryInput) {
-                    expiryInput.addEventListener('input', function(e) {
-                        let value = e.target.value.replace(/\D/g, '');
-                        if (value.length >= 2) {
-                            e.target.value = value.substring(0, 2) + '/' + value.substring(2, 4);
-                        }
-                    });
-                }
-            }
-
-            // Submit card payment
-            async submitCardPayment(amount) {
-                const cardNumber = document.getElementById('cardNumber')?.value || '';
-                const expiryDate = document.getElementById('expiryDate')?.value || '';
-                const cvv = document.getElementById('cvv')?.value || '';
-                const cardName = document.getElementById('cardName')?.value || '';
-
-                // Basic validation
-                if (!cardNumber || !expiryDate || !cvv || !cardName) {
-                    this.showNotification('Please fill all card details', 'error');
-                    return;
-                }
-
-                this.showProcessingModal('Processing Payment', amount);
-
-                // Simulate payment processing
-                setTimeout(() => {
-                    this.completePayment(amount, 'credit_card');
-                }, 3000);
-            }
-
-            // Process PayPal
-            async processPayPal(amount) {
-                this.showProcessingModal('PayPal', amount);
-                
-                setTimeout(() => {
-                    this.closeModal();
-                    this.showPayPalApproval(amount);
-                }, 1500);
-            }
-
-            // Show PayPal approval
-            showPayPalApproval(amount) {
-                const modal = document.createElement('div');
-                modal.id = 'paypalModal';
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.8);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 10001;
-                `;
-
-                modal.innerHTML = `
-                    <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; text-align: center;">
-                        <h2>📊 PayPal Payment</h2>
-                        <div style="font-size: 1.5em; margin: 20px 0; color: #0070ba;">
-                            $${amount.toFixed(2)} USD
-                        </div>
-                        <p>You will be redirected to PayPal to complete your payment.</p>
-                        
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                            <p style="margin: 0;">Click "Confirm Payment" to simulate successful PayPal payment.</p>
-                        </div>
-                        
-                        <button onclick="window.paymentGateway.completePayment(${amount}, 'paypal')" 
-                                style="background: #0070ba; color: white; border: none; padding: 15px 30px; border-radius: 8px; cursor: pointer; font-size: 16px; margin: 10px;">
-                            ✅ Confirm Payment
-                        </button>
-                        
-                        <br>
-                        
-                        <button onclick="window.paymentGateway.closeModal()" 
-                                style="background: #718096; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer;">
-                            Cancel
-                        </button>
-                    </div>
-                `;
-
-                document.body.appendChild(modal);
-            }
-
-            // Process bank transfer
-            async processBankTransfer(amount) {
-                this.closeModal();
-                this.showBankDetails(amount);
-            }
-
-            // Show bank details
-            showBankDetails(amount) {
-                const modal = document.createElement('div');
-                modal.id = 'bankModal';
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.8);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 10000;
-                `;
-
-                const reference = `MUSD${window.app.currentUser.phone.replace(/\D/g, '')}${Date.now()}`.substring(0, 16);
-
-                modal.innerHTML = `
-                    <div style="background: white; padding: 30px; border-radius: 15px; max-width: 600px; width: 90%;">
-                        <h2>🏦 Bank Transfer</h2>
-                        <p style="text-align: center; margin-bottom: 20px;">
-                            Send <strong>$${amount.toFixed(2)} USD</strong> using the details below:
-                        </p>
-                        
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0; font-family: monospace;">
-                            <div style="margin-bottom: 10px;"><strong>Bank Name:</strong> M-USD Trust Bank</div>
-                            <div style="margin-bottom: 10px;"><strong>Account Name:</strong> M-USD Payments Inc.</div>
-                            <div style="margin-bottom: 10px;"><strong>Account Number:</strong> 880123456789</div>
-                            <div style="margin-bottom: 10px;"><strong>Routing Number:</strong> 021000021</div>
-                            <div style="margin-bottom: 10px;"><strong>SWIFT/BIC:</strong> MUSBUS33</div>
-                            <div style="margin-bottom: 10px;"><strong>Reference:</strong> ${reference}</div>
-                            <div style="margin-bottom: 10px;"><strong>Amount:</strong> $${amount.toFixed(2)} USD</div>
-                        </div>
-                        
-                        <div style="background: #e6fffa; padding: 15px; border-radius: 8px; margin: 15px 0;">
-                            <p style="margin: 0; color: #234e52;">
-                                💡 <strong>Important:</strong> Include the reference number exactly as shown above. 
-                                Funds will be added to your account within 1-2 business days.
-                            </p>
-                        </div>
-                        
-                        <button onclick="window.paymentGateway.recordBankTransfer(${amount}, '${reference}')" 
-                                style="background: #38a169; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; width: 100%;">
-                            ✅ I've Sent the Transfer
-                        </button>
-                        
-                        <button onclick="window.paymentGateway.closeModal()" 
-                                style="background: #718096; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 10px;">
-                            Close
-                        </button>
-                    </div>
-                `;
-
-                document.body.appendChild(modal);
-            }
-
-            // Process crypto
-            async processCrypto(amount) {
-                this.closeModal();
-                this.showCryptoDetails(amount);
-            }
-
-            // Show crypto details
-            showCryptoDetails(amount) {
-                const modal = document.createElement('div');
-                modal.id = 'cryptoModal';
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.8);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 10000;
-                `;
-
-                modal.innerHTML = `
-                    <div style="background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; text-align: center;">
-                        <h2>₿ Crypto Payment</h2>
-                        <p>Send cryptocurrency equivalent to <strong>$${amount.toFixed(2)} USD</strong></p>
-                        
-                        <div style="background: #f8f9fa; padding: 20px; border-radius: 10px; margin: 20px 0;">
-                            <div style="margin-bottom: 15px;">
-                                <strong>Bitcoin (BTC):</strong><br>
-                                <code style="background: white; padding: 10px; border-radius: 5px; display: inline-block; margin: 5px 0; font-size: 12px;">
-                                    bc1qxy2kgdygjrsqtzq2n0yrf2493p83kkfjhx0wlh
-                                </code>
-                            </div>
-                            <div style="margin-bottom: 15px;">
-                                <strong>Ethereum (ETH):</strong><br>
-                                <code style="background: white; padding: 10px; border-radius: 5px; display: inline-block; margin: 5px 0; font-size: 12px;">
-                                    0x71C7656EC7ab88b098defB751B7401B5f6d8976F
-                                </code>
-                            </div>
-                            <div>
-                                <strong>USDT (ERC-20):</strong><br>
-                                <code style="background: white; padding: 10px; border-radius: 5px; display: inline-block; margin: 5px 0; font-size: 12px;">
-                                    0x71C7656EC7ab88b098defB751B7401B5f6d8976F
-                                </code>
-                            </div>
-                        </div>
-                        
-                        <p style="color: #666; font-size: 14px;">
-                            Funds will be added automatically after 3 network confirmations.
-                        </p>
-                        
-                        <button onclick="window.paymentGateway.recordCryptoPayment(${amount})" 
-                                style="background: #f59e0b; color: white; border: none; padding: 12px 20px; border-radius: 8px; cursor: pointer; width: 100%;">
-                            ✅ I've Sent Crypto
-                        </button>
-                        
-                        <button onclick="window.paymentGateway.closeModal()" 
-                                style="background: #718096; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; width: 100%; margin-top: 10px;">
-                            Close
-                        </button>
-                    </div>
-                `;
-
-                document.body.appendChild(modal);
-            }
-
-            // Complete payment - FIXED VERSION
-            completePayment(amount, method) {
-                try {
-                    if (!window.app || !window.app.currentUser) {
-                        throw new Error('User not logged in');
-                    }
-
-                    // Use the global callback function
-                    if (window.completePaymentGatewayTransaction) {
-                        // Close modal first
-                        this.closeModal();
-                        
-                        // Show success message
-                        this.showSuccessMessage(amount, method);
-                        
-                        // Call the main app's completion function
-                        setTimeout(() => {
-                            window.completePaymentGatewayTransaction(amount, method);
-                        }, 2000);
-                        
-                    } else {
-                        throw new Error('Payment system not available');
-                    }
-                    
-                } catch (error) {
-                    console.error('Payment error:', error);
-                    this.showNotification('Payment failed: ' + error.message, 'error');
-                    this.closeModal();
-                }
-            }
-
-            // Record bank transfer
-            recordBankTransfer(amount, reference) {
-                this.recordTransaction(amount, 'bank_transfer', 'pending', reference);
-                this.closeModal();
-                this.showNotification('Bank transfer recorded! We will notify you when funds are available.', 'success');
-            }
-
-            // Record crypto payment
-            recordCryptoPayment(amount) {
-                this.recordTransaction(amount, 'crypto', 'pending');
-                this.closeModal();
-                this.showNotification('Crypto payment recorded! Funds will be added after confirmation.', 'success');
-            }
-
-            // Record transaction
-            recordTransaction(amount, method, status, reference = '') {
-                const transaction = {
-                    id: 'PAY_' + Date.now(),
-                    phoneNumber: window.app.currentUser.phone,
-                    amount: amount,
-                    method: method,
-                    status: status,
-                    reference: reference,
-                    timestamp: new Date().toISOString()
-                };
-                
-                // Store in pending transactions if not completed
-                if (status === 'pending') {
-                    this.pendingTransactions.set(transaction.id, transaction);
-                    this.savePendingTransactions();
-                } else {
-                    // Remove from pending if completed
-                    this.pendingTransactions.delete(transaction.id);
-                    this.savePendingTransactions();
-                }
-                
-                // Also save to main transaction history
-                const transactions = JSON.parse(localStorage.getItem('payment_transactions') || '[]');
-                transactions.push(transaction);
-                localStorage.setItem('payment_transactions', JSON.stringify(transactions));
-                
-                return transaction;
-            }
-
-            // Show processing modal
-            showProcessingModal(method, amount) {
-                const modal = document.createElement('div');
-                modal.id = 'processingModal';
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.8);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 10002;
-                `;
-
-                modal.innerHTML = `
-                    <div style="background: white; padding: 40px; border-radius: 15px; max-width: 400px; width: 90%; text-align: center;">
-                        <div style="font-size: 3em; margin-bottom: 20px;">⏳</div>
-                        <h3>Processing ${method} Payment</h3>
-                        <p>Please wait while we process your payment of <strong>$${amount.toFixed(2)}</strong></p>
-                        <div style="margin: 20px 0;">
-                            <div style="height: 4px; background: #e2e8f0; border-radius: 2px; overflow: hidden;">
-                                <div style="height: 100%; background: #48bb78; width: 60%; animation: pulse 1.5s infinite;"></div>
-                            </div>
-                        </div>
-                        <p style="color: #666; font-size: 14px;">Do not close this window...</p>
-                    </div>
-                `;
-
-                document.body.appendChild(modal);
-            }
-
-            // Show success message
-            showSuccessMessage(amount, method) {
-                const modal = document.createElement('div');
-                modal.id = 'successModal';
-                modal.style.cssText = `
-                    position: fixed;
-                    top: 0;
-                    left: 0;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(0,0,0,0.8);
-                    display: flex;
-                    justify-content: center;
-                    align-items: center;
-                    z-index: 10002;
-                `;
-
-                modal.innerHTML = `
-                    <div style="background: white; padding: 40px; border-radius: 15px; max-width: 400px; width: 90%; text-align: center;">
-                        <div style="font-size: 4em; margin-bottom: 20px;">🎉</div>
-                        <h3 style="color: #38a169;">Payment Successful!</h3>
-                        <p>You have successfully deposited <strong>$${amount.toFixed(2)} USD</strong></p>
-                        <p style="color: #666; margin: 10px 0;">via ${method.replace('_', ' ').toUpperCase()}</p>
-                        
-                        <div style="background: #f0fff4; padding: 15px; border-radius: 8px; margin: 20px 0;">
-                            <p style="margin: 0; color: #234e52;">
-                                💰 Funds are now available in your M-USD account
-                            </p>
-                        </div>
-                        
-                        <button onclick="window.paymentGateway.closeAllModals()" 
-                                style="background: #48bb78; color: white; border: none; padding: 12px 30px; border-radius: 8px; cursor: pointer; font-size: 16px;">
-                            Continue
-                        </button>
-                    </div>
-                `;
-
-                document.body.appendChild(modal);
-            }
-
-            // Close modal
-            closeModal() {
-                const modals = ['paymentModal', 'cardPaymentModal', 'paypalModal', 'bankModal', 'cryptoModal', 'processingModal'];
-                modals.forEach(id => {
-                    const modal = document.getElementById(id);
-                    if (modal) modal.remove();
-                });
-            }
-
-            // Close all modals
-            closeAllModals() {
-                const modals = document.querySelectorAll('[id$="Modal"]');
-                modals.forEach(modal => modal.remove());
-            }
-
-            // Show notification
-            showNotification(message, type = 'success') {
-                if (window.app && window.app.showNotification) {
-                    window.app.showNotification(message, type);
-                } else {
-                    alert(message);
-                }
-            }
-        }
-
-        // Create global instance
-        window.paymentGateway = new PaymentGateway();
-        console.log('Payment gateway loaded successfully');
-    </script>
-
-    <!-- Main App Script -->
-    <script type="module">
-        // Import Firebase modules for Realtime Database
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-        import { getDatabase, ref, set, get, push, update, query, orderByChild, onValue } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
-
-        // Your Firebase configuration
-        const firebaseConfig = {
-            apiKey: "AIzaSyDfP7BSZB7kufh4yrSdpDn14kIdbF9SJdc",
-            authDomain: "m-usd-e3555.firebaseapp.com",
-            databaseURL: "https://m-usd-e3555-default-rtdb.firebaseio.com",
-            projectId: "m-usd-e3555",
-            storageBucket: "m-usd-e3555.firebasestorage.app",
-            messagingSenderId: "966918203590",
-            appId: "1:966918203590:web:b19913384b906a472d0fc7",
-            measurementId: "G-Y3X5T8GSNC"
-        };
-
-        // Initialize Firebase
-        const app = initializeApp(firebaseConfig);
-        const database = getDatabase(app);
-
-        // Data Storage
-        let users = [];
-        let transactions = [];
-        let currentUser = null;
-
-        // DOM Elements
-        const authScreen = document.getElementById('auth-screen');
-        const dashboardScreen = document.getElementById('dashboard-screen');
-        const depositScreen = document.getElementById('deposit-screen');
-        const sendMoneyScreen = document.getElementById('send-money-screen');
-        const transactionsScreen = document.getElementById('transactions-screen');
-        const adminPanel = document.getElementById('admin-panel');
-        const loadingScreen = document.getElementById('loading-screen');
-        
-        const loginTab = document.getElementById('login-tab');
-        const registerTab = document.getElementById('register-tab');
-        const loginForm = document.getElementById('login-form');
-        const registerForm = document.getElementById('register-form');
-        
-        const loginBtn = document.getElementById('login-btn');
-        const registerBtn = document.getElementById('register-btn');
-        const logoutBtn = document.getElementById('logout-btn');
-        
-        const depositBtn = document.getElementById('deposit-btn');
-        const sendMoneyBtn = document.getElementById('send-money-btn');
-        const transactionsBtn = document.getElementById('transactions-btn');
-        const adminBtn = document.getElementById('admin-btn');
-        
-        const confirmDeposit = document.getElementById('confirm-deposit');
-        const backFromDeposit = document.getElementById('back-from-deposit');
-        
-        const confirmSend = document.getElementById('confirm-send');
-        const backFromSend = document.getElementById('back-from-send');
-        
-        const backFromTransactions = document.getElementById('back-from-transactions');
-        const backFromAdmin = document.getElementById('back-from-admin');
-        
-        const userBalance = document.getElementById('user-balance');
-        const userPhone = document.getElementById('user-phone');
-        const transactionsList = document.getElementById('transactions-list');
-        const usersList = document.getElementById('users-list');
-        const adminTransactionsList = document.getElementById('admin-transactions-list');
-        
-        const sendAmount = document.getElementById('send-amount');
-        const recipientPhone = document.getElementById('recipient-phone');
-        const transactionFee = document.getElementById('transaction-fee');
-        const totalDeducted = document.getElementById('total-deducted');
-        
-        const notification = document.getElementById('notification');
-
-        // Event Listeners
-        loginTab.addEventListener('click', () => {
-            loginTab.classList.add('active');
-            registerTab.classList.remove('active');
-            loginForm.classList.remove('hidden');
-            registerForm.classList.add('hidden');
-        });
-
-        registerTab.addEventListener('click', () => {
-            registerTab.classList.add('active');
-            loginTab.classList.remove('active');
-            registerForm.classList.remove('hidden');
-            loginForm.classList.add('hidden');
-        });
-
-        loginBtn.addEventListener('click', handleLogin);
-        registerBtn.addEventListener('click', handleRegister);
-        logoutBtn.addEventListener('click', handleLogout);
-
-        depositBtn.addEventListener('click', showDepositScreen);
-        sendMoneyBtn.addEventListener('click', showSendMoneyScreen);
-        transactionsBtn.addEventListener('click', showTransactionsScreen);
-        adminBtn.addEventListener('click', showAdminPanel);
-
-        confirmDeposit.addEventListener('click', handleDeposit);
-        backFromDeposit.addEventListener('click', () => showScreen(dashboardScreen));
-
-        confirmSend.addEventListener('click', handleSendMoney);
-        backFromSend.addEventListener('click', () => showScreen(dashboardScreen));
-
-        backFromTransactions.addEventListener('click', () => showScreen(dashboardScreen));
-        backFromAdmin.addEventListener('click', () => showScreen(dashboardScreen));
-
-        sendAmount.addEventListener('input', updateTransactionDetails);
-        recipientPhone.addEventListener('input', updateTransactionDetails);
-
-        // Firebase Realtime Database Functions
-        async function loadUsers() {
-            try {
-                const usersRef = ref(database, 'users');
-                const snapshot = await get(usersRef);
-                users = [];
-                if (snapshot.exists()) {
-                    const usersData = snapshot.val();
-                    Object.keys(usersData).forEach(key => {
-                        users.push({ id: key, ...usersData[key] });
-                    });
-                }
-                console.log('Loaded users:', users.length);
-                return users;
-            } catch (error) {
-                console.error("Error loading users:", error);
-                showNotification('Error loading users', 'error');
-                return [];
-            }
-        }
-
-        async function loadTransactions() {
-            try {
-                const transactionsRef = ref(database, 'transactions');
-                const snapshot = await get(transactionsRef);
-                transactions = [];
-                if (snapshot.exists()) {
-                    const transactionsData = snapshot.val();
-                    Object.keys(transactionsData).forEach(key => {
-                        transactions.push({ id: key, ...transactionsData[key] });
-                    });
-                    // Sort by date descending
-                    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-                }
-                console.log('Loaded transactions:', transactions.length);
-                return transactions;
-            } catch (error) {
-                console.error("Error loading transactions:", error);
-                showNotification('Error loading transactions', 'error');
-                return [];
-            }
-        }
-
-        async function saveUser(user) {
-            try {
-                if (user.id) {
-                    // Update existing user
-                    const userRef = ref(database, 'users/' + user.id);
-                    await update(userRef, user);
-                } else {
-                    // Add new user
-                    const usersRef = ref(database, 'users');
-                    const newUserRef = push(usersRef);
-                    user.id = newUserRef.key;
-                    await set(newUserRef, user);
-                }
-                return user;
-            } catch (error) {
-                console.error("Error saving user:", error);
-                showNotification('Error saving user data', 'error');
-                return null;
-            }
-        }
-
-        async function saveTransaction(transaction) {
-            try {
-                const transactionsRef = ref(database, 'transactions');
-                const newTransactionRef = push(transactionsRef);
-                transaction.id = newTransactionRef.key;
-                await set(newTransactionRef, transaction);
-                return transaction;
-            } catch (error) {
-                console.error("Error saving transaction:", error);
-                showNotification('Error saving transaction', 'error');
-                return null;
-            }
-        }
-
-        // App Functions
-        function showNotification(message, type = 'info') {
-            notification.textContent = message;
-            notification.className = `notification ${type} show`;
-            
-            setTimeout(() => {
-                notification.classList.remove('show');
-            }, 3000);
-        }
-
-        function showScreen(screen) {
-            authScreen.classList.add('hidden');
-            dashboardScreen.classList.add('hidden');
-            depositScreen.classList.add('hidden');
-            sendMoneyScreen.classList.add('hidden');
-            transactionsScreen.classList.add('hidden');
-            adminPanel.classList.add('hidden');
-            loadingScreen.classList.add('hidden');
-            
-            screen.classList.remove('hidden');
-        }
-
-        function showLoading() {
-            authScreen.classList.add('hidden');
-            dashboardScreen.classList.add('hidden');
-            depositScreen.classList.add('hidden');
-            sendMoneyScreen.classList.add('hidden');
-            transactionsScreen.classList.add('hidden');
-            adminPanel.classList.add('hidden');
-            loadingScreen.classList.remove('hidden');
-        }
-
-        async function handleLogin() {
-            const phone = document.getElementById('login-phone').value;
-            const pin = document.getElementById('login-pin').value;
-            
-            if (!phone || !pin) {
-                showNotification('Please enter phone number and PIN', 'error');
-                return;
-            }
-            
-            showLoading();
-            
-            try {
-                await loadUsers();
-                const user = users.find(u => u.phone === phone && u.pin === pin);
-                
-                if (!user) {
-                    showNotification('Invalid phone number or PIN', 'error');
-                    showScreen(authScreen);
-                    return;
-                }
-                
-                if (user.isSuspended) {
-                    showNotification('Your account has been suspended. Contact support.', 'error');
-                    showScreen(authScreen);
-                    return;
-                }
-                
-                if (user.isBlocked) {
-                    showNotification('Your account has been blocked. Contact support.', 'error');
-                    showScreen(authScreen);
-                    return;
-                }
-                
-                currentUser = user;
-                // Set the global app user for payment gateway
-                window.app.setCurrentUser(user);
-                updateDashboard();
-                showScreen(dashboardScreen);
-                showNotification('Login successful!', 'success');
-            } catch (error) {
-                console.error("Login error:", error);
-                showNotification('Login failed. Please try again.', 'error');
-                showScreen(authScreen);
-            }
-        }
-
-        async function handleRegister() {
-            const phone = document.getElementById('register-phone').value;
-            const pin = document.getElementById('register-pin').value;
-            const confirmPin = document.getElementById('confirm-pin').value;
-            
-            if (!phone || !pin || !confirmPin) {
-                showNotification('Please fill all fields', 'error');
-                return;
-            }
-            
-            if (pin !== confirmPin) {
-                showNotification('PINs do not match', 'error');
-                return;
-            }
-            
-            if (pin.length !== 4) {
-                showNotification('PIN must be 4 digits', 'error');
-                return;
-            }
-            
-            showLoading();
-            
-            try {
-                await loadUsers();
-                
-                if (users.find(u => u.phone === phone)) {
-                    showNotification('Phone number already registered', 'error');
-                    showScreen(authScreen);
-                    return;
-                }
-                
-                const newUser = {
-                    phone,
-                    pin,
-                    balance: 0,
-                    isAdmin: false,
-                    isSuspended: false,
-                    isBlocked: false,
-                    dateCreated: new Date().toISOString()
-                };
-                
-                const savedUser = await saveUser(newUser);
-                if (savedUser) {
-                    users.push(savedUser);
-                    showNotification('Registration successful! Please login.', 'success');
-                    loginTab.click();
-                    showScreen(authScreen);
-                    
-                    // Clear form
-                    document.getElementById('register-phone').value = '';
-                    document.getElementById('register-pin').value = '';
-                    document.getElementById('confirm-pin').value = '';
-                }
-            } catch (error) {
-                console.error("Registration error:", error);
-                showNotification('Registration failed. Please try again.', 'error');
-                showScreen(authScreen);
-            }
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            window.app.setCurrentUser(null);
-            showScreen(authScreen);
-            showNotification('Logged out successfully', 'info');
-        }
-
-        function updateDashboard() {
-            if (!currentUser) return;
-            
-            userBalance.textContent = `USD ${currentUser.balance.toFixed(2)}`;
-            userPhone.textContent = currentUser.phone;
-            
-            // Only show admin button for admin users
-            adminBtn.style.display = currentUser.isAdmin ? 'block' : 'none';
-        }
-
-        function showDepositScreen() {
-            showScreen(depositScreen);
-            document.getElementById('deposit-amount').value = '';
-        }
-
-        async function handleDeposit() {
-            const amount = parseFloat(document.getElementById('deposit-amount').value);
-            
-            if (!amount || amount <= 0) {
-                showNotification('Please enter a valid amount', 'error');
-                return;
-            }
-            
-            if (amount < 5) {
-                showNotification('Minimum deposit is $5.00', 'error');
-                return;
-            }
-            
-            if (amount > 10000) {
-                showNotification('Maximum deposit is $10,000.00', 'error');
-                return;
-            }
-            
-            // Use the payment gateway
-            if (window.paymentGateway && window.paymentGateway.showPaymentMethods) {
-                console.log('Payment gateway available, showing methods...');
-                const success = window.paymentGateway.showPaymentMethods(amount);
-                if (!success) {
-                    showNotification('Please login first', 'error');
-                }
-            } else {
-                console.log('Payment gateway not available');
-                showNotification('Payment gateway not available. Please refresh the page.', 'error');
-            }
-        }
-
-        // Payment Gateway Integration Function
-        window.completePaymentGatewayTransaction = async function(amount, method) {
-            showLoading();
-            
-            try {
-                // Update user balance
-                currentUser.balance += amount;
-                
-                // Save updated user
-                await saveUser(currentUser);
-                
-                // Record transaction
-                const transaction = {
-                    from: 'DEPOSIT',
-                    to: currentUser.phone,
-                    amount: amount,
-                    fee: 0,
-                    type: 'deposit',
-                    method: method,
-                    date: new Date().toISOString()
-                };
-                
-                await saveTransaction(transaction);
-                
-                // Reload data
-                await loadUsers();
-                await loadTransactions();
-                
-                // Update current user reference
-                currentUser = users.find(u => u.id === currentUser.id);
-                window.app.setCurrentUser(currentUser);
-                
-                updateDashboard();
-                showScreen(dashboardScreen);
-                showNotification(`Deposit of USD ${amount.toFixed(2)} successful!`, 'success');
-            } catch (error) {
-                console.error("Deposit error:", error);
-                showNotification('Deposit failed. Please try again.', 'error');
-                showScreen(dashboardScreen);
-            }
-        }
-
-        function showSendMoneyScreen() {
-            showScreen(sendMoneyScreen);
-            document.getElementById('recipient-phone').value = '';
-            document.getElementById('send-amount').value = '';
-            updateTransactionDetails();
-        }
-
-        function updateTransactionDetails() {
-            const amount = parseFloat(sendAmount.value) || 0;
-            const fee = amount * 0.01; // 1% transaction fee
-            const total = amount + fee;
-            
-            transactionFee.textContent = `USD ${fee.toFixed(2)}`;
-            totalDeducted.textContent = `USD ${total.toFixed(2)}`;
-        }
-
-        async function handleSendMoney() {
-            const recipient = document.getElementById('recipient-phone').value;
-            const amount = parseFloat(document.getElementById('send-amount').value);
-            
-            if (!recipient || !amount || amount <= 0) {
-                showNotification('Please enter valid recipient and amount', 'error');
-                return;
-            }
-            
-            if (recipient === currentUser.phone) {
-                showNotification('Cannot send money to yourself', 'error');
-                return;
-            }
-            
-            showLoading();
-            
-            try {
-                await loadUsers();
-                const recipientUser = users.find(u => u.phone === recipient);
-                
-                if (!recipientUser) {
-                    showNotification('Recipient not found', 'error');
-                    showScreen(dashboardScreen);
-                    return;
-                }
-                
-                if (recipientUser.isSuspended || recipientUser.isBlocked) {
-                    showNotification('Recipient account is not active', 'error');
-                    showScreen(dashboardScreen);
-                    return;
-                }
-                
-                const fee = amount * 0.01; // 1% transaction fee
-                const total = amount + fee;
-                
-                if (currentUser.balance < total) {
-                    showNotification('Insufficient balance', 'error');
-                    showScreen(dashboardScreen);
-                    return;
-                }
-                
-                // Update balances
-                currentUser.balance -= total;
-                recipientUser.balance += amount;
-                
-                // Add fee to admin account
-                const adminUser = users.find(u => u.isAdmin);
-                if (adminUser) {
-                    adminUser.balance += fee;
-                    await saveUser(adminUser);
-                }
-                
-                // Save updated users
-                await saveUser(currentUser);
-                await saveUser(recipientUser);
-                
-                // Record transaction
-                const transaction = {
-                    from: currentUser.phone,
-                    to: recipient,
-                    amount: amount,
-                    fee: fee,
-                    type: 'send',
-                    date: new Date().toISOString()
-                };
-                
-                await saveTransaction(transaction);
-                
-                // Reload data
-                await loadUsers();
-                await loadTransactions();
-                
-                // Update current user reference
-                currentUser = users.find(u => u.id === currentUser.id);
-                window.app.setCurrentUser(currentUser);
-                
-                updateDashboard();
-                showScreen(dashboardScreen);
-                showNotification(`Sent USD ${amount.toFixed(2)} to ${recipient}`, 'success');
-            } catch (error) {
-                console.error("Send money error:", error);
-                showNotification('Transaction failed. Please try again.', 'error');
-                showScreen(dashboardScreen);
-            }
-        }
-
-        async function showTransactionsScreen() {
-            showScreen(transactionsScreen);
-            await displayUserTransactions();
-        }
-
-        async function displayUserTransactions() {
-            if (!currentUser) return;
-            
-            await loadTransactions();
-            
-            const userTransactions = transactions.filter(
-                t => t.from === currentUser.phone || t.to === currentUser.phone
-            );
-            
-            transactionsList.innerHTML = '';
-            
-            if (userTransactions.length === 0) {
-                transactionsList.innerHTML = '<p class="no-transactions">No transactions found</p>';
-                return;
-            }
-            
-            userTransactions.forEach(transaction => {
-                const transactionEl = document.createElement('div');
-                transactionEl.className = 'transaction-item';
-                
-                const isSent = transaction.from === currentUser.phone;
-                const amountClass = isSent ? 'transaction-negative' : 'transaction-positive';
-                const amountPrefix = isSent ? '-' : '+';
-                const typeText = isSent ? 'Sent' : 'Received';
-                
-                transactionEl.innerHTML = `
-                    <div class="transaction-details">
-                        <div class="transaction-type">${typeText} ${isSent ? `to ${transaction.to}` : `from ${transaction.from}`}</div>
-                        <div class="transaction-date">${new Date(transaction.date).toLocaleString()}</div>
-                        ${transaction.fee > 0 ? `<div class="transaction-fee">Fee: USD ${transaction.fee.toFixed(2)}</div>` : ''}
-                        <div class="transaction-method">${transaction.method ? `Method: ${transaction.method}` : ''}</div>
-                    </div>
-                    <div class="transaction-amount ${amountClass}">
-                        ${amountPrefix}USD ${transaction.amount.toFixed(2)}
-                    </div>
-                `;
-                
-                transactionsList.appendChild(transactionEl);
-            });
-        }
-
-        async function showAdminPanel() {
-            if (!currentUser || !currentUser.isAdmin) {
-                showNotification('Access denied', 'error');
-                return;
-            }
-            
-            showScreen(adminPanel);
-            await displayAllUsers();
-            await displayAllTransactions();
-        }
-
-        async function displayAllUsers() {
-            await loadUsers();
-            usersList.innerHTML = '';
-            
-            if (users.length === 0) {
-                usersList.innerHTML = '<p class="no-users">No users found</p>';
-                return;
-            }
-            
-            users.forEach(user => {
-                // Skip showing the admin user in the list to avoid self-management
-                if (user.isAdmin && user.phone === currentUser.phone) return;
-                
-                const userEl = document.createElement('div');
-                userEl.className = 'user-item';
-                
-                let statusClass = 'status-active';
-                let statusText = 'Active';
-                
-                if (user.isBlocked) {
-                    statusClass = 'status-blocked';
-                    statusText = 'Blocked';
-                } else if (user.isSuspended) {
-                    statusClass = 'status-suspended';
-                    statusText = 'Suspended';
-                }
-                
-                userEl.innerHTML = `
-                    <div class="user-info">
-                        <div class="user-phone"><strong>${user.phone}</strong></div>
-                        <div class="user-balance">Balance: USD ${user.balance.toFixed(2)}</div>
-                        <div class="user-registered">Registered: ${new Date(user.dateCreated).toLocaleDateString()}</div>
-                    </div>
-                    <div class="user-controls">
-                        <span class="status-badge ${statusClass}">${statusText}</span>
-                        <div class="user-actions">
-                            <button class="action-btn suspend" data-phone="${user.phone}">${user.isSuspended ? 'Activate' : 'Suspend'}</button>
-                            <button class="action-btn block" data-phone="${user.phone}">${user.isBlocked ? 'Unblock' : 'Block'}</button>
-                            <button class="action-btn recover" data-phone="${user.phone}">Recover Funds</button>
-                        </div>
-                    </div>
-                `;
-                
-                usersList.appendChild(userEl);
-            });
-            
-            // Add event listeners to action buttons
-            setTimeout(() => {
-                document.querySelectorAll('.action-btn.suspend').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        handleSuspendUser(btn.dataset.phone);
-                    });
-                });
-                
-                document.querySelectorAll('.action-btn.block').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        handleBlockUser(btn.dataset.phone);
-                    });
-                });
-                
-                document.querySelectorAll('.action-btn.recover').forEach(btn => {
-                    btn.addEventListener('click', (e) => {
-                        e.stopPropagation();
-                        handleRecoverFunds(btn.dataset.phone);
-                    });
-                });
-            }, 100);
-        }
-
-        async function displayAllTransactions() {
-            await loadTransactions();
-            adminTransactionsList.innerHTML = '';
-            
-            if (transactions.length === 0) {
-                adminTransactionsList.innerHTML = '<p class="no-transactions">No transactions found</p>';
-                return;
-            }
-            
-            transactions.forEach(transaction => {
-                const transactionEl = document.createElement('div');
-                transactionEl.className = 'transaction-admin-item';
-                
-                transactionEl.innerHTML = `
-                    <div class="transaction-info">
-                        <div class="transaction-parties"><strong>From:</strong> ${transaction.from} <strong>→ To:</strong> ${transaction.to}</div>
-                        <div class="transaction-date"><strong>Date:</strong> ${new Date(transaction.date).toLocaleString()}</div>
-                        <div class="transaction-type"><strong>Type:</strong> ${transaction.type}</div>
-                        ${transaction.method ? `<div class="transaction-method"><strong>Method:</strong> ${transaction.method}</div>` : ''}
-                    </div>
-                    <div class="transaction-amounts">
-                        <div class="transaction-amount"><strong>Amount:</strong> USD ${transaction.amount.toFixed(2)}</div>
-                        ${transaction.fee > 0 ? `<div class="transaction-fee"><strong>Fee:</strong> USD ${transaction.fee.toFixed(2)}</div>` : ''}
-                    </div>
-                `;
-                
-                adminTransactionsList.appendChild(transactionEl);
-            });
-        }
-
-        async function handleSuspendUser(phone) {
-            const user = users.find(u => u.phone === phone);
-            if (user) {
-                user.isSuspended = !user.isSuspended;
-                user.isBlocked = false; // Can't be both suspended and blocked
-                await saveUser(user);
-                await displayAllUsers();
-                showNotification(`User ${user.isSuspended ? 'suspended' : 'activated'}`, 'info');
-            }
-        }
-
-        async function handleBlockUser(phone) {
-            const user = users.find(u => u.phone === phone);
-            if (user) {
-                user.isBlocked = !user.isBlocked;
-                user.isSuspended = false; // Can't be both suspended and blocked
-                await saveUser(user);
-                await displayAllUsers();
-                showNotification(`User ${user.isBlocked ? 'blocked' : 'activated'}`, 'info');
-            }
-        }
-
-        async function handleRecoverFunds(phone) {
-            const user = users.find(u => u.phone === phone);
-            if (user && user.balance > 0) {
-                const amount = user.balance;
-                
-                // Add to admin account
-                const adminUser = users.find(u => u.isAdmin);
-                if (adminUser) {
-                    adminUser.balance += amount;
-                    await saveUser(adminUser);
-                }
-                
-                // Record transaction
-                const transaction = {
-                    from: user.phone,
-                    to: 'ADMIN',
-                    amount: amount,
-                    fee: 0,
-                    type: 'recovery',
-                    date: new Date().toISOString()
-                };
-                
-                await saveTransaction(transaction);
-                
-                // Reset user balance
-                user.balance = 0;
-                await saveUser(user);
-                
-                await displayAllUsers();
-                await displayAllTransactions();
-                showNotification(`Recovered USD ${amount.toFixed(2)} from ${user.phone}`, 'success');
-            } else {
-                showNotification('No funds to recover', 'info');
-            }
-        }
-
-        // Make the app global for payment gateway access
-        window.app = {
-            currentUser: null,
-            updateDashboard: updateDashboard,
-            showNotification: showNotification,
-            
-            // This will be set when user logs in
-            setCurrentUser: function(user) {
-                this.currentUser = user;
-                currentUser = user; // Also set the local variable
-            }
-        };
-
-        // Initialize the app
-        document.addEventListener('DOMContentLoaded', async () => {
-            showScreen(authScreen);
-            
-            // Initialize admin account if not exists
-            try {
-                await loadUsers();
-                const adminExists = users.find(u => u.phone === '0700000000');
-                
-                if (!adminExists) {
-                    const adminAccount = {
-                        phone: '0700000000',
-                        pin: '0000',
-                        balance: 0,
-                        isAdmin: true,
-                        isSuspended: false,
-                        isBlocked: false,
-                        dateCreated: new Date().toISOString()
-                    };
-                    
-                    await saveUser(adminAccount);
-                    users.push(adminAccount);
-                    console.log('Admin account created');
-                } else {
-                    console.log('Admin account already exists');
-                }
-            } catch (error) {
-                console.error("Error initializing admin account:", error);
-            }
-        });
-    </script>
-
     <style>
-        /* Your existing CSS styles remain the same */
+        /* All the CSS styles remain exactly the same as before */
         * {
             margin: 0;
             padding: 0;
@@ -1699,7 +113,7 @@
         }
 
         .hidden {
-            display: none;
+            display: none !important;
         }
 
         .nav-tabs {
@@ -2080,6 +494,1964 @@
             border-bottom: 2px solid var(--primary);
             color: var(--primary);
         }
+
+        /* Crypto Trading Styles */
+        .portfolio-summary {
+            margin-bottom: 20px;
+        }
+
+        .portfolio-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .portfolio-card h3 {
+            margin-bottom: 15px;
+            font-size: 18px;
+        }
+
+        .portfolio-balance {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .total-value {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 20px;
+            font-weight: 700;
+        }
+
+        .breakdown {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+
+        .breakdown-item {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+        }
+
+        .crypto-holdings, .crypto-market {
+            margin-bottom: 20px;
+        }
+
+        .crypto-holdings h3, .crypto-market h3 {
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: var(--primary);
+        }
+
+        .search-bar {
+            margin-bottom: 15px;
+        }
+
+        .crypto-item, .holding-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #eee;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .crypto-info, .holding-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .crypto-icon, .holding-icon {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f0f2f5;
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .crypto-icon img, .holding-icon img {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .crypto-details, .holding-details {
+            flex: 1;
+        }
+
+        .crypto-name, .holding-name {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .crypto-symbol, .holding-symbol {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .crypto-price, .holding-quantity {
+            text-align: right;
+            margin-right: 10px;
+        }
+
+        .crypto-current, .holding-amount {
+            font-weight: 600;
+            margin-bottom: 2px;
+        }
+
+        .crypto-change, .holding-change {
+            font-size: 12px;
+        }
+
+        .positive {
+            color: var(--success);
+        }
+
+        .negative {
+            color: var(--danger);
+        }
+
+        .holding-value {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .crypto-actions {
+            display: flex;
+            gap: 5px;
+        }
+
+        .btn-trade {
+            padding: 6px 12px;
+            border: none;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-trade[data-action="buy"] {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .btn-trade[data-action="sell"] {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .no-crypto, .no-holdings {
+            text-align: center;
+            padding: 20px;
+            color: #666;
+            font-style: italic;
+        }
+
+        /* Crypto Modal Styles */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .close-modal {
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .modal-body {
+            padding: 20px;
+        }
+
+        .crypto-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+        }
+
+        .crypto-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #e9ecef;
+            font-size: 24px;
+            font-weight: bold;
+        }
+
+        .crypto-details h3 {
+            margin: 0 0 5px 0;
+        }
+
+        .crypto-details p {
+            margin: 0;
+            color: #666;
+        }
+
+        .trade-tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .trade-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .trade-tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
     </style>
+</head>
+<body>
+    <div class="app-header">
+        <div class="container">
+            <div class="logo">
+                <i class="fas fa-money-bill-wave logo-icon"></i>
+                <h1>🇺🇸M-USD</h1>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- Login/Register Screen -->
+        <div id="auth-screen" class="card">
+            <h2>Welcome to M-USD</h2>
+            <p>Please login or register to continue</p>
+            
+            <div class="nav-tabs">
+                <div class="nav-tab active" id="login-tab">Login</div>
+                <div class="nav-tab" id="register-tab">Register</div>
+            </div>
+            
+            <div id="login-form">
+                <div class="form-group">
+                    <label for="login-phone">Phone Number</label>
+                    <input type="tel" id="login-phone" class="form-control" placeholder="07XXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label for="login-pin">PIN</label>
+                    <input type="password" id="login-pin" class="form-control" placeholder="4-digit PIN" maxlength="4">
+                </div>
+                <button class="btn btn-primary" id="login-btn">Login</button>
+            </div>
+            
+            <div id="register-form" class="hidden">
+                <div class="form-group">
+                    <label for="register-phone">Phone Number</label>
+                    <input type="tel" id="register-phone" class="form-control" placeholder="07XXXXXXXX">
+                </div>
+                <div class="form-group">
+                    <label for="register-pin">Create PIN</label>
+                    <input type="password" id="register-pin" class="form-control" placeholder="4-digit PIN" maxlength="4">
+                </div>
+                <div class="form-group">
+                    <label for="confirm-pin">Confirm PIN</label>
+                    <input type="password" id="confirm-pin" class="form-control" placeholder="Confirm PIN" maxlength="4">
+                </div>
+                <button class="btn btn-primary" id="register-btn">Register</button>
+            </div>
+        </div>
+
+        <!-- Dashboard Screen -->
+        <div id="dashboard-screen" class="hidden">
+            <div class="balance-card">
+                <p>Your Balance</p>
+                <div class="balance-amount" id="user-balance">USD 0.00</div>
+                <p id="user-phone"></p>
+            </div>
+            
+            <div class="menu-grid">
+                <div class="menu-item" id="deposit-btn">
+                    <div class="menu-icon">
+                        <i class="fas fa-money-bill-wave"></i>
+                    </div>
+                    <div>Deposit</div>
+                </div>
+                <div class="menu-item" id="send-money-btn">
+                    <div class="menu-icon">
+                        <i class="fas fa-paper-plane"></i>
+                    </div>
+                    <div>Send Money</div>
+                </div>
+                <div class="menu-item" id="transactions-btn">
+                    <div class="menu-icon">
+                        <i class="fas fa-history"></i>
+                    </div>
+                    <div>Transactions</div>
+                </div>
+                <div class="menu-item" id="crypto-btn">
+                    <div class="menu-icon">
+                        <i class="fab fa-bitcoin"></i>
+                    </div>
+                    <div>Crypto Trading</div>
+                </div>
+                <div class="menu-item" id="admin-btn">
+                    <div class="menu-icon">
+                        <i class="fas fa-cog"></i>
+                    </div>
+                    <div>Admin</div>
+                </div>
+            </div>
+            
+            <button class="btn btn-outline" id="logout-btn">Logout</button>
+        </div>
+
+        <!-- Deposit Screen -->
+        <div id="deposit-screen" class="card hidden">
+            <h2>Deposit Method Coming Soon</h2>
+            <div class="form-group">
+                <label for="deposit-amount">Enter Amount (USD)</label>
+                
+            </div>
+            <div class="form-group">
+                <p>Minimum deposit: $5.00</p>
+                <p>Maximum deposit: $10,000.00</p>
+            </div>
+            <button class="btn btn-primary" id="confirm-deposit">Continue to Payment</button>
+            <button class="btn btn-outline" id="back-from-deposit">Back</button>
+        </div>
+
+        <!-- Send Money Screen -->
+        <div id="send-money-screen" class="card hidden">
+            <h2>Send Money</h2>
+            <div class="form-group">
+                <label for="recipient-phone">Recipient Phone Number</label>
+                <input type="tel" id="recipient-phone" class="form-control" placeholder="07XXXXXXXX">
+            </div>
+            <div class="form-group">
+                <label for="send-amount">Amount (USD)</label>
+                <input type="number" id="send-amount" class="form-control" placeholder="Enter amount">
+            </div>
+            <div class="form-group">
+                <p>Transaction Fee (1%): <span id="transaction-fee">USD 0.00</span></p>
+                <p>Total Deducted: <span id="total-deducted">USD 0.00</span></p>
+            </div>
+            <button class="btn btn-primary" id="confirm-send">Send Money</button>
+            <button class="btn btn-outline" id="back-from-send">Back</button>
+        </div>
+
+        <!-- Transactions Screen -->
+        <div id="transactions-screen" class="card hidden">
+            <h2>Transaction History</h2>
+            <div id="transactions-list">
+                <!-- Transactions will be populated here -->
+            </div>
+            <button class="btn btn-outline" id="back-from-transactions">Back</button>
+        </div>
+
+        <!-- Crypto Trading Screen -->
+        <div id="crypto-trading-screen" class="card hidden">
+            <h2>Crypto Trading</h2>
+            
+            <!-- Portfolio Summary -->
+            <div class="portfolio-summary">
+                <div class="portfolio-card">
+                    <h3>Your Portfolio</h3>
+                    <div class="portfolio-balance">
+                        <div class="total-value">
+                            <span class="label">Total Value:</span>
+                            <span class="amount" id="portfolio-total">USD 0.00</span>
+                        </div>
+                        <div class="breakdown">
+                            <div class="breakdown-item">
+                                <span class="label">Cash Balance:</span>
+                                <span class="amount" id="portfolio-cash">USD 0.00</span>
+                            </div>
+                            <div class="breakdown-item">
+                                <span class="label">Crypto Value:</span>
+                                <span class="amount" id="portfolio-crypto">USD 0.00</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Crypto Holdings -->
+            <div class="crypto-holdings">
+                <h3>Your Crypto Holdings</h3>
+                <div id="crypto-holdings-list">
+                    <!-- Crypto holdings will be populated here -->
+                </div>
+            </div>
+            
+            <!-- Top Cryptocurrencies -->
+            <div class="crypto-market">
+                <h3>Top Cryptocurrencies</h3>
+                <div class="search-bar">
+                    <input type="text" id="crypto-search" class="form-control" placeholder="Search cryptocurrencies...">
+                </div>
+                <div id="crypto-list">
+                    <!-- Cryptocurrencies will be populated here -->
+                </div>
+            </div>
+            
+            <button class="btn btn-outline" id="back-from-crypto">Back to Dashboard</button>
+        </div>
+
+        <!-- Admin Panel -->
+        <div id="admin-panel" class="admin-panel hidden">
+            <h2>Admin Panel</h2>
+            
+            <div class="admin-section">
+                <h3>All Users</h3>
+                <div id="users-list">
+                    <!-- Users will be populated here -->
+                </div>
+            </div>
+            
+            <div class="admin-section">
+                <h3>All Transactions</h3>
+                <div id="admin-transactions-list">
+                    <!-- All transactions will be populated here -->
+                </div>
+            </div>
+            
+            <button class="btn btn-outline" id="back-from-admin">Back to Dashboard</button>
+        </div>
+
+        <!-- Loading Indicator -->
+        <div id="loading-screen" class="card hidden">
+            <div class="loading">
+                <div class="spinner"></div>
+                <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Notification -->
+    <div id="notification" class="notification"></div>
+
+    <div class="footer">
+        <p>🇺🇸M-USD &copy; 2026 | Transparent•Simple•Honest</p>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+        import { getDatabase, ref, set, get, push, update, query, orderByChild, onValue, remove } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfP7BSZB7kufh4yrSdpDn14kIdbF9SJdc",
+            authDomain: "m-usd-e3555.firebaseapp.com",
+            databaseURL: "https://m-usd-e3555-default-rtdb.firebaseio.com",
+            projectId: "m-usd-e3555",
+            storageBucket: "m-usd-e3555.firebasestorage.app",
+            messagingSenderId: "966918203590",
+            appId: "1:966918203590:web:b19913384b906a472d0fc7",
+            measurementId: "G-Y3X5T8GSNC"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const database = getDatabase(app);
+
+        // App Configuration
+        const CONFIG = {
+            PAYMENTS: {
+                MIN_DEPOSIT: 5,
+                MAX_DEPOSIT: 10000
+            }
+        };
+
+        // Data Storage
+        let users = [];
+        let transactions = [];
+        let currentUser = null;
+        let cryptoPrices = {};
+        let cryptoHoldings = {};
+        let cryptoList = [];
+        let currentCryptoModal = null;
+
+        // DOM Elements
+        const authScreen = document.getElementById('auth-screen');
+        const dashboardScreen = document.getElementById('dashboard-screen');
+        const depositScreen = document.getElementById('deposit-screen');
+        const sendMoneyScreen = document.getElementById('send-money-screen');
+        const transactionsScreen = document.getElementById('transactions-screen');
+        const cryptoTradingScreen = document.getElementById('crypto-trading-screen');
+        const adminPanel = document.getElementById('admin-panel');
+        const loadingScreen = document.getElementById('loading-screen');
+        
+        const loginTab = document.getElementById('login-tab');
+        const registerTab = document.getElementById('register-tab');
+        const loginForm = document.getElementById('login-form');
+        const registerForm = document.getElementById('register-form');
+        
+        const loginBtn = document.getElementById('login-btn');
+        const registerBtn = document.getElementById('register-btn');
+        const logoutBtn = document.getElementById('logout-btn');
+        
+        const depositBtn = document.getElementById('deposit-btn');
+        const sendMoneyBtn = document.getElementById('send-money-btn');
+        const transactionsBtn = document.getElementById('transactions-btn');
+        const cryptoBtn = document.getElementById('crypto-btn');
+        const adminBtn = document.getElementById('admin-btn');
+        
+        const confirmDeposit = document.getElementById('confirm-deposit');
+        const backFromDeposit = document.getElementById('back-from-deposit');
+        
+        const confirmSend = document.getElementById('confirm-send');
+        const backFromSend = document.getElementById('back-from-send');
+        
+        const backFromTransactions = document.getElementById('back-from-transactions');
+        const backFromCrypto = document.getElementById('back-from-crypto');
+        const backFromAdmin = document.getElementById('back-from-admin');
+        
+        const userBalance = document.getElementById('user-balance');
+        const userPhone = document.getElementById('user-phone');
+        const transactionsList = document.getElementById('transactions-list');
+        const usersList = document.getElementById('users-list');
+        const adminTransactionsList = document.getElementById('admin-transactions-list');
+        
+        const sendAmount = document.getElementById('send-amount');
+        const recipientPhone = document.getElementById('recipient-phone');
+        const transactionFee = document.getElementById('transaction-fee');
+        const totalDeducted = document.getElementById('total-deducted');
+        
+        const notification = document.getElementById('notification');
+
+        // Crypto Trading Elements
+        const cryptoListContainer = document.getElementById('crypto-list');
+        const cryptoHoldingsList = document.getElementById('crypto-holdings-list');
+        const cryptoSearch = document.getElementById('crypto-search');
+        const portfolioTotal = document.getElementById('portfolio-total');
+        const portfolioCash = document.getElementById('portfolio-cash');
+        const portfolioCrypto = document.getElementById('portfolio-crypto');
+
+        // Firebase Database References
+        const usersRef = ref(database, 'users');
+        const transactionsRef = ref(database, 'transactions');
+        const cryptoHoldingsRef = ref(database, 'cryptoHoldings');
+
+        // Event Listeners
+        loginTab.addEventListener('click', () => {
+            loginTab.classList.add('active');
+            registerTab.classList.remove('active');
+            loginForm.classList.remove('hidden');
+            registerForm.classList.add('hidden');
+        });
+
+        registerTab.addEventListener('click', () => {
+            registerTab.classList.add('active');
+            loginTab.classList.remove('active');
+            registerForm.classList.remove('hidden');
+            loginForm.classList.add('hidden');
+        });
+
+        loginBtn.addEventListener('click', handleLogin);
+        registerBtn.addEventListener('click', handleRegister);
+        logoutBtn.addEventListener('click', handleLogout);
+
+        depositBtn.addEventListener('click', showDepositScreen);
+        sendMoneyBtn.addEventListener('click', showSendMoneyScreen);
+        transactionsBtn.addEventListener('click', showTransactionsScreen);
+        cryptoBtn.addEventListener('click', showCryptoTradingScreen);
+        adminBtn.addEventListener('click', showAdminPanel);
+
+        confirmDeposit.addEventListener('click', handleDeposit);
+        backFromDeposit.addEventListener('click', () => showScreen(dashboardScreen));
+
+        confirmSend.addEventListener('click', handleSendMoney);
+        backFromSend.addEventListener('click', () => showScreen(dashboardScreen));
+
+        backFromTransactions.addEventListener('click', () => showScreen(dashboardScreen));
+        backFromCrypto.addEventListener('click', () => showScreen(dashboardScreen));
+        backFromAdmin.addEventListener('click', () => showScreen(dashboardScreen));
+
+        sendAmount.addEventListener('input', updateTransactionDetails);
+        recipientPhone.addEventListener('input', updateTransactionDetails);
+
+        // Crypto Trading Event Listeners
+        cryptoSearch.addEventListener('input', filterCryptoList);
+
+        // Global event listener for trade buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('btn-trade')) {
+                e.preventDefault();
+                e.stopPropagation();
+                
+                const symbol = e.target.dataset.symbol;
+                const action = e.target.dataset.action;
+                
+                // Check if user is logged in
+                if (!currentUser) {
+                    showNotification('Please login first to trade cryptocurrencies', 'error');
+                    showScreen(authScreen);
+                    return;
+                }
+                
+                openTradeModal(symbol, action);
+            }
+        });
+
+        // Firebase Data Functions
+        async function loadUsers() {
+            try {
+                const snapshot = await get(usersRef);
+                if (snapshot.exists()) {
+                    users = snapshot.val();
+                    // Convert object to array
+                    users = Object.keys(users).map(key => ({
+                        id: key,
+                        ...users[key]
+                    }));
+                } else {
+                    users = [];
+                }
+                console.log('Loaded users:', users.length);
+                return users;
+            } catch (error) {
+                console.error("Error loading users:", error);
+                showNotification('Error loading users', 'error');
+                return [];
+            }
+        }
+
+        async function loadTransactions() {
+            try {
+                const snapshot = await get(transactionsRef);
+                if (snapshot.exists()) {
+                    transactions = snapshot.val();
+                    // Convert object to array
+                    transactions = Object.keys(transactions).map(key => ({
+                        id: key,
+                        ...transactions[key]
+                    }));
+                    // Sort by date descending
+                    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+                } else {
+                    transactions = [];
+                }
+                console.log('Loaded transactions:', transactions.length);
+                return transactions;
+            } catch (error) {
+                console.error("Error loading transactions:", error);
+                showNotification('Error loading transactions', 'error');
+                return [];
+            }
+        }
+
+        async function saveUser(user) {
+            try {
+                if (user.id) {
+                    // Update existing user
+                    await update(ref(database, `users/${user.id}`), user);
+                } else {
+                    // Add new user
+                    const newUserRef = push(usersRef);
+                    user.id = newUserRef.key;
+                    await set(newUserRef, user);
+                }
+                return user;
+            } catch (error) {
+                console.error("Error saving user:", error);
+                showNotification('Error saving user data', 'error');
+                return null;
+            }
+        }
+
+        async function saveTransaction(transaction) {
+            try {
+                const newTransactionRef = push(transactionsRef);
+                transaction.id = newTransactionRef.key;
+                await set(newTransactionRef, transaction);
+                return transaction;
+            } catch (error) {
+                console.error("Error saving transaction:", error);
+                showNotification('Error saving transaction', 'error');
+                return null;
+            }
+        }
+
+        async function loadCryptoHoldings() {
+            if (!currentUser) return {};
+            
+            try {
+                const holdingsRef = ref(database, `cryptoHoldings/${currentUser.id}`);
+                const snapshot = await get(holdingsRef);
+                if (snapshot.exists()) {
+                    cryptoHoldings = snapshot.val();
+                } else {
+                    cryptoHoldings = {};
+                }
+                return cryptoHoldings;
+            } catch (error) {
+                console.error("Error loading crypto holdings:", error);
+                return {};
+            }
+        }
+
+        async function saveCryptoHoldings(holdings) {
+            if (!currentUser) return;
+            
+            try {
+                const holdingsRef = ref(database, `cryptoHoldings/${currentUser.id}`);
+                await set(holdingsRef, holdings);
+            } catch (error) {
+                console.error("Error saving crypto holdings:", error);
+            }
+        }
+
+        // Crypto Trading Functions
+        async function loadCryptoPrices() {
+            try {
+                // Using CoinGecko API to get top 20 cryptocurrencies
+                const response = await fetch('https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&order=market_cap_desc&per_page=20&page=1&sparkline=false&price_change_percentage=24h');
+                const data = await response.json();
+                
+                cryptoList = data;
+                cryptoPrices = {};
+                
+                data.forEach(crypto => {
+                    cryptoPrices[crypto.symbol.toUpperCase()] = {
+                        id: crypto.id,
+                        name: crypto.name,
+                        symbol: crypto.symbol.toUpperCase(),
+                        price: crypto.current_price,
+                        change24h: crypto.price_change_percentage_24h,
+                        marketCap: crypto.market_cap,
+                        icon: crypto.image
+                    };
+                });
+                
+                console.log('Loaded crypto prices:', Object.keys(cryptoPrices).length);
+                return cryptoPrices;
+            } catch (error) {
+                console.error("Error loading crypto prices:", error);
+                // Fallback to mock data if API fails
+                cryptoPrices = getMockCryptoPrices();
+                cryptoList = Object.values(cryptoPrices);
+                showNotification('Using demo crypto data', 'info');
+                return cryptoPrices;
+            }
+        }
+
+        function getMockCryptoPrices() {
+            return {
+                'BTC': { id: 'bitcoin', name: 'Bitcoin', symbol: 'BTC', price: 87026.00, change24h: -3.41, marketCap: 880000000000, icon: '₿' },
+                'ETH': { id: 'ethereum', name: 'Ethereum', symbol: 'ETH', price: 2847.50, change24h: -4.25, marketCap: 385000000000, icon: 'Ξ' },
+                'BNB': { id: 'binancecoin', name: 'Binance Coin', symbol: 'BNB', price: 580, change24h: 0.5, marketCap: 89000000000, icon: 'ⓑ' },
+                'SOL': { id: 'solana', name: 'Solana', symbol: 'SOL', price: 120, change24h: 5.2, marketCap: 52000000000, icon: '◎' },
+                'XRP': { id: 'ripple', name: 'XRP', symbol: 'XRP', price: 0.62, change24h: -1.2, marketCap: 34000000000, icon: '✕' },
+                'ADA': { id: 'cardano', name: 'Cardano', symbol: 'ADA', price: 0.48, change24h: 0.8, marketCap: 17000000000, icon: 'A' },
+                'DOGE': { id: 'dogecoin', name: 'Dogecoin', symbol: 'DOGE', price: 0.12, change24h: 3.5, marketCap: 17000000000, icon: 'Ð' },
+                'DOT': { id: 'polkadot', name: 'Polkadot', symbol: 'DOT', price: 7.2, change24h: -0.5, marketCap: 9200000000, icon: '●' },
+                'AVAX': { id: 'avalanche-2', name: 'Avalanche', symbol: 'AVAX', price: 38, change24h: 2.1, marketCap: 15000000000, icon: '⛰️' },
+                'LINK': { id: 'chainlink', name: 'Chainlink', symbol: 'LINK', price: 18, change24h: 1.2, marketCap: 10500000000, icon: '🔗' },
+                'MATIC': { id: 'matic-network', name: 'Polygon', symbol: 'MATIC', price: 0.85, change24h: -0.8, marketCap: 8000000000, icon: '⬡' },
+                'LTC': { id: 'litecoin', name: 'Litecoin', symbol: 'LTC', price: 72, change24h: 0.3, marketCap: 5300000000, icon: 'Ł' },
+                'BCH': { id: 'bitcoin-cash', name: 'Bitcoin Cash', symbol: 'BCH', price: 260, change24h: 1.1, marketCap: 5100000000, icon: 'Ƀ' },
+                'ATOM': { id: 'cosmos', name: 'Cosmos', symbol: 'ATOM', price: 10.5, change24h: -2.1, marketCap: 4100000000, icon: '⚛' },
+                'ETC': { id: 'ethereum-classic', name: 'Ethereum Classic', symbol: 'ETC', price: 26, change24h: 0.7, marketCap: 3700000000, icon: 'ξ' },
+                'XLM': { id: 'stellar', name: 'Stellar', symbol: 'XLM', price: 0.13, change24h: 0.9, marketCap: 3700000000, icon: '★' },
+                'FIL': { id: 'filecoin', name: 'Filecoin', symbol: 'FIL', price: 5.8, change24h: -1.5, marketCap: 2900000000, icon: '⛰' },
+                'ALGO': { id: 'algorand', name: 'Algorand', symbol: 'ALGO', price: 0.18, change24h: 1.8, marketCap: 2300000000, icon: 'Α' },
+                'XTZ': { id: 'tezos', name: 'Tezos', symbol: 'XTZ', price: 1.05, change24h: -0.3, marketCap: 1000000000, icon: 'ꜩ' },
+                'EOS': { id: 'eos', name: 'EOS', symbol: 'EOS', price: 0.75, change24h: 0.4, marketCap: 850000000, icon: 'ε' }
+            };
+        }
+
+        function calculatePortfolioValue() {
+            if (!currentUser) return { total: 0, cash: 0, crypto: 0 };
+            
+            const cash = currentUser.balance || 0;
+            let cryptoValue = 0;
+            
+            Object.keys(cryptoHoldings).forEach(symbol => {
+                const holding = cryptoHoldings[symbol];
+                const price = cryptoPrices[symbol]?.price || 0;
+                cryptoValue += holding.quantity * price;
+            });
+            
+            const total = cash + cryptoValue;
+            
+            return {
+                total: total,
+                cash: cash,
+                crypto: cryptoValue
+            };
+        }
+
+        function updatePortfolioDisplay() {
+            const portfolio = calculatePortfolioValue();
+            
+            portfolioTotal.textContent = `USD ${portfolio.total.toFixed(2)}`;
+            portfolioCash.textContent = `USD ${portfolio.cash.toFixed(2)}`;
+            portfolioCrypto.textContent = `USD ${portfolio.crypto.toFixed(2)}`;
+        }
+
+        function displayCryptoList() {
+            if (!cryptoListContainer) return;
+            
+            cryptoListContainer.innerHTML = '';
+            
+            if (cryptoList.length === 0) {
+                cryptoListContainer.innerHTML = '<p class="no-crypto">No cryptocurrencies found</p>';
+                return;
+            }
+            
+            cryptoList.forEach(crypto => {
+                const cryptoEl = document.createElement('div');
+                cryptoEl.className = 'crypto-item';
+                
+                const changeClass = crypto.price_change_percentage_24h >= 0 ? 'positive' : 'negative';
+                const changeIcon = crypto.price_change_percentage_24h >= 0 ? '↗' : '↘';
+                
+                cryptoEl.innerHTML = `
+                    <div class="crypto-info">
+                        <div class="crypto-icon">
+                            <img src="${crypto.image}" alt="${crypto.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : crypto.symbol.toUpperCase() === 'SOL' ? '◎' : crypto.symbol.toUpperCase() === 'XRP' ? '✕' : crypto.symbol.toUpperCase() === 'ADA' ? 'A' : crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : crypto.symbol.toUpperCase() === 'DOT' ? '●' : crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : crypto.symbol.toUpperCase() === 'MATIC' ? '⬡' : crypto.symbol.toUpperCase() === 'LTC' ? 'Ł' : crypto.symbol.toUpperCase() === 'BCH' ? 'Ƀ' : crypto.symbol.toUpperCase() === 'ATOM' ? '⚛' : crypto.symbol.toUpperCase() === 'ETC' ? 'ξ' : crypto.symbol.toUpperCase() === 'XLM' ? '★' : crypto.symbol.toUpperCase() === 'FIL' ? '⛰' : crypto.symbol.toUpperCase() === 'ALGO' ? 'Α' : crypto.symbol.toUpperCase() === 'XTZ' ? 'ꜩ' : crypto.symbol.toUpperCase() === 'EOS' ? 'ε' : '₿'}';">
+                        </div>
+                        <div class="crypto-details">
+                            <div class="crypto-name">${crypto.name}</div>
+                            <div class="crypto-symbol">${crypto.symbol.toUpperCase()}</div>
+                        </div>
+                    </div>
+                    <div class="crypto-price">
+                        <div class="crypto-current">$${crypto.current_price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 8})}</div>
+                        <div class="crypto-change ${changeClass}">
+                            ${changeIcon} ${Math.abs(crypto.price_change_percentage_24h || 0).toFixed(2)}%
+                        </div>
+                    </div>
+                    <div class="crypto-actions">
+                        <button class="btn-trade" data-symbol="${crypto.symbol.toUpperCase()}" data-action="buy">Buy</button>
+                        <button class="btn-trade" data-symbol="${crypto.symbol.toUpperCase()}" data-action="sell">Sell</button>
+                    </div>
+                `;
+                
+                cryptoListContainer.appendChild(cryptoEl);
+            });
+        }
+
+        function displayCryptoHoldings() {
+            if (!cryptoHoldingsList) return;
+            
+            cryptoHoldingsList.innerHTML = '';
+            
+            const holdings = Object.values(cryptoHoldings);
+            
+            if (holdings.length === 0) {
+                cryptoHoldingsList.innerHTML = '<p class="no-holdings">No crypto holdings</p>';
+                return;
+            }
+            
+            holdings.forEach(holding => {
+                const crypto = cryptoPrices[holding.symbol];
+                if (!crypto) return;
+                
+                const value = holding.quantity * crypto.price;
+                const changeClass = crypto.change24h >= 0 ? 'positive' : 'negative';
+                const changeIcon = crypto.change24h >= 0 ? '↗' : '↘';
+                
+                const holdingEl = document.createElement('div');
+                holdingEl.className = 'holding-item';
+                
+                holdingEl.innerHTML = `
+                    <div class="holding-info">
+                        <div class="holding-icon">
+                            <img src="${crypto.icon}" alt="${crypto.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : crypto.symbol.toUpperCase() === 'SOL' ? '◎' : crypto.symbol.toUpperCase() === 'XRP' ? '✕' : crypto.symbol.toUpperCase() === 'ADA' ? 'A' : crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : crypto.symbol.toUpperCase() === 'DOT' ? '●' : crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : crypto.symbol.toUpperCase() === 'MATIC' ? '⬡' : crypto.symbol.toUpperCase() === 'LTC' ? 'Ł' : crypto.symbol.toUpperCase() === 'BCH' ? 'Ƀ' : crypto.symbol.toUpperCase() === 'ATOM' ? '⚛' : crypto.symbol.toUpperCase() === 'ETC' ? 'ξ' : crypto.symbol.toUpperCase() === 'XLM' ? '★' : crypto.symbol.toUpperCase() === 'FIL' ? '⛰' : crypto.symbol.toUpperCase() === 'ALGO' ? 'Α' : crypto.symbol.toUpperCase() === 'XTZ' ? 'ꜩ' : crypto.symbol.toUpperCase() === 'EOS' ? 'ε' : '₿'}';"> 
+                        </div>
+                        <div class="holding-details">
+                            <div class="holding-name">${crypto.name}</div>
+                            <div class="holding-symbol">${holding.symbol}</div>
+                        </div>
+                    </div>
+                    <div class="holding-quantity">
+                        <div class="holding-amount">${holding.quantity.toFixed(8)}</div>
+                        <div class="holding-value">$${value.toFixed(2)}</div>
+                    </div>
+                    <div class="holding-change ${changeClass}">
+                        ${changeIcon} ${Math.abs(crypto.change24h || 0).toFixed(2)}%
+                    </div>
+                `;
+                
+                cryptoHoldingsList.appendChild(holdingEl);
+            });
+        }
+
+        function filterCryptoList() {
+            const searchTerm = cryptoSearch.value.toLowerCase();
+            
+            if (!searchTerm) {
+                displayCryptoList();
+                return;
+            }
+            
+            const filteredCrypto = cryptoList.filter(crypto => 
+                crypto.name.toLowerCase().includes(searchTerm) || 
+                crypto.symbol.toLowerCase().includes(searchTerm)
+            );
+            
+            cryptoListContainer.innerHTML = '';
+            
+            if (filteredCrypto.length === 0) {
+                cryptoListContainer.innerHTML = '<p class="no-crypto">No cryptocurrencies found</p>';
+                return;
+            }
+            
+            filteredCrypto.forEach(crypto => {
+                const cryptoEl = document.createElement('div');
+                cryptoEl.className = 'crypto-item';
+                
+                const changeClass = crypto.price_change_percentage_24h >= 0 ? 'positive' : 'negative';
+                const changeIcon = crypto.price_change_percentage_24h >= 0 ? '↗' : '↘';
+                
+                cryptoEl.innerHTML = `
+                    <div class="crypto-info">
+                        <div class="crypto-icon">
+                            <img src="${crypto.image}" alt="${crypto.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : crypto.symbol.toUpperCase() === 'SOL' ? '◎' : crypto.symbol.toUpperCase() === 'XRP' ? '✕' : crypto.symbol.toUpperCase() === 'ADA' ? 'A' : crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : crypto.symbol.toUpperCase() === 'DOT' ? '●' : crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : crypto.symbol.toUpperCase() === 'MATIC' ? '⬡' : crypto.symbol.toUpperCase() === 'LTC' ? 'Ł' : crypto.symbol.toUpperCase() === 'BCH' ? 'Ƀ' : crypto.symbol.toUpperCase() === 'ATOM' ? '⚛' : crypto.symbol.toUpperCase() === 'ETC' ? 'ξ' : crypto.symbol.toUpperCase() === 'XLM' ? '★' : crypto.symbol.toUpperCase() === 'FIL' ? '⛰' : crypto.symbol.toUpperCase() === 'ALGO' ? 'Α' : crypto.symbol.toUpperCase() === 'XTZ' ? 'ꜩ' : crypto.symbol.toUpperCase() === 'EOS' ? 'ε' : '₿'}';"> 
+                        </div>
+                        <div class="crypto-details">
+                            <div class="crypto-name">${crypto.name}</div>
+                            <div class="crypto-symbol">${crypto.symbol.toUpperCase()}</div>
+                        </div>
+                    </div>
+                    <div class="crypto-price">
+                        <div class="crypto-current">$${crypto.current_price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 8})}</div>
+                        <div class="crypto-change ${changeClass}">
+                            ${changeIcon} ${Math.abs(crypto.price_change_percentage_24h || 0).toFixed(2)}%
+                        </div>
+                    </div>
+                    <div class="crypto-actions">
+                        <button class="btn-trade" data-symbol="${crypto.symbol.toUpperCase()}" data-action="buy">Buy</button>
+                        <button class="btn-trade" data-symbol="${crypto.symbol.toUpperCase()}" data-action="sell">Sell</button>
+                    </div>
+                `;
+                
+                cryptoListContainer.appendChild(cryptoEl);
+            });
+        }
+
+        function openTradeModal(symbol, action) {
+            // Check if user is logged in
+            if (!currentUser) {
+                showNotification('Please login first', 'error');
+                return;
+            }
+
+            const crypto = cryptoPrices[symbol];
+            if (!crypto) {
+                showNotification('Cryptocurrency not found', 'error');
+                return;
+            }
+            
+            // Remove any existing modal first
+            closeCryptoModal();
+            
+            // Create modal dynamically
+            const modal = document.createElement('div');
+            modal.className = 'modal';
+            modal.id = 'crypto-modal';
+            
+            modal.innerHTML = `
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h2 id="crypto-modal-title">${action === 'buy' ? 'Buy' : 'Sell'} ${crypto.name}</h2>
+                        <span class="close-modal" id="close-crypto-modal">&times;</span>
+                    </div>
+                    <div class="modal-body">
+                        <div class="crypto-info">
+                            <div class="crypto-icon" id="crypto-modal-icon">
+                                <img src="${crypto.icon}" alt="${crypto.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : crypto.symbol.toUpperCase() === 'SOL' ? '◎' : crypto.symbol.toUpperCase() === 'XRP' ? '✕' : crypto.symbol.toUpperCase() === 'ADA' ? 'A' : crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : crypto.symbol.toUpperCase() === 'DOT' ? '●' : crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : crypto.symbol.toUpperCase() === 'MATIC' ? '⬡' : crypto.symbol.toUpperCase() === 'LTC' ? 'Ł' : crypto.symbol.toUpperCase() === 'BCH' ? 'Ƀ' : crypto.symbol.toUpperCase() === 'ATOM' ? '⚛' : crypto.symbol.toUpperCase() === 'ETC' ? 'ξ' : crypto.symbol.toUpperCase() === 'XLM' ? '★' : crypto.symbol.toUpperCase() === 'FIL' ? '⛰' : crypto.symbol.toUpperCase() === 'ALGO' ? 'Α' : crypto.symbol.toUpperCase() === 'XTZ' ? 'ꜩ' : crypto.symbol.toUpperCase() === 'EOS' ? 'ε' : '₿'}';"> 
+                            </div>
+                            <div class="crypto-details">
+                                <h3 id="crypto-modal-name">${crypto.name}</h3>
+                                <p id="crypto-modal-symbol">${crypto.symbol}</p>
+                                <p id="crypto-modal-price">Price: $${crypto.price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 8})}</p>
+                            </div>
+                        </div>
+                        
+                        <div class="trade-tabs">
+                            <div class="trade-tab ${action === 'buy' ? 'active' : ''}" id="buy-tab">Buy</div>
+                            <div class="trade-tab ${action === 'sell' ? 'active' : ''}" id="sell-tab">Sell</div>
+                        </div>
+                        
+                        <div id="buy-form" ${action === 'buy' ? '' : 'class="hidden"'}>
+                            <div class="form-group">
+                                <label for="buy-amount">Amount in USD</label>
+                                <input type="number" id="buy-amount" class="form-control" placeholder="Enter USD amount" min="1" step="0.01">
+                            </div>
+                            <div class="form-group">
+                                <label for="buy-quantity">Quantity</label>
+                                <input type="number" id="buy-quantity" class="form-control" placeholder="0.00000000" step="0.00000001" readonly>
+                            </div>
+                            <div class="form-group">
+                                <p>Available Balance: <span id="available-balance">USD ${currentUser.balance.toFixed(2)}</span></p>
+                                <p>Fee (0.5%): <span id="buy-fee">USD 0.00</span></p>
+                                <p>Total Cost: <span id="buy-total">USD 0.00</span></p>
+                            </div>
+                            <button class="btn btn-primary" id="confirm-buy">Buy</button>
+                        </div>
+                        
+                        <div id="sell-form" ${action === 'sell' ? '' : 'class="hidden"'}>
+                            <div class="form-group">
+                                <label for="sell-quantity">Quantity to Sell</label>
+                                <input type="number" id="sell-quantity" class="form-control" placeholder="0.00000000" min="0" step="0.00000001">
+                            </div>
+                            <div class="form-group">
+                                <label for="sell-amount">Amount in USD</label>
+                                <input type="number" id="sell-amount" class="form-control" placeholder="0.00" readonly>
+                            </div>
+                            <div class="form-group">
+                                <p>Available: <span id="available-crypto">${cryptoHoldings[symbol] ? cryptoHoldings[symbol].quantity.toFixed(8) : '0.00000000'}</span></p>
+                                <p>Fee (0.5%): <span id="sell-fee">USD 0.00</span></p>
+                                <p>Total Proceeds: <span id="sell-total">USD 0.00</span></p>
+                            </div>
+                            <button class="btn btn-danger" id="confirm-sell">Sell</button>
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            document.body.appendChild(modal);
+            currentCryptoModal = modal;
+            
+            // Add event listeners
+            document.getElementById('close-crypto-modal').addEventListener('click', closeCryptoModal);
+            document.getElementById('buy-tab').addEventListener('click', () => switchTradeTab('buy'));
+            document.getElementById('sell-tab').addEventListener('click', () => switchTradeTab('sell'));
+            
+            const buyAmountInput = document.getElementById('buy-amount');
+            const sellQuantityInput = document.getElementById('sell-quantity');
+            
+            if (buyAmountInput) {
+                buyAmountInput.addEventListener('input', updateBuyDetails);
+            }
+            if (sellQuantityInput) {
+                sellQuantityInput.addEventListener('input', updateSellDetails);
+            }
+            
+            document.getElementById('confirm-buy').addEventListener('click', handleBuyCrypto);
+            document.getElementById('confirm-sell').addEventListener('click', handleSellCrypto);
+            
+            // Store current trading symbol
+            modal.dataset.tradingSymbol = symbol;
+        }
+
+        function closeCryptoModal() {
+            if (currentCryptoModal) {
+                currentCryptoModal.remove();
+                currentCryptoModal = null;
+            }
+        }
+
+        function switchTradeTab(tab) {
+            if (!currentCryptoModal) return;
+            
+            const buyTab = document.getElementById('buy-tab');
+            const sellTab = document.getElementById('sell-tab');
+            const buyForm = document.getElementById('buy-form');
+            const sellForm = document.getElementById('sell-form');
+            
+            if (tab === 'buy') {
+                buyTab.classList.add('active');
+                sellTab.classList.remove('active');
+                buyForm.classList.remove('hidden');
+                sellForm.classList.add('hidden');
+            } else {
+                sellTab.classList.add('active');
+                buyTab.classList.remove('active');
+                sellForm.classList.remove('hidden');
+                buyForm.classList.add('hidden');
+            }
+        }
+
+        function updateBuyDetails() {
+            if (!currentCryptoModal) return;
+            
+            const amount = parseFloat(document.getElementById('buy-amount')?.value) || 0;
+            const symbol = currentCryptoModal.dataset.tradingSymbol;
+            const crypto = cryptoPrices[symbol];
+            
+            if (!crypto || amount <= 0) {
+                document.getElementById('buy-quantity').value = '';
+                document.getElementById('buy-fee').textContent = 'USD 0.00';
+                document.getElementById('buy-total').textContent = 'USD 0.00';
+                return;
+            }
+            
+            const fee = amount * 0.005; // 0.5% trading fee
+            const total = amount + fee;
+            const quantity = amount / crypto.price;
+            
+            document.getElementById('buy-quantity').value = quantity.toFixed(8);
+            document.getElementById('buy-fee').textContent = `USD ${fee.toFixed(2)}`;
+            document.getElementById('buy-total').textContent = `USD ${total.toFixed(2)}`;
+        }
+
+        function updateSellDetails() {
+            if (!currentCryptoModal) return;
+            
+            const quantity = parseFloat(document.getElementById('sell-quantity')?.value) || 0;
+            const symbol = currentCryptoModal.dataset.tradingSymbol;
+            const crypto = cryptoPrices[symbol];
+            
+            if (!crypto || quantity <= 0) {
+                document.getElementById('sell-amount').value = '';
+                document.getElementById('sell-fee').textContent = 'USD 0.00';
+                document.getElementById('sell-total').textContent = 'USD 0.00';
+                return;
+            }
+            
+            const amount = quantity * crypto.price;
+            const fee = amount * 0.005; // 0.5% trading fee
+            const total = amount - fee;
+            
+            document.getElementById('sell-amount').value = total.toFixed(2);
+            document.getElementById('sell-fee').textContent = `USD ${fee.toFixed(2)}`;
+            document.getElementById('sell-total').textContent = `USD ${total.toFixed(2)}`;
+        }
+
+        async function handleBuyCrypto() {
+            if (!currentUser) {
+                showNotification('Please login first', 'error');
+                return;
+            }
+
+            if (!currentCryptoModal) return;
+            
+            const amount = parseFloat(document.getElementById('buy-amount')?.value) || 0;
+            const symbol = currentCryptoModal.dataset.tradingSymbol;
+            const crypto = cryptoPrices[symbol];
+            
+            if (!amount || amount <= 0) {
+                showNotification('Please enter a valid amount', 'error');
+                return;
+            }
+            
+            const fee = amount * 0.005;
+            const total = amount + fee;
+            
+            if (currentUser.balance < total) {
+                showNotification('Insufficient balance', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // Update user balance
+                currentUser.balance -= total;
+                
+                // Update crypto holdings
+                const quantity = amount / crypto.price;
+                if (cryptoHoldings[symbol]) {
+                    cryptoHoldings[symbol].quantity += quantity;
+                } else {
+                    cryptoHoldings[symbol] = {
+                        symbol: symbol,
+                        quantity: quantity,
+                        name: crypto.name
+                    };
+                }
+                
+                // Save updated user and holdings
+                await saveUser(currentUser);
+                await saveCryptoHoldings(cryptoHoldings);
+                
+                // Record transaction
+                const transaction = {
+                    from: 'USD',
+                    to: symbol,
+                    amount: amount,
+                    fee: fee,
+                    type: 'crypto_buy',
+                    symbol: symbol,
+                    quantity: quantity,
+                    price: crypto.price,
+                    date: new Date().toISOString(),
+                    userId: currentUser.id
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Reload data
+                await loadUsers();
+                
+                // Update current user reference
+                currentUser = users.find(u => u.id === currentUser.id);
+                window.app.setCurrentUser(currentUser);
+                
+                // Update displays
+                updateDashboard();
+                updatePortfolioDisplay();
+                displayCryptoHoldings();
+                
+                // Close modal and show success
+                closeCryptoModal();
+                showScreen(cryptoTradingScreen);
+                showNotification(`Bought ${quantity.toFixed(8)} ${symbol} for $${amount.toFixed(2)}`, 'success');
+            } catch (error) {
+                console.error("Buy crypto error:", error);
+                showNotification('Purchase failed. Please try again.', 'error');
+                showScreen(cryptoTradingScreen);
+            }
+        }
+
+        async function handleSellCrypto() {
+            if (!currentUser) {
+                showNotification('Please login first', 'error');
+                return;
+            }
+
+            if (!currentCryptoModal) return;
+            
+            const quantity = parseFloat(document.getElementById('sell-quantity')?.value) || 0;
+            const symbol = currentCryptoModal.dataset.tradingSymbol;
+            const crypto = cryptoPrices[symbol];
+            
+            if (!quantity || quantity <= 0) {
+                showNotification('Please enter a valid quantity', 'error');
+                return;
+            }
+            
+            const holding = cryptoHoldings[symbol];
+            if (!holding || holding.quantity < quantity) {
+                showNotification('Insufficient crypto balance', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                const amount = quantity * crypto.price;
+                const fee = amount * 0.005;
+                const total = amount - fee;
+                
+                // Update user balance
+                currentUser.balance += total;
+                
+                // Update crypto holdings
+                holding.quantity -= quantity;
+                if (holding.quantity <= 0) {
+                    delete cryptoHoldings[symbol];
+                }
+                
+                // Save updated user and holdings
+                await saveUser(currentUser);
+                await saveCryptoHoldings(cryptoHoldings);
+                
+                // Record transaction
+                const transaction = {
+                    from: symbol,
+                    to: 'USD',
+                    amount: amount,
+                    fee: fee,
+                    type: 'crypto_sell',
+                    symbol: symbol,
+                    quantity: quantity,
+                    price: crypto.price,
+                    date: new Date().toISOString(),
+                    userId: currentUser.id
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Reload data
+                await loadUsers();
+                
+                // Update current user reference
+                currentUser = users.find(u => u.id === currentUser.id);
+                window.app.setCurrentUser(currentUser);
+                
+                // Update displays
+                updateDashboard();
+                updatePortfolioDisplay();
+                displayCryptoHoldings();
+                
+                // Close modal and show success
+                closeCryptoModal();
+                showScreen(cryptoTradingScreen);
+                showNotification(`Sold ${quantity.toFixed(8)} ${symbol} for $${total.toFixed(2)}`, 'success');
+            } catch (error) {
+                console.error("Sell crypto error:", error);
+                showNotification('Sale failed. Please try again.', 'error');
+                showScreen(cryptoTradingScreen);
+            }
+        }
+
+        // App Functions
+        function showNotification(message, type = 'info') {
+            notification.textContent = message;
+            notification.className = `notification ${type} show`;
+            
+            setTimeout(() => {
+                notification.classList.remove('show');
+            }, 3000);
+        }
+
+        function showScreen(screen) {
+            authScreen.classList.add('hidden');
+            dashboardScreen.classList.add('hidden');
+            depositScreen.classList.add('hidden');
+            sendMoneyScreen.classList.add('hidden');
+            transactionsScreen.classList.add('hidden');
+            cryptoTradingScreen.classList.add('hidden');
+            adminPanel.classList.add('hidden');
+            loadingScreen.classList.add('hidden');
+            
+            // Close any open modal
+            closeCryptoModal();
+            
+            screen.classList.remove('hidden');
+        }
+
+        function showLoading() {
+            authScreen.classList.add('hidden');
+            dashboardScreen.classList.add('hidden');
+            depositScreen.classList.add('hidden');
+            sendMoneyScreen.classList.add('hidden');
+            transactionsScreen.classList.add('hidden');
+            cryptoTradingScreen.classList.add('hidden');
+            adminPanel.classList.add('hidden');
+            loadingScreen.classList.remove('hidden');
+        }
+
+        async function handleLogin() {
+            const phone = document.getElementById('login-phone').value;
+            const pin = document.getElementById('login-pin').value;
+            
+            if (!phone || !pin) {
+                showNotification('Please enter phone number and PIN', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                await loadUsers();
+                const user = users.find(u => u.phone === phone && u.pin === pin);
+                
+                if (!user) {
+                    showNotification('Invalid phone number or PIN', 'error');
+                    showScreen(authScreen);
+                    return;
+                }
+                
+                if (user.isSuspended) {
+                    showNotification('Your account has been suspended. Contact support.', 'error');
+                    showScreen(authScreen);
+                    return;
+                }
+                
+                if (user.isBlocked) {
+                    showNotification('Your account has been blocked. Contact support.', 'error');
+                    showScreen(authScreen);
+                    return;
+                }
+                
+                currentUser = user;
+                // Set the global app user
+                window.app.setCurrentUser(user);
+                
+                // Load crypto data
+                await loadCryptoPrices();
+                cryptoHoldings = await loadCryptoHoldings();
+                
+                // Initialize demo holdings if none exist
+                if (Object.keys(cryptoHoldings).length === 0) {
+                    cryptoHoldings = {
+                        'BTC': { symbol: 'BTC', quantity: 0.00057226, name: 'Bitcoin' },
+                        'ETH': { symbol: 'ETH', quantity: 0.10602469, name: 'Ethereum' }
+                    };
+                    await saveCryptoHoldings(cryptoHoldings);
+                }
+                
+                updateDashboard();
+                showScreen(dashboardScreen);
+                showNotification('Login successful!', 'success');
+            } catch (error) {
+                console.error("Login error:", error);
+                showNotification('Login failed. Please try again.', 'error');
+                showScreen(authScreen);
+            }
+        }
+
+        async function handleRegister() {
+            const phone = document.getElementById('register-phone').value;
+            const pin = document.getElementById('register-pin').value;
+            const confirmPin = document.getElementById('confirm-pin').value;
+            
+            if (!phone || !pin || !confirmPin) {
+                showNotification('Please fill all fields', 'error');
+                return;
+            }
+            
+            if (pin !== confirmPin) {
+                showNotification('PINs do not match', 'error');
+                return;
+            }
+            
+            if (pin.length !== 4) {
+                showNotification('PIN must be 4 digits', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                await loadUsers();
+                
+                if (users.find(u => u.phone === phone)) {
+                    showNotification('Phone number already registered', 'error');
+                    showScreen(authScreen);
+                    return;
+                }
+                
+                const newUser = {
+                    phone,
+                    pin,
+                    balance: 0,
+                    isAdmin: false,
+                    isSuspended: false,
+                    isBlocked: false,
+                    dateCreated: new Date().toISOString()
+                };
+                
+                const savedUser = await saveUser(newUser);
+                if (savedUser) {
+                    users.push(savedUser);
+                    showNotification('Registration successful! Please login.', 'success');
+                    loginTab.click();
+                    showScreen(authScreen);
+                    
+                    // Clear form
+                    document.getElementById('register-phone').value = '';
+                    document.getElementById('register-pin').value = '';
+                    document.getElementById('confirm-pin').value = '';
+                }
+            } catch (error) {
+                console.error("Registration error:", error);
+                showNotification('Registration failed. Please try again.', 'error');
+                showScreen(authScreen);
+            }
+        }
+
+        function handleLogout() {
+            currentUser = null;
+            window.app.setCurrentUser(null);
+            showScreen(authScreen);
+            showNotification('Logged out successfully', 'info');
+        }
+
+        function updateDashboard() {
+            if (!currentUser) return;
+            
+            userBalance.textContent = `USD ${currentUser.balance.toFixed(2)}`;
+            userPhone.textContent = currentUser.phone;
+            
+            // Only show admin button for admin users
+            adminBtn.style.display = currentUser.isAdmin ? 'block' : 'none';
+        }
+
+        function showDepositScreen() {
+            showScreen(depositScreen);
+            document.getElementById('deposit-amount').value = '';
+        }
+
+        async function handleDeposit() {
+            const amount = parseFloat(document.getElementById('deposit-amount').value);
+            
+            if (!amount || amount <= 0) {
+                showNotification('Please enter a valid amount', 'error');
+                return;
+            }
+            
+            if (amount < 5) {
+                showNotification('Minimum deposit is $5.00', 'error');
+                return;
+            }
+            
+            if (amount > 10000) {
+                showNotification('Maximum deposit is $10,000.00', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // Simulate deposit
+                currentUser.balance += amount;
+                
+                // Save updated user
+                await saveUser(currentUser);
+                
+                // Record transaction
+                const transaction = {
+                    from: 'DEPOSIT',
+                    to: currentUser.phone,
+                    amount: amount,
+                    fee: 0,
+                    type: 'deposit',
+                    method: 'manual',
+                    date: new Date().toISOString(),
+                    userId: currentUser.id
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Reload data
+                await loadUsers();
+                
+                // Update current user reference
+                currentUser = users.find(u => u.id === currentUser.id);
+                window.app.setCurrentUser(currentUser);
+                
+                updateDashboard();
+                showScreen(dashboardScreen);
+                showNotification(`Deposit of USD ${amount.toFixed(2)} successful!`, 'success');
+            } catch (error) {
+                console.error("Deposit error:", error);
+                showNotification('Deposit failed. Please try again.', 'error');
+                showScreen(dashboardScreen);
+            }
+        }
+
+        function showSendMoneyScreen() {
+            showScreen(sendMoneyScreen);
+            document.getElementById('recipient-phone').value = '';
+            document.getElementById('send-amount').value = '';
+            updateTransactionDetails();
+        }
+
+        function updateTransactionDetails() {
+            const amount = parseFloat(sendAmount.value) || 0;
+            const fee = amount * 0.01; // 1% transaction fee
+            const total = amount + fee;
+            
+            transactionFee.textContent = `USD ${fee.toFixed(2)}`;
+            totalDeducted.textContent = `USD ${total.toFixed(2)}`;
+        }
+
+        async function handleSendMoney() {
+            const recipient = document.getElementById('recipient-phone').value;
+            const amount = parseFloat(document.getElementById('send-amount').value);
+            
+            if (!recipient || !amount || amount <= 0) {
+                showNotification('Please enter valid recipient and amount', 'error');
+                return;
+            }
+            
+            if (recipient === currentUser.phone) {
+                showNotification('Cannot send money to yourself', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                await loadUsers();
+                const recipientUser = users.find(u => u.phone === recipient);
+                
+                if (!recipientUser) {
+                    showNotification('Recipient not found', 'error');
+                    showScreen(dashboardScreen);
+                    return;
+                }
+                
+                if (recipientUser.isSuspended || recipientUser.isBlocked) {
+                    showNotification('Recipient account is not active', 'error');
+                    showScreen(dashboardScreen);
+                    return;
+                }
+                
+                const fee = amount * 0.01; // 1% transaction fee
+                const total = amount + fee;
+                
+                if (currentUser.balance < total) {
+                    showNotification('Insufficient balance', 'error');
+                    showScreen(dashboardScreen);
+                    return;
+                }
+                
+                // Update balances
+                currentUser.balance -= total;
+                recipientUser.balance += amount;
+                
+                // Add fee to admin account
+                const adminUser = users.find(u => u.isAdmin);
+                if (adminUser) {
+                    adminUser.balance += fee;
+                    await saveUser(adminUser);
+                }
+                
+                // Save updated users
+                await saveUser(currentUser);
+                await saveUser(recipientUser);
+                
+                // Record transaction
+                const transaction = {
+                    from: currentUser.phone,
+                    to: recipient,
+                    amount: amount,
+                    fee: fee,
+                    type: 'send',
+                    date: new Date().toISOString(),
+                    userId: currentUser.id
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Reload data
+                await loadUsers();
+                await loadTransactions();
+                
+                // Update current user reference
+                currentUser = users.find(u => u.id === currentUser.id);
+                window.app.setCurrentUser(currentUser);
+                
+                updateDashboard();
+                showScreen(dashboardScreen);
+                showNotification(`Sent USD ${amount.toFixed(2)} to ${recipient}`, 'success');
+            } catch (error) {
+                console.error("Send money error:", error);
+                showNotification('Transaction failed. Please try again.', 'error');
+                showScreen(dashboardScreen);
+            }
+        }
+
+        async function showTransactionsScreen() {
+            showScreen(transactionsScreen);
+            await displayUserTransactions();
+        }
+
+        async function displayUserTransactions() {
+            if (!currentUser) return;
+            
+            await loadTransactions();
+            
+            const userTransactions = transactions.filter(
+                t => t.userId === currentUser.id
+            );
+            
+            transactionsList.innerHTML = '';
+            
+            if (userTransactions.length === 0) {
+                transactionsList.innerHTML = '<p class="no-transactions">No transactions found</p>';
+                return;
+            }
+            
+            userTransactions.forEach(transaction => {
+                const transactionEl = document.createElement('div');
+                transactionEl.className = 'transaction-item';
+                
+                const isSent = transaction.from === currentUser.phone;
+                const amountClass = isSent ? 'transaction-negative' : 'transaction-positive';
+                const amountPrefix = isSent ? '-' : '+';
+                const typeText = isSent ? 'Sent' : 'Received';
+                
+                transactionEl.innerHTML = `
+                    <div class="transaction-details">
+                        <div class="transaction-type">${typeText} ${isSent ? `to ${transaction.to}` : `from ${transaction.from}`}</div>
+                        <div class="transaction-date">${new Date(transaction.date).toLocaleString()}</div>
+                        ${transaction.fee > 0 ? `<div class="transaction-fee">Fee: USD ${transaction.fee.toFixed(2)}</div>` : ''}
+                        <div class="transaction-method">${transaction.method ? `Method: ${transaction.method}` : ''}</div>
+                    </div>
+                    <div class="transaction-amount ${amountClass}">
+                        ${amountPrefix}USD ${transaction.amount.toFixed(2)}
+                    </div>
+                `;
+                
+                transactionsList.appendChild(transactionEl);
+            });
+        }
+
+        async function showCryptoTradingScreen() {
+            // Check if user is logged in
+            if (!currentUser) {
+                showNotification('Please login first to access crypto trading', 'error');
+                showScreen(authScreen);
+                return;
+            }
+
+            showScreen(cryptoTradingScreen);
+            
+            // Load crypto data if not already loaded
+            if (Object.keys(cryptoPrices).length === 0) {
+                await loadCryptoPrices();
+            }
+            
+            // Update portfolio and displays
+            updatePortfolioDisplay();
+            displayCryptoList();
+            displayCryptoHoldings();
+        }
+
+        async function showAdminPanel() {
+            if (!currentUser || !currentUser.isAdmin) {
+                showNotification('Access denied', 'error');
+                return;
+            }
+            
+            showScreen(adminPanel);
+            await displayAllUsers();
+            await displayAllTransactions();
+        }
+
+        async function displayAllUsers() {
+            await loadUsers();
+            usersList.innerHTML = '';
+            
+            if (users.length === 0) {
+                usersList.innerHTML = '<p class="no-users">No users found</p>';
+                return;
+            }
+            
+            users.forEach(user => {
+                // Skip showing the admin user in the list to avoid self-management
+                if (user.isAdmin && user.phone === currentUser.phone) return;
+                
+                const userEl = document.createElement('div');
+                userEl.className = 'user-item';
+                
+                let statusClass = 'status-active';
+                let statusText = 'Active';
+                
+                if (user.isBlocked) {
+                    statusClass = 'status-blocked';
+                    statusText = 'Blocked';
+                } else if (user.isSuspended) {
+                    statusClass = 'status-suspended';
+                    statusText = 'Suspended';
+                }
+                
+                userEl.innerHTML = `
+                    <div class="user-info">
+                        <div class="user-phone"><strong>${user.phone}</strong></div>
+                        <div class="user-balance">Balance: USD ${user.balance.toFixed(2)}</div>
+                        <div class="user-registered">Registered: ${new Date(user.dateCreated).toLocaleDateString()}</div>
+                    </div>
+                    <div class="user-controls">
+                        <span class="status-badge ${statusClass}">${statusText}</span>
+                        <div class="user-actions">
+                            <button class="action-btn suspend" data-phone="${user.phone}">${user.isSuspended ? 'Activate' : 'Suspend'}</button>
+                            <button class="action-btn block" data-phone="${user.phone}">${user.isBlocked ? 'Unblock' : 'Block'}</button>
+                            <button class="action-btn recover" data-phone="${user.phone}">Recover Funds</button>
+                        </div>
+                    </div>
+                `;
+                
+                usersList.appendChild(userEl);
+            });
+            
+            // Add event listeners to action buttons
+            setTimeout(() => {
+                document.querySelectorAll('.action-btn.suspend').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        handleSuspendUser(btn.dataset.phone);
+                    });
+                });
+                
+                document.querySelectorAll('.action-btn.block').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        handleBlockUser(btn.dataset.phone);
+                    });
+                });
+                
+                document.querySelectorAll('.action-btn.recover').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        handleRecoverFunds(btn.dataset.phone);
+                    });
+                });
+            }, 100);
+        }
+
+        async function displayAllTransactions() {
+            await loadTransactions();
+            adminTransactionsList.innerHTML = '';
+            
+            if (transactions.length === 0) {
+                adminTransactionsList.innerHTML = '<p class="no-transactions">No transactions found</p>';
+                return;
+            }
+            
+            transactions.forEach(transaction => {
+                const transactionEl = document.createElement('div');
+                transactionEl.className = 'transaction-admin-item';
+                
+                transactionEl.innerHTML = `
+                    <div class="transaction-info">
+                        <div class="transaction-parties"><strong>From:</strong> ${transaction.from} <strong>→ To:</strong> ${transaction.to}</div>
+                        <div class="transaction-date"><strong>Date:</strong> ${new Date(transaction.date).toLocaleString()}</div>
+                        <div class="transaction-type"><strong>Type:</strong> ${transaction.type}</div>
+                        ${transaction.method ? `<div class="transaction-method"><strong>Method:</strong> ${transaction.method}</div>` : ''}
+                    </div>
+                    <div class="transaction-amounts">
+                        <div class="transaction-amount"><strong>Amount:</strong> USD ${transaction.amount.toFixed(2)}</div>
+                        ${transaction.fee > 0 ? `<div class="transaction-fee"><strong>Fee:</strong> USD ${transaction.fee.toFixed(2)}</div>` : ''}
+                    </div>
+                `;
+                
+                adminTransactionsList.appendChild(transactionEl);
+            });
+        }
+
+        async function handleSuspendUser(phone) {
+            const user = users.find(u => u.phone === phone);
+            if (user) {
+                user.isSuspended = !user.isSuspended;
+                user.isBlocked = false; // Can't be both suspended and blocked
+                await saveUser(user);
+                await displayAllUsers();
+                showNotification(`User ${user.isSuspended ? 'suspended' : 'activated'}`, 'info');
+            }
+        }
+
+        async function handleBlockUser(phone) {
+            const user = users.find(u => u.phone === phone);
+            if (user) {
+                user.isBlocked = !user.isBlocked;
+                user.isSuspended = false; // Can't be both suspended and blocked
+                await saveUser(user);
+                await displayAllUsers();
+                showNotification(`User ${user.isBlocked ? 'blocked' : 'activated'}`, 'info');
+            }
+        }
+
+        async function handleRecoverFunds(phone) {
+            const user = users.find(u => u.phone === phone);
+            if (user && user.balance > 0) {
+                const amount = user.balance;
+                
+                // Add to admin account
+                const adminUser = users.find(u => u.isAdmin);
+                if (adminUser) {
+                    adminUser.balance += amount;
+                    await saveUser(adminUser);
+                }
+                
+                // Record transaction
+                const transaction = {
+                    from: user.phone,
+                    to: 'ADMIN',
+                    amount: amount,
+                    fee: 0,
+                    type: 'recovery',
+                    date: new Date().toISOString(),
+                    userId: user.id
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Reset user balance
+                user.balance = 0;
+                await saveUser(user);
+                
+                await displayAllUsers();
+                await displayAllTransactions();
+                showNotification(`Recovered USD ${amount.toFixed(2)} from ${user.phone}`, 'success');
+            } else {
+                showNotification('No funds to recover', 'info');
+            }
+        }
+
+        // Make the app global
+        window.app = {
+            currentUser: null,
+            updateDashboard: updateDashboard,
+            showNotification: showNotification,
+            
+            // This will be set when user logs in
+            setCurrentUser: function(user) {
+                this.currentUser = user;
+                currentUser = user; // Also set the local variable
+            }
+        };
+
+        // Initialize the app
+        document.addEventListener('DOMContentLoaded', async () => {
+            showScreen(authScreen);
+            
+            // Initialize admin account if not exists
+            try {
+                await loadUsers();
+                const adminExists = users.find(u => u.phone === '0700000000');
+                
+                if (!adminExists) {
+                    const adminAccount = {
+                        phone: '0700000000',
+                        pin: '0000',
+                        balance: 0,
+                        isAdmin: true,
+                        isSuspended: false,
+                        isBlocked: false,
+                        dateCreated: new Date().toISOString()
+                    };
+                    
+                    await saveUser(adminAccount);
+                    users.push(adminAccount);
+                    console.log('Admin account created');
+                } else {
+                    console.log('Admin account already exists');
+                }
+            } catch (error) {
+                console.error("Error initializing admin account:", error);
+            }
+        });
+    </script>
 </body>
 </html>
