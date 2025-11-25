@@ -6,7 +6,6 @@
     <title>📱M-USD</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* All the CSS styles remain exactly the same as before */
         * {
             margin: 0;
             padding: 0;
@@ -155,29 +154,53 @@
         .transaction-item {
             display: flex;
             justify-content: space-between;
-            padding: 15px 0;
+            align-items: center;
+            padding: 15px;
             border-bottom: 1px solid #eee;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
         }
 
         .transaction-details {
             flex: 1;
         }
 
-        .transaction-amount {
+        .transaction-type {
             font-weight: 600;
+            color: #333;
+            margin-bottom: 4px;
         }
 
-        .transaction-positive {
-            color: var(--success);
-        }
-
-        .transaction-negative {
-            color: var(--danger);
+        .transaction-date {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 4px;
         }
 
         .transaction-fee {
-            color: var(--warning);
             font-size: 12px;
+            color: #f39c12;
+        }
+
+        .transaction-method {
+            font-size: 12px;
+            color: #3498db;
+            margin-top: 4px;
+        }
+
+        .transaction-amount {
+            font-weight: 700;
+            font-size: 16px;
+        }
+
+        .transaction-positive {
+            color: #27ae60;
+        }
+
+        .transaction-negative {
+            color: #e74c3c;
         }
 
         .menu-grid {
@@ -216,24 +239,62 @@
 
         .admin-section {
             margin-bottom: 30px;
+            padding: 20px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
         }
 
         .admin-section h3 {
             margin-bottom: 15px;
             padding-bottom: 10px;
-            border-bottom: 1px solid #eee;
+            border-bottom: 2px solid var(--primary);
+            color: var(--primary);
         }
 
         .user-item, .transaction-admin-item {
             display: flex;
             justify-content: space-between;
-            padding: 12px 0;
+            align-items: center;
+            padding: 15px;
             border-bottom: 1px solid #eee;
+            background: white;
+            margin-bottom: 8px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .user-info {
+            flex: 1;
+        }
+
+        .user-phone {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+
+        .user-balance {
+            color: #333;
+            margin-bottom: 2px;
+        }
+
+        .user-registered {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .user-controls {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 8px;
         }
 
         .user-actions {
             display: flex;
-            gap: 10px;
+            gap: 5px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
         .action-btn {
@@ -357,116 +418,6 @@
             font-style: italic;
         }
 
-        .transaction-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            background: white;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .transaction-details {
-            flex: 1;
-        }
-
-        .transaction-type {
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 4px;
-        }
-
-        .transaction-date {
-            font-size: 12px;
-            color: #666;
-            margin-bottom: 4px;
-        }
-
-        .transaction-fee {
-            font-size: 12px;
-            color: #f39c12;
-        }
-
-        .transaction-method {
-            font-size: 12px;
-            color: #3498db;
-            margin-top: 4px;
-        }
-
-        .transaction-amount {
-            font-weight: 700;
-            font-size: 16px;
-        }
-
-        .transaction-positive {
-            color: #27ae60;
-        }
-
-        .transaction-negative {
-            color: #e74c3c;
-        }
-
-        /* Admin Panel Styles */
-        .user-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            background: white;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
-        .user-info {
-            flex: 1;
-        }
-
-        .user-phone {
-            font-weight: 600;
-            margin-bottom: 4px;
-        }
-
-        .user-balance {
-            color: #333;
-            margin-bottom: 2px;
-        }
-
-        .user-registered {
-            font-size: 12px;
-            color: #666;
-        }
-
-        .user-controls {
-            display: flex;
-            flex-direction: column;
-            align-items: flex-end;
-            gap: 8px;
-        }
-
-        .user-actions {
-            display: flex;
-            gap: 5px;
-            flex-wrap: wrap;
-            justify-content: flex-end;
-        }
-
-        .transaction-admin-item {
-            display: flex;
-            justify-content: space-between;
-            align-items: flex-start;
-            padding: 15px;
-            border-bottom: 1px solid #eee;
-            background: white;
-            margin-bottom: 8px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-        }
-
         .transaction-info {
             flex: 1;
         }
@@ -478,21 +429,6 @@
 
         .transaction-amounts {
             text-align: right;
-        }
-
-        .admin-section {
-            margin-bottom: 30px;
-            padding: 20px;
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
-
-        .admin-section h3 {
-            margin-bottom: 15px;
-            padding-bottom: 10px;
-            border-bottom: 2px solid var(--primary);
-            color: var(--primary);
         }
 
         /* Crypto Trading Styles */
@@ -584,13 +520,6 @@
             font-size: 18px;
             font-weight: bold;
             color: #333;
-        }
-
-        .crypto-icon img, .holding-icon img {
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-            object-fit: cover;
         }
 
         .crypto-details, .holding-details {
@@ -780,6 +709,62 @@
             font-size: 48px;
             margin-bottom: 15px;
         }
+
+        /* M-Pesa Styles */
+        .mpesa-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .payment-method-tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .payment-method-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .payment-method-tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .mpesa-phone-input {
+            margin-bottom: 15px;
+        }
+
+        .mpesa-instructions {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+        }
+
+        .mpesa-instructions ol {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        .mpesa-instructions li {
+            margin-bottom: 8px;
+        }
+
+        .mpesa-status {
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            border-left: 4px solid var(--info);
+        }
     </style>
 </head>
 <body>
@@ -879,6 +864,13 @@
         <!-- Deposit Screen -->
         <div id="deposit-screen" class="card hidden">
             <h2>Deposit Funds</h2>
+            
+            <!-- Payment Method Tabs -->
+            <div class="payment-method-tabs">
+                <div class="payment-method-tab active" id="paypal-tab">PayPal</div>
+                <div class="payment-method-tab" id="mpesa-tab">M-Pesa</div>
+            </div>
+            
             <div class="form-group">
                 <label for="deposit-amount">Enter Amount (USD)</label>
                 <input type="number" id="deposit-amount" class="form-control" placeholder="Enter amount" min="5" max="10000" step="0.01">
@@ -887,7 +879,42 @@
                 <p>Minimum deposit: $5.00</p>
                 <p>Maximum deposit: $10,000.00</p>
             </div>
-            <div class="paypal-container" id="paypal-container"></div>
+            
+            <!-- PayPal Payment Method -->
+            <div id="paypal-method">
+                <div class="paypal-container" id="paypal-container"></div>
+            </div>
+            
+            <!-- M-Pesa Payment Method -->
+            <div id="mpesa-method" class="hidden">
+                <div class="mpesa-container">
+                    <div class="form-group mpesa-phone-input">
+                        <label for="mpesa-phone">M-Pesa Phone Number</label>
+                        <input type="tel" id="mpesa-phone" class="form-control" placeholder="2547XXXXXXXX" value="">
+                    </div>
+                    
+                    <div class="mpesa-instructions">
+                        <h4>How to deposit with M-Pesa:</h4>
+                        <ol>
+                            <li>Enter your M-Pesa phone number above</li>
+                            <li>Enter the deposit amount in USD</li>
+                            <li>Click "Deposit with M-Pesa"</li>
+                            <li>Check your phone for STK Push prompt</li>
+                            <li>Enter your M-Pesa PIN to complete payment</li>
+                            <li>Wait for confirmation (may take a few seconds)</li>
+                        </ol>
+                    </div>
+                    
+                    <button class="btn btn-primary" id="mpesa-deposit-btn">
+                        <i class="fas fa-mobile-alt"></i> Deposit with M-Pesa
+                    </button>
+                    
+                    <div id="mpesa-status" class="mpesa-status hidden">
+                        <p id="mpesa-status-text">Processing...</p>
+                    </div>
+                </div>
+            </div>
+            
             <button class="btn btn-outline" id="back-from-deposit">Back</button>
         </div>
 
@@ -898,6 +925,7 @@
                 <h2>Payment Successful!</h2>
                 <p>Your deposit has been processed successfully.</p>
                 <p>Amount: <span id="deposit-success-amount">USD 0.00</span></p>
+                <p>Method: <span id="deposit-method">PayPal</span></p>
                 <button class="btn btn-primary" id="back-to-dashboard">Back to Dashboard</button>
             </div>
         </div>
@@ -1039,6 +1067,16 @@
         const app = initializeApp(firebaseConfig);
         const database = getDatabase(app);
 
+        // M-Pesa Configuration
+        const MPESA_CONFIG = {
+            CONSUMER_KEY: 'qvBMMqTOzWWjPUKSVL9fqnOgeumfflUp3BCDVRARRbOOJBA',
+            CONSUMER_SECRET: '33q8Rz2eGBlwBjy84IGYhdXiOaRyzcIV2IXkyOAeLHJ9AARVyiqdGKqRIX28qYcu',
+            BUSINESS_SHORTCODE: '174379',
+            PASSKEY: 'bfb279f9aa9bdbcf158e97dd71a467cd2e0c893059b10f78e6b72ada1ed2c919',
+            CALLBACK_URL: 'https://yourwebsite.com/mpesa-callback',
+            ENVIRONMENT: 'sandbox'
+        };
+
         // App Configuration
         const CONFIG = {
             PAYMENTS: {
@@ -1056,6 +1094,7 @@
         let cryptoList = [];
         let currentCryptoModal = null;
         let currentDepositAmount = 0;
+        let mpesaAccessToken = null;
 
         // DOM Elements
         const authScreen = document.getElementById('auth-screen');
@@ -1108,6 +1147,17 @@
         const depositAmountInput = document.getElementById('deposit-amount');
         const paypalContainer = document.getElementById('paypal-container');
         const depositSuccessAmount = document.getElementById('deposit-success-amount');
+        const depositMethod = document.getElementById('deposit-method');
+
+        // Payment Method Tabs
+        const paypalTab = document.getElementById('paypal-tab');
+        const mpesaTab = document.getElementById('mpesa-tab');
+        const paypalMethod = document.getElementById('paypal-method');
+        const mpesaMethod = document.getElementById('mpesa-method');
+        const mpesaPhoneInput = document.getElementById('mpesa-phone');
+        const mpesaDepositBtn = document.getElementById('mpesa-deposit-btn');
+        const mpesaStatus = document.getElementById('mpesa-status');
+        const mpesaStatusText = document.getElementById('mpesa-status-text');
 
         // Crypto Trading Elements
         const cryptoListContainer = document.getElementById('crypto-list');
@@ -1161,6 +1211,13 @@
         recipientPhone.addEventListener('input', updateTransactionDetails);
         depositAmountInput.addEventListener('input', handleDepositAmountChange);
 
+        // Payment Method Tabs
+        paypalTab.addEventListener('click', () => switchPaymentMethod('paypal'));
+        mpesaTab.addEventListener('click', () => switchPaymentMethod('mpesa'));
+        
+        // M-Pesa Deposit Button Event Listener
+        mpesaDepositBtn.addEventListener('click', handleMpesaDeposit);
+
         // Crypto Trading Event Listeners
         cryptoSearch.addEventListener('input', filterCryptoList);
 
@@ -1184,6 +1241,236 @@
             }
         });
 
+        // M-Pesa Functions
+        async function getMpesaAccessToken() {
+            try {
+                const auth = btoa(`${MPESA_CONFIG.CONSUMER_KEY}:${MPESA_CONFIG.CONSUMER_SECRET}`);
+                const url = MPESA_CONFIG.ENVIRONMENT === 'sandbox' 
+                    ? 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
+                    : 'https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
+                
+                const response = await fetch(url, {
+                    method: 'GET',
+                    headers: {
+                        'Authorization': `Basic ${auth}`
+                    }
+                });
+                
+                const data = await response.json();
+                mpesaAccessToken = data.access_token;
+                return mpesaAccessToken;
+            } catch (error) {
+                console.error('Error getting M-Pesa access token:', error);
+                throw error;
+            }
+        }
+
+        function generateTimestamp() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            return `${year}${month}${day}${hours}${minutes}${seconds}`;
+        }
+
+        function generatePassword(businessShortCode, passkey, timestamp) {
+            const stringToEncode = businessShortCode + passkey + timestamp;
+            return btoa(stringToEncode);
+        }
+
+        async function initiateSTKPush(phone, amount, accountReference) {
+            try {
+                if (!mpesaAccessToken) {
+                    await getMpesaAccessToken();
+                }
+
+                const timestamp = generateTimestamp();
+                const password = generatePassword(MPESA_CONFIG.BUSINESS_SHORTCODE, MPESA_CONFIG.PASSKEY, timestamp);
+                
+                // Format phone number (254 format)
+                let formattedPhone = phone.replace(/^0/, '254');
+                if (!formattedPhone.startsWith('254')) {
+                    formattedPhone = '254' + formattedPhone.slice(-9);
+                }
+
+                const stkPayload = {
+                    BusinessShortCode: MPESA_CONFIG.BUSINESS_SHORTCODE,
+                    Password: password,
+                    Timestamp: timestamp,
+                    TransactionType: "CustomerPayBillOnline",
+                    Amount: Math.round(amount),
+                    PartyA: formattedPhone,
+                    PartyB: MPESA_CONFIG.BUSINESS_SHORTCODE,
+                    PhoneNumber: formattedPhone,
+                    CallBackURL: MPESA_CONFIG.CALLBACK_URL,
+                    AccountReference: accountReference,
+                    TransactionDesc: "M-USD Deposit"
+                };
+
+                const url = MPESA_CONFIG.ENVIRONMENT === 'sandbox'
+                    ? 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
+                    : 'https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
+
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': `Bearer ${mpesaAccessToken}`,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(stkPayload)
+                });
+
+                const data = await response.json();
+                return data;
+            } catch (error) {
+                console.error('Error initiating STK Push:', error);
+                throw error;
+            }
+        }
+
+        // M-Pesa Deposit Handler - FIXED VERSION
+        async function handleMpesaDeposit() {
+            const amount = parseFloat(depositAmountInput.value) || 0;
+            const phone = mpesaPhoneInput.value.trim();
+
+            // Validation
+            if (!phone) {
+                showNotification('Please enter your M-Pesa phone number', 'error');
+                return;
+            }
+
+            if (amount < CONFIG.PAYMENTS.MIN_DEPOSIT) {
+                showNotification(`Minimum deposit is $${CONFIG.PAYMENTS.MIN_DEPOSIT}`, 'error');
+                return;
+            }
+
+            if (amount > CONFIG.PAYMENTS.MAX_DEPOSIT) {
+                showNotification(`Maximum deposit is $${CONFIG.PAYMENTS.MAX_DEPOSIT}`, 'error');
+                return;
+            }
+
+            if (!currentUser) {
+                showNotification('Please login first', 'error');
+                return;
+            }
+
+            showLoading();
+            mpesaStatus.classList.remove('hidden');
+            mpesaStatusText.textContent = 'Initiating M-Pesa payment...';
+
+            try {
+                // For demo purposes - simulate M-Pesa payment
+                // In production, you would call your backend which calls M-Pesa API
+                await simulateMpesaSTKPush(phone, amount);
+                
+            } catch (error) {
+                console.error('M-Pesa deposit error:', error);
+                mpesaStatusText.textContent = 'Payment failed. Please try again.';
+                showNotification('M-Pesa payment failed', 'error');
+                showScreen(depositScreen);
+            }
+        }
+
+        // Simulate M-Pesa STK Push (for demo - replace with actual M-Pesa API call)
+        async function simulateMpesaSTKPush(phone, amount) {
+            // Show processing status
+            mpesaStatusText.textContent = 'Sending STK Push to your phone...';
+            
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Simulate successful STK Push
+            mpesaStatusText.textContent = 'STK Push sent! Check your phone and enter M-Pesa PIN.';
+            
+            // Simulate waiting for user to complete payment
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            
+            // Simulate payment confirmation
+            await completeMpesaPayment(amount);
+        }
+
+        // Complete M-Pesa payment and update balance
+        async function completeMpesaPayment(amount) {
+            try {
+                mpesaStatusText.textContent = 'Processing payment...';
+                
+                // Update user balance
+                currentUser.balance += amount;
+                
+                // Save updated user
+                await saveUser(currentUser);
+                
+                // Record transaction
+                const transaction = {
+                    from: 'MPESA',
+                    to: currentUser.phone,
+                    amount: amount,
+                    fee: 0,
+                    type: 'deposit',
+                    method: 'mpesa',
+                    date: new Date().toISOString(),
+                    userId: currentUser.id,
+                    status: 'completed'
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Reload data
+                await loadUsers();
+                
+                // Update current user reference
+                currentUser = users.find(u => u.id === currentUser.id);
+                if (window.app && window.app.setCurrentUser) {
+                    window.app.setCurrentUser(currentUser);
+                }
+                
+                // Update displays
+                updateDashboard();
+                
+                // Show success screen
+                depositSuccessAmount.textContent = `USD ${amount.toFixed(2)}`;
+                if (depositMethod) {
+                    depositMethod.textContent = 'M-Pesa';
+                }
+                showScreen(paymentSuccessScreen);
+                showNotification(`M-Pesa deposit of USD ${amount.toFixed(2)} successful!`, 'success');
+                
+            } catch (error) {
+                console.error("M-Pesa payment processing error:", error);
+                mpesaStatusText.textContent = 'Payment processing failed. Please contact support.';
+                showNotification('M-Pesa payment processing failed', 'error');
+                showScreen(depositScreen);
+            }
+        }
+
+        function switchPaymentMethod(method) {
+            if (method === 'paypal') {
+                paypalTab.classList.add('active');
+                mpesaTab.classList.remove('active');
+                paypalMethod.classList.remove('hidden');
+                mpesaMethod.classList.add('hidden');
+            } else if (method === 'mpesa') {
+                mpesaTab.classList.add('active');
+                paypalTab.classList.remove('active');
+                mpesaMethod.classList.remove('hidden');
+                paypalMethod.classList.add('hidden');
+                
+                // Pre-fill M-Pesa phone with user's phone if available
+                if (currentUser && mpesaPhoneInput) {
+                    mpesaPhoneInput.value = currentUser.phone;
+                }
+                
+                // Reset M-Pesa status
+                if (mpesaStatus) {
+                    mpesaStatus.classList.add('hidden');
+                }
+            }
+        }
+
         // PayPal Integration
         function initializePayPalButton(amount) {
             // Clear previous PayPal button
@@ -1196,7 +1483,7 @@
                     // This function is called when the payment is approved
                     return actions.order.capture().then(function(details) {
                         // Payment completed successfully
-                        handleSuccessfulPayment(amount);
+                        handleSuccessfulPayment(amount, 'paypal');
                     });
                 },
                 onError: (err) => {
@@ -1228,7 +1515,7 @@
             }
         }
 
-        async function handleSuccessfulPayment(amount) {
+        async function handleSuccessfulPayment(amount, method) {
             showLoading();
             
             try {
@@ -1240,12 +1527,12 @@
                 
                 // Record transaction
                 const transaction = {
-                    from: 'PAYPAL',
+                    from: method.toUpperCase(),
                     to: currentUser.phone,
                     amount: amount,
                     fee: 0,
                     type: 'deposit',
-                    method: 'paypal',
+                    method: method,
                     date: new Date().toISOString(),
                     userId: currentUser.id
                 };
@@ -1264,6 +1551,7 @@
                 
                 // Show success screen
                 depositSuccessAmount.textContent = `USD ${amount.toFixed(2)}`;
+                depositMethod.textContent = method === 'paypal' ? 'PayPal' : 'M-Pesa';
                 showScreen(paymentSuccessScreen);
                 showNotification(`Deposit of USD ${amount.toFixed(2)} successful!`, 'success');
             } catch (error) {
@@ -1278,16 +1566,15 @@
             try {
                 const snapshot = await get(usersRef);
                 if (snapshot.exists()) {
-                    users = snapshot.val();
+                    const usersData = snapshot.val();
                     // Convert object to array
-                    users = Object.keys(users).map(key => ({
+                    users = Object.keys(usersData).map(key => ({
                         id: key,
-                        ...users[key]
+                        ...usersData[key]
                     }));
                 } else {
                     users = [];
                 }
-                console.log('Loaded users:', users.length);
                 return users;
             } catch (error) {
                 console.error("Error loading users:", error);
@@ -1300,18 +1587,17 @@
             try {
                 const snapshot = await get(transactionsRef);
                 if (snapshot.exists()) {
-                    transactions = snapshot.val();
+                    const transactionsData = snapshot.val();
                     // Convert object to array
-                    transactions = Object.keys(transactions).map(key => ({
+                    transactions = Object.keys(transactionsData).map(key => ({
                         id: key,
-                        ...transactions[key]
+                        ...transactionsData[key]
                     }));
                     // Sort by date descending
                     transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
                 } else {
                     transactions = [];
                 }
-                console.log('Loaded transactions:', transactions.length);
                 return transactions;
             } catch (error) {
                 console.error("Error loading transactions:", error);
@@ -1403,7 +1689,6 @@
                     };
                 });
                 
-                console.log('Loaded crypto prices:', Object.keys(cryptoPrices).length);
                 return cryptoPrices;
             } catch (error) {
                 console.error("Error loading crypto prices:", error);
@@ -1426,17 +1711,7 @@
                 'DOGE': { id: 'dogecoin', name: 'Dogecoin', symbol: 'DOGE', price: 0.12, change24h: 3.5, marketCap: 17000000000, icon: 'Ð' },
                 'DOT': { id: 'polkadot', name: 'Polkadot', symbol: 'DOT', price: 7.2, change24h: -0.5, marketCap: 9200000000, icon: '●' },
                 'AVAX': { id: 'avalanche-2', name: 'Avalanche', symbol: 'AVAX', price: 38, change24h: 2.1, marketCap: 15000000000, icon: '⛰️' },
-                'LINK': { id: 'chainlink', name: 'Chainlink', symbol: 'LINK', price: 18, change24h: 1.2, marketCap: 10500000000, icon: '🔗' },
-                'MATIC': { id: 'matic-network', name: 'Polygon', symbol: 'MATIC', price: 0.85, change24h: -0.8, marketCap: 8000000000, icon: '⬡' },
-                'LTC': { id: 'litecoin', name: 'Litecoin', symbol: 'LTC', price: 72, change24h: 0.3, marketCap: 5300000000, icon: 'Ł' },
-                'BCH': { id: 'bitcoin-cash', name: 'Bitcoin Cash', symbol: 'BCH', price: 260, change24h: 1.1, marketCap: 5100000000, icon: 'Ƀ' },
-                'ATOM': { id: 'cosmos', name: 'Cosmos', symbol: 'ATOM', price: 10.5, change24h: -2.1, marketCap: 4100000000, icon: '⚛' },
-                'ETC': { id: 'ethereum-classic', name: 'Ethereum Classic', symbol: 'ETC', price: 26, change24h: 0.7, marketCap: 3700000000, icon: 'ξ' },
-                'XLM': { id: 'stellar', name: 'Stellar', symbol: 'XLM', price: 0.13, change24h: 0.9, marketCap: 3700000000, icon: '★' },
-                'FIL': { id: 'filecoin', name: 'Filecoin', symbol: 'FIL', price: 5.8, change24h: -1.5, marketCap: 2900000000, icon: '⛰' },
-                'ALGO': { id: 'algorand', name: 'Algorand', symbol: 'ALGO', price: 0.18, change24h: 1.8, marketCap: 2300000000, icon: 'Α' },
-                'XTZ': { id: 'tezos', name: 'Tezos', symbol: 'XTZ', price: 1.05, change24h: -0.3, marketCap: 1000000000, icon: 'ꜩ' },
-                'EOS': { id: 'eos', name: 'EOS', symbol: 'EOS', price: 0.75, change24h: 0.4, marketCap: 850000000, icon: 'ε' }
+                'LINK': { id: 'chainlink', name: 'Chainlink', symbol: 'LINK', price: 18, change24h: 1.2, marketCap: 10500000000, icon: '🔗' }
             };
         }
 
@@ -1489,7 +1764,16 @@
                 cryptoEl.innerHTML = `
                     <div class="crypto-info">
                         <div class="crypto-icon">
-                            <img src="${crypto.image}" alt="${crypto.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : crypto.symbol.toUpperCase() === 'SOL' ? '◎' : crypto.symbol.toUpperCase() === 'XRP' ? '✕' : crypto.symbol.toUpperCase() === 'ADA' ? 'A' : crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : crypto.symbol.toUpperCase() === 'DOT' ? '●' : crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : crypto.symbol.toUpperCase() === 'MATIC' ? '⬡' : crypto.symbol.toUpperCase() === 'LTC' ? 'Ł' : crypto.symbol.toUpperCase() === 'BCH' ? 'Ƀ' : crypto.symbol.toUpperCase() === 'ATOM' ? '⚛' : crypto.symbol.toUpperCase() === 'ETC' ? 'ξ' : crypto.symbol.toUpperCase() === 'XLM' ? '★' : crypto.symbol.toUpperCase() === 'FIL' ? '⛰' : crypto.symbol.toUpperCase() === 'ALGO' ? 'Α' : crypto.symbol.toUpperCase() === 'XTZ' ? 'ꜩ' : crypto.symbol.toUpperCase() === 'EOS' ? 'ε' : '₿'}';">
+                            ${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : 
+                              crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : 
+                              crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : 
+                              crypto.symbol.toUpperCase() === 'SOL' ? '◎' : 
+                              crypto.symbol.toUpperCase() === 'XRP' ? '✕' : 
+                              crypto.symbol.toUpperCase() === 'ADA' ? 'A' : 
+                              crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : 
+                              crypto.symbol.toUpperCase() === 'DOT' ? '●' : 
+                              crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : 
+                              crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : '₿'}
                         </div>
                         <div class="crypto-details">
                             <div class="crypto-name">${crypto.name}</div>
@@ -1497,7 +1781,7 @@
                         </div>
                     </div>
                     <div class="crypto-price">
-                        <div class="crypto-current">$${crypto.current_price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 8})}</div>
+                        <div class="crypto-current">$${crypto.current_price?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 8}) || '0.00'}</div>
                         <div class="crypto-change ${changeClass}">
                             ${changeIcon} ${Math.abs(crypto.price_change_percentage_24h || 0).toFixed(2)}%
                         </div>
@@ -1538,7 +1822,16 @@
                 holdingEl.innerHTML = `
                     <div class="holding-info">
                         <div class="holding-icon">
-                            <img src="${crypto.icon}" alt="${crypto.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : crypto.symbol.toUpperCase() === 'SOL' ? '◎' : crypto.symbol.toUpperCase() === 'XRP' ? '✕' : crypto.symbol.toUpperCase() === 'ADA' ? 'A' : crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : crypto.symbol.toUpperCase() === 'DOT' ? '●' : crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : crypto.symbol.toUpperCase() === 'MATIC' ? '⬡' : crypto.symbol.toUpperCase() === 'LTC' ? 'Ł' : crypto.symbol.toUpperCase() === 'BCH' ? 'Ƀ' : crypto.symbol.toUpperCase() === 'ATOM' ? '⚛' : crypto.symbol.toUpperCase() === 'ETC' ? 'ξ' : crypto.symbol.toUpperCase() === 'XLM' ? '★' : crypto.symbol.toUpperCase() === 'FIL' ? '⛰' : crypto.symbol.toUpperCase() === 'ALGO' ? 'Α' : crypto.symbol.toUpperCase() === 'XTZ' ? 'ꜩ' : crypto.symbol.toUpperCase() === 'EOS' ? 'ε' : '₿'}';"> 
+                            ${holding.symbol === 'BTC' ? '₿' : 
+                              holding.symbol === 'ETH' ? 'Ξ' : 
+                              holding.symbol === 'BNB' ? 'ⓑ' : 
+                              holding.symbol === 'SOL' ? '◎' : 
+                              holding.symbol === 'XRP' ? '✕' : 
+                              holding.symbol === 'ADA' ? 'A' : 
+                              holding.symbol === 'DOGE' ? 'Ð' : 
+                              holding.symbol === 'DOT' ? '●' : 
+                              holding.symbol === 'AVAX' ? '⛰️' : 
+                              holding.symbol === 'LINK' ? '🔗' : '₿'}
                         </div>
                         <div class="holding-details">
                             <div class="holding-name">${crypto.name}</div>
@@ -1588,7 +1881,16 @@
                 cryptoEl.innerHTML = `
                     <div class="crypto-info">
                         <div class="crypto-icon">
-                            <img src="${crypto.image}" alt="${crypto.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : crypto.symbol.toUpperCase() === 'SOL' ? '◎' : crypto.symbol.toUpperCase() === 'XRP' ? '✕' : crypto.symbol.toUpperCase() === 'ADA' ? 'A' : crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : crypto.symbol.toUpperCase() === 'DOT' ? '●' : crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : crypto.symbol.toUpperCase() === 'MATIC' ? '⬡' : crypto.symbol.toUpperCase() === 'LTC' ? 'Ł' : crypto.symbol.toUpperCase() === 'BCH' ? 'Ƀ' : crypto.symbol.toUpperCase() === 'ATOM' ? '⚛' : crypto.symbol.toUpperCase() === 'ETC' ? 'ξ' : crypto.symbol.toUpperCase() === 'XLM' ? '★' : crypto.symbol.toUpperCase() === 'FIL' ? '⛰' : crypto.symbol.toUpperCase() === 'ALGO' ? 'Α' : crypto.symbol.toUpperCase() === 'XTZ' ? 'ꜩ' : crypto.symbol.toUpperCase() === 'EOS' ? 'ε' : '₿'}';"> 
+                            ${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : 
+                              crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : 
+                              crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : 
+                              crypto.symbol.toUpperCase() === 'SOL' ? '◎' : 
+                              crypto.symbol.toUpperCase() === 'XRP' ? '✕' : 
+                              crypto.symbol.toUpperCase() === 'ADA' ? 'A' : 
+                              crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : 
+                              crypto.symbol.toUpperCase() === 'DOT' ? '●' : 
+                              crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : 
+                              crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : '₿'}
                         </div>
                         <div class="crypto-details">
                             <div class="crypto-name">${crypto.name}</div>
@@ -1596,7 +1898,7 @@
                         </div>
                     </div>
                     <div class="crypto-price">
-                        <div class="crypto-current">$${crypto.current_price.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 8})}</div>
+                        <div class="crypto-current">$${crypto.current_price?.toLocaleString(undefined, {minimumFractionDigits: 2, maximumFractionDigits: 8}) || '0.00'}</div>
                         <div class="crypto-change ${changeClass}">
                             ${changeIcon} ${Math.abs(crypto.price_change_percentage_24h || 0).toFixed(2)}%
                         </div>
@@ -1641,7 +1943,16 @@
                     <div class="modal-body">
                         <div class="crypto-info">
                             <div class="crypto-icon" id="crypto-modal-icon">
-                                <img src="${crypto.icon}" alt="${crypto.name}" onerror="this.style.display='none'; this.parentNode.innerHTML='${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : crypto.symbol.toUpperCase() === 'SOL' ? '◎' : crypto.symbol.toUpperCase() === 'XRP' ? '✕' : crypto.symbol.toUpperCase() === 'ADA' ? 'A' : crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : crypto.symbol.toUpperCase() === 'DOT' ? '●' : crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : crypto.symbol.toUpperCase() === 'MATIC' ? '⬡' : crypto.symbol.toUpperCase() === 'LTC' ? 'Ł' : crypto.symbol.toUpperCase() === 'BCH' ? 'Ƀ' : crypto.symbol.toUpperCase() === 'ATOM' ? '⚛' : crypto.symbol.toUpperCase() === 'ETC' ? 'ξ' : crypto.symbol.toUpperCase() === 'XLM' ? '★' : crypto.symbol.toUpperCase() === 'FIL' ? '⛰' : crypto.symbol.toUpperCase() === 'ALGO' ? 'Α' : crypto.symbol.toUpperCase() === 'XTZ' ? 'ꜩ' : crypto.symbol.toUpperCase() === 'EOS' ? 'ε' : '₿'}';"> 
+                                ${symbol === 'BTC' ? '₿' : 
+                                  symbol === 'ETH' ? 'Ξ' : 
+                                  symbol === 'BNB' ? 'ⓑ' : 
+                                  symbol === 'SOL' ? '◎' : 
+                                  symbol === 'XRP' ? '✕' : 
+                                  symbol === 'ADA' ? 'A' : 
+                                  symbol === 'DOGE' ? 'Ð' : 
+                                  symbol === 'DOT' ? '●' : 
+                                  symbol === 'AVAX' ? '⛰️' : 
+                                  symbol === 'LINK' ? '🔗' : '₿'}
                             </div>
                             <div class="crypto-details">
                                 <h3 id="crypto-modal-name">${crypto.name}</h3>
@@ -2140,6 +2451,7 @@
             depositAmountInput.value = '';
             paypalContainer.innerHTML = '';
             currentDepositAmount = 0;
+            mpesaStatus.classList.add('hidden');
         }
 
         function showSendMoneyScreen() {
