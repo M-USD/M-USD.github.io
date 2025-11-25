@@ -4,10 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>📱M-USD</title>
-    <script 
-  src="https://www.paypal.com/sdk/js?client-id=BAACQuXuWBU-kINGYikHAl1SJbKvE39-jQgtC-83wwy2341zOdFtP0N4owr_xBsaUqGBUWgPajOljdo_Eo&components=hosted-buttons&disable-funding=venmo&currency=USD">
-</script>
-  
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         /* All the CSS styles remain exactly the same as before */
@@ -767,6 +763,23 @@
             color: var(--primary);
             font-weight: 600;
         }
+
+        /* PayPal Styles */
+        .paypal-container {
+            margin: 20px 0;
+            text-align: center;
+        }
+
+        .payment-success {
+            text-align: center;
+            padding: 20px;
+            color: var(--success);
+        }
+
+        .payment-success i {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
     </style>
 </head>
 <body>
@@ -865,17 +878,28 @@
 
         <!-- Deposit Screen -->
         <div id="deposit-screen" class="card hidden">
-            <h2>Deposit Method Coming Soon</h2>
+            <h2>Deposit Funds</h2>
             <div class="form-group">
                 <label for="deposit-amount">Enter Amount (USD)</label>
-                
+                <input type="number" id="deposit-amount" class="form-control" placeholder="Enter amount" min="5" max="10000" step="0.01">
             </div>
             <div class="form-group">
                 <p>Minimum deposit: $5.00</p>
                 <p>Maximum deposit: $10,000.00</p>
             </div>
-            <button class="btn btn-primary" id="confirm-deposit">Continue to Payment</button>
+            <div class="paypal-container" id="paypal-container"></div>
             <button class="btn btn-outline" id="back-from-deposit">Back</button>
+        </div>
+
+        <!-- Payment Success Screen -->
+        <div id="payment-success-screen" class="card hidden">
+            <div class="payment-success">
+                <i class="fas fa-check-circle"></i>
+                <h2>Payment Successful!</h2>
+                <p>Your deposit has been processed successfully.</p>
+                <p>Amount: <span id="deposit-success-amount">USD 0.00</span></p>
+                <button class="btn btn-primary" id="back-to-dashboard">Back to Dashboard</button>
+            </div>
         </div>
 
         <!-- Send Money Screen -->
@@ -908,7 +932,7 @@
 
         <!-- Crypto Trading Screen -->
         <div id="crypto-trading-screen" class="card hidden">
-            <h2>Crypto Trading Platform</h2>
+            <h2>Cryptocurrency Trading Platform</h2>
             
             <!-- Portfolio Summary -->
             <div class="portfolio-summary">
@@ -992,6 +1016,11 @@
         <p>🇺🇸M-USD &copy; 2026 | Transparent•Simple•Honest</p>
     </div>
 
+    <!-- PayPal SDK -->
+    <script 
+        src="https://www.paypal.com/sdk/js?client-id=BAACQuXuWBU-kINGYikHAl1SJbKvE39-jQgtC-83wwy2341zOdFtP0N4owr_xBsaUqGBUWgPajOljdo_Eo&components=hosted-buttons&disable-funding=venmo&currency=USD">
+    </script>
+
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
         import { getDatabase, ref, set, get, push, update, query, orderByChild, onValue, remove } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-database.js";
@@ -1026,11 +1055,13 @@
         let cryptoHoldings = {};
         let cryptoList = [];
         let currentCryptoModal = null;
+        let currentDepositAmount = 0;
 
         // DOM Elements
         const authScreen = document.getElementById('auth-screen');
         const dashboardScreen = document.getElementById('dashboard-screen');
         const depositScreen = document.getElementById('deposit-screen');
+        const paymentSuccessScreen = document.getElementById('payment-success-screen');
         const sendMoneyScreen = document.getElementById('send-money-screen');
         const transactionsScreen = document.getElementById('transactions-screen');
         const cryptoTradingScreen = document.getElementById('crypto-trading-screen');
@@ -1052,8 +1083,8 @@
         const cryptoBtn = document.getElementById('crypto-btn');
         const adminBtn = document.getElementById('admin-btn');
         
-        const confirmDeposit = document.getElementById('confirm-deposit');
         const backFromDeposit = document.getElementById('back-from-deposit');
+        const backToDashboard = document.getElementById('back-to-dashboard');
         
         const confirmSend = document.getElementById('confirm-send');
         const backFromSend = document.getElementById('back-from-send');
@@ -1074,6 +1105,9 @@
         const totalDeducted = document.getElementById('total-deducted');
         
         const notification = document.getElementById('notification');
+        const depositAmountInput = document.getElementById('deposit-amount');
+        const paypalContainer = document.getElementById('paypal-container');
+        const depositSuccessAmount = document.getElementById('deposit-success-amount');
 
         // Crypto Trading Elements
         const cryptoListContainer = document.getElementById('crypto-list');
@@ -1113,8 +1147,8 @@
         cryptoBtn.addEventListener('click', showCryptoTradingScreen);
         adminBtn.addEventListener('click', showAdminPanel);
 
-        confirmDeposit.addEventListener('click', handleDeposit);
         backFromDeposit.addEventListener('click', () => showScreen(dashboardScreen));
+        backToDashboard.addEventListener('click', () => showScreen(dashboardScreen));
 
         confirmSend.addEventListener('click', handleSendMoney);
         backFromSend.addEventListener('click', () => showScreen(dashboardScreen));
@@ -1125,6 +1159,7 @@
 
         sendAmount.addEventListener('input', updateTransactionDetails);
         recipientPhone.addEventListener('input', updateTransactionDetails);
+        depositAmountInput.addEventListener('input', handleDepositAmountChange);
 
         // Crypto Trading Event Listeners
         cryptoSearch.addEventListener('input', filterCryptoList);
@@ -1148,6 +1183,95 @@
                 openTradeModal(symbol, action);
             }
         });
+
+        // PayPal Integration
+        function initializePayPalButton(amount) {
+            // Clear previous PayPal button
+            paypalContainer.innerHTML = '';
+            
+            // Create new PayPal button
+            paypal.HostedButtons({
+                hostedButtonId: "U7CSKJSFDZLW2",
+                onApprove: (data, actions) => {
+                    // This function is called when the payment is approved
+                    return actions.order.capture().then(function(details) {
+                        // Payment completed successfully
+                        handleSuccessfulPayment(amount);
+                    });
+                },
+                onError: (err) => {
+                    // This function is called when an error occurs during payment
+                    console.error('PayPal payment error:', err);
+                    showNotification('Payment failed. Please try again.', 'error');
+                }
+            }).render("#paypal-container");
+        }
+
+        function handleDepositAmountChange() {
+            const amount = parseFloat(depositAmountInput.value) || 0;
+            
+            if (amount < CONFIG.PAYMENTS.MIN_DEPOSIT) {
+                showNotification(`Minimum deposit is $${CONFIG.PAYMENTS.MIN_DEPOSIT}`, 'error');
+                paypalContainer.innerHTML = '';
+                return;
+            }
+            
+            if (amount > CONFIG.PAYMENTS.MAX_DEPOSIT) {
+                showNotification(`Maximum deposit is $${CONFIG.PAYMENTS.MAX_DEPOSIT}`, 'error');
+                paypalContainer.innerHTML = '';
+                return;
+            }
+            
+            if (amount >= CONFIG.PAYMENTS.MIN_DEPOSIT && amount <= CONFIG.PAYMENTS.MAX_DEPOSIT) {
+                currentDepositAmount = amount;
+                initializePayPalButton(amount);
+            }
+        }
+
+        async function handleSuccessfulPayment(amount) {
+            showLoading();
+            
+            try {
+                // Update user balance
+                currentUser.balance += amount;
+                
+                // Save updated user
+                await saveUser(currentUser);
+                
+                // Record transaction
+                const transaction = {
+                    from: 'PAYPAL',
+                    to: currentUser.phone,
+                    amount: amount,
+                    fee: 0,
+                    type: 'deposit',
+                    method: 'paypal',
+                    date: new Date().toISOString(),
+                    userId: currentUser.id
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Reload data
+                await loadUsers();
+                
+                // Update current user reference
+                currentUser = users.find(u => u.id === currentUser.id);
+                window.app.setCurrentUser(currentUser);
+                
+                // Update displays
+                updateDashboard();
+                
+                // Show success screen
+                depositSuccessAmount.textContent = `USD ${amount.toFixed(2)}`;
+                showScreen(paymentSuccessScreen);
+                showNotification(`Deposit of USD ${amount.toFixed(2)} successful!`, 'success');
+            } catch (error) {
+                console.error("Payment processing error:", error);
+                showNotification('Payment processing failed. Please contact support.', 'error');
+                showScreen(dashboardScreen);
+            }
+        }
 
         // Firebase Data Functions
         async function loadUsers() {
@@ -1849,6 +1973,7 @@
             authScreen.classList.add('hidden');
             dashboardScreen.classList.add('hidden');
             depositScreen.classList.add('hidden');
+            paymentSuccessScreen.classList.add('hidden');
             sendMoneyScreen.classList.add('hidden');
             transactionsScreen.classList.add('hidden');
             cryptoTradingScreen.classList.add('hidden');
@@ -1865,6 +1990,7 @@
             authScreen.classList.add('hidden');
             dashboardScreen.classList.add('hidden');
             depositScreen.classList.add('hidden');
+            paymentSuccessScreen.classList.add('hidden');
             sendMoneyScreen.classList.add('hidden');
             transactionsScreen.classList.add('hidden');
             cryptoTradingScreen.classList.add('hidden');
@@ -2011,65 +2137,9 @@
 
         function showDepositScreen() {
             showScreen(depositScreen);
-            document.getElementById('deposit-amount').value = '';
-        }
-
-        async function handleDeposit() {
-            const amount = parseFloat(document.getElementById('deposit-amount').value);
-            
-            if (!amount || amount <= 0) {
-                showNotification('Please enter a valid amount', 'error');
-                return;
-            }
-            
-            if (amount < 5) {
-                showNotification('Minimum deposit is $5.00', 'error');
-                return;
-            }
-            
-            if (amount > 10000) {
-                showNotification('Maximum deposit is $10,000.00', 'error');
-                return;
-            }
-            
-            showLoading();
-            
-            try {
-                // Simulate deposit
-                currentUser.balance += amount;
-                
-                // Save updated user
-                await saveUser(currentUser);
-                
-                // Record transaction
-                const transaction = {
-                    from: 'DEPOSIT',
-                    to: currentUser.phone,
-                    amount: amount,
-                    fee: 0,
-                    type: 'deposit',
-                    method: 'manual',
-                    date: new Date().toISOString(),
-                    userId: currentUser.id
-                };
-                
-                await saveTransaction(transaction);
-                
-                // Reload data
-                await loadUsers();
-                
-                // Update current user reference
-                currentUser = users.find(u => u.id === currentUser.id);
-                window.app.setCurrentUser(currentUser);
-                
-                updateDashboard();
-                showScreen(dashboardScreen);
-                showNotification(`Deposit of USD ${amount.toFixed(2)} successful!`, 'success');
-            } catch (error) {
-                console.error("Deposit error:", error);
-                showNotification('Deposit failed. Please try again.', 'error');
-                showScreen(dashboardScreen);
-            }
+            depositAmountInput.value = '';
+            paypalContainer.innerHTML = '';
+            currentDepositAmount = 0;
         }
 
         function showSendMoneyScreen() {
