@@ -230,6 +230,7 @@
             color: var(--primary);
         }
 
+        /* Updated Admin Panel Styles */
         .admin-panel {
             background: white;
             border-radius: 12px;
@@ -237,8 +238,21 @@
             margin: 20px 0;
         }
 
+        .admin-layout {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        @media (min-width: 768px) {
+            .admin-layout {
+                flex-direction: row;
+            }
+        }
+
         .admin-section {
-            margin-bottom: 30px;
+            flex: 1;
+            margin-bottom: 20px;
             padding: 20px;
             background: white;
             border-radius: 12px;
@@ -320,6 +334,11 @@
             color: white;
         }
 
+        .action-btn.deduct {
+            background-color: var(--danger);
+            color: white;
+        }
+
         .status-badge {
             padding: 3px 8px;
             border-radius: 12px;
@@ -339,6 +358,99 @@
 
         .status-blocked {
             background-color: var(--danger);
+            color: white;
+        }
+
+        .status-pending {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        /* Deduction Modal Styles */
+        .deduction-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0,0,0,0.8);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+        }
+
+        .deduction-modal-content {
+            background: white;
+            border-radius: 12px;
+            max-width: 400px;
+            width: 90%;
+            padding: 20px;
+        }
+
+        .deduction-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .deduction-modal-header h2 {
+            margin: 0;
+            color: var(--primary);
+        }
+
+        .close-deduction-modal {
+            font-size: 24px;
+            cursor: pointer;
+            color: #666;
+        }
+
+        .deduction-user-info {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+
+        .deduction-user-info p {
+            margin: 5px 0;
+        }
+
+        .deduction-form-group {
+            margin-bottom: 15px;
+        }
+
+        .deduction-form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 500;
+        }
+
+        .deduction-form-control {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .deduction-actions {
+            display: flex;
+            gap: 10px;
+            justify-content: flex-end;
+            margin-top: 20px;
+        }
+
+        .btn-deduct {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .btn-cancel {
+            background-color: #6c757d;
             color: white;
         }
 
@@ -765,6 +877,152 @@
             border-radius: 8px;
             border-left: 4px solid var(--info);
         }
+
+        /* Admin Panel Control Buttons */
+        .admin-controls {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+
+        .admin-control-btn {
+            flex: 1;
+            min-width: 150px;
+            padding: 12px 15px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+        }
+
+        .admin-control-btn.users {
+            background-color: var(--info);
+            color: white;
+        }
+
+        .admin-control-btn.transactions {
+            background-color: var(--success);
+            color: white;
+        }
+
+        .admin-control-btn.pending {
+            background-color: var(--warning);
+            color: white;
+        }
+
+        .admin-control-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Admin Search Bars */
+        .admin-search {
+            margin-bottom: 15px;
+        }
+
+        .admin-search input {
+            width: 100%;
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        .admin-section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        /* Crypto Symbol Colors */
+        .crypto-icon.BTC { background-color: #f7931a; color: white; }
+        .crypto-icon.ETH { background-color: #627eea; color: white; }
+        .crypto-icon.BNB { background-color: #f3ba2f; color: white; }
+        .crypto-icon.SOL { background-color: #00ffbd; color: black; }
+        .crypto-icon.XRP { background-color: #23292f; color: white; }
+        .crypto-icon.ADA { background-color: #0033ad; color: white; }
+        .crypto-icon.DOGE { background-color: #c2a633; color: white; }
+        .crypto-icon.DOT { background-color: #e6007a; color: white; }
+        .crypto-icon.AVAX { background-color: #e84142; color: white; }
+        .crypto-icon.LINK { background-color: #2a5ada; color: white; }
+        
+        .holding-icon.BTC { background-color: #f7931a; color: white; }
+        .holding-icon.ETH { background-color: #627eea; color: white; }
+        .holding-icon.BNB { background-color: #f3ba2f; color: white; }
+        .holding-icon.SOL { background-color: #00ffbd; color: black; }
+        .holding-icon.XRP { background-color: #23292f; color: white; }
+        .holding-icon.ADA { background-color: #0033ad; color: white; }
+        .holding-icon.DOGE { background-color: #c2a633; color: white; }
+        .holding-icon.DOT { background-color: #e6007a; color: white; }
+        .holding-icon.AVAX { background-color: #e84142; color: white; }
+        .holding-icon.LINK { background-color: #2a5ada; color: white; }
+
+        /* Pending Transactions */
+        .pending-transaction-item {
+            background: #fff9e6;
+            border-left: 4px solid var(--warning);
+        }
+
+        .pending-actions {
+            display: flex;
+            gap: 5px;
+            margin-top: 10px;
+        }
+
+        .btn-approve {
+            background-color: var(--success);
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .btn-reject {
+            background-color: var(--danger);
+            color: white;
+            padding: 5px 10px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767px) {
+            .admin-layout {
+                flex-direction: column;
+            }
+            
+            .user-item, .transaction-admin-item {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            
+            .user-controls {
+                width: 100%;
+                margin-top: 10px;
+                align-items: flex-start;
+            }
+            
+            .user-actions {
+                justify-content: flex-start;
+            }
+            
+            .admin-controls {
+                flex-direction: column;
+            }
+            
+            .admin-section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -883,6 +1141,9 @@
             <!-- PayPal Payment Method -->
             <div id="paypal-method">
                 <div class="paypal-container" id="paypal-container"></div>
+                <div class="payment-notice">
+                    <p><strong>Note:</strong> Your deposit will be pending until verified by admin. You'll receive a notification once approved.</p>
+                </div>
             </div>
             
             <!-- M-Pesa Payment Method -->
@@ -901,7 +1162,7 @@
                             <li>Click "Deposit with M-Pesa"</li>
                             <li>Check your phone for STK Push prompt</li>
                             <li>Enter your M-Pesa PIN to complete payment</li>
-                            <li>Wait for confirmation (may take a few seconds)</li>
+                            <li>Wait for admin verification (usually within 24 hours)</li>
                         </ol>
                     </div>
                     
@@ -912,10 +1173,27 @@
                     <div id="mpesa-status" class="mpesa-status hidden">
                         <p id="mpesa-status-text">Processing...</p>
                     </div>
+                    
+                    <div class="payment-notice">
+                        <p><strong>Note:</strong> Your deposit will be pending until verified by admin. You'll receive a notification once approved.</p>
+                    </div>
                 </div>
             </div>
             
             <button class="btn btn-outline" id="back-from-deposit">Back</button>
+        </div>
+
+        <!-- Payment Pending Screen -->
+        <div id="payment-pending-screen" class="card hidden">
+            <div class="payment-success">
+                <i class="fas fa-clock"></i>
+                <h2>Payment Pending Verification</h2>
+                <p>Your deposit is pending admin verification.</p>
+                <p>Amount: <span id="pending-deposit-amount">USD 0.00</span></p>
+                <p>Method: <span id="pending-deposit-method">PayPal</span></p>
+                <p>You will be notified once your deposit is approved.</p>
+                <button class="btn btn-primary" id="back-to-dashboard-from-pending">Back to Dashboard</button>
+            </div>
         </div>
 
         <!-- Payment Success Screen -->
@@ -1011,17 +1289,70 @@
         <div id="admin-panel" class="admin-panel hidden">
             <h2>Admin Panel</h2>
             
-            <div class="admin-section">
-                <h3>All Users</h3>
-                <div id="users-list">
-                    <!-- Users will be populated here -->
-                </div>
+            <!-- Admin Control Buttons -->
+            <div class="admin-controls">
+                <button class="admin-control-btn users" id="show-users-btn">
+                    <i class="fas fa-users"></i> Show All Users
+                </button>
+                <button class="admin-control-btn transactions" id="show-transactions-btn">
+                    <i class="fas fa-exchange-alt"></i> Show All Transactions
+                </button>
+                <button class="admin-control-btn pending" id="show-pending-btn">
+                    <i class="fas fa-clock"></i> Pending Deposits
+                </button>
             </div>
             
-            <div class="admin-section">
-                <h3>All Transactions</h3>
-                <div id="admin-transactions-list">
-                    <!-- All transactions will be populated here -->
+            <div class="admin-layout">
+                <!-- Users Section (Hidden by Default) -->
+                <div class="admin-section hidden" id="users-section">
+                    <div class="admin-section-header">
+                        <h3>All Users</h3>
+                        <button class="btn btn-outline" id="hide-users-btn">
+                            <i class="fas fa-times"></i> Hide Users
+                        </button>
+                    </div>
+                    
+                    <!-- User Search -->
+                    <div class="admin-search">
+                        <input type="text" id="user-search" class="form-control" placeholder="Search users by phone number...">
+                    </div>
+                    
+                    <div id="users-list">
+                        <!-- Users will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Transactions Section (Hidden by Default) -->
+                <div class="admin-section hidden" id="transactions-section">
+                    <div class="admin-section-header">
+                        <h3>All Transactions</h3>
+                        <button class="btn btn-outline" id="hide-transactions-btn">
+                            <i class="fas fa-times"></i> Hide Transactions
+                        </button>
+                    </div>
+                    
+                    <!-- Transaction Search -->
+                    <div class="admin-search">
+                        <input type="text" id="transaction-search" class="form-control" placeholder="Search transactions by phone, type, or method...">
+                    </div>
+                    
+                    <div id="admin-transactions-list">
+                        <!-- All transactions will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Pending Deposits Section (Hidden by Default) -->
+                <div class="admin-section hidden" id="pending-section">
+                    <div class="admin-section-header">
+                        <h3>Pending Deposits</h3>
+                        <button class="btn btn-outline" id="hide-pending-btn">
+                            <i class="fas fa-times"></i> Hide Pending
+                        </button>
+                    </div>
+                    
+                    <div id="pending-deposits-list">
+                        <!-- Pending deposits will be populated here -->
+                    </div>
                 </div>
             </div>
             
@@ -1033,6 +1364,31 @@
             <div class="loading">
                 <div class="spinner"></div>
                 <p>Loading...</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Deduction Modal -->
+    <div id="deduction-modal" class="deduction-modal hidden">
+        <div class="deduction-modal-content">
+            <div class="deduction-modal-header">
+                <h2>Deduct Funds</h2>
+                <span class="close-deduction-modal" id="close-deduction-modal">&times;</span>
+            </div>
+            <div class="deduction-user-info" id="deduction-user-info">
+                <!-- User info will be populated here -->
+            </div>
+            <div class="deduction-form-group">
+                <label for="deduction-amount">Amount to Deduct (USD)</label>
+                <input type="number" id="deduction-amount" class="deduction-form-control" placeholder="Enter amount" min="0.01" step="0.01">
+            </div>
+            <div class="deduction-form-group">
+                <label for="deduction-reason">Reason for Deduction</label>
+                <textarea id="deduction-reason" class="deduction-form-control" placeholder="Enter reason for deduction" rows="3"></textarea>
+            </div>
+            <div class="deduction-actions">
+                <button class="btn btn-cancel" id="cancel-deduction">Cancel</button>
+                <button class="btn btn-deduct" id="confirm-deduction">Deduct Funds</button>
             </div>
         </div>
     </div>
@@ -1088,6 +1444,7 @@
         // Data Storage
         let users = [];
         let transactions = [];
+        let pendingDeposits = [];
         let currentUser = null;
         let cryptoPrices = {};
         let cryptoHoldings = {};
@@ -1095,11 +1452,13 @@
         let currentCryptoModal = null;
         let currentDepositAmount = 0;
         let mpesaAccessToken = null;
+        let currentDeductionUser = null;
 
         // DOM Elements
         const authScreen = document.getElementById('auth-screen');
         const dashboardScreen = document.getElementById('dashboard-screen');
         const depositScreen = document.getElementById('deposit-screen');
+        const paymentPendingScreen = document.getElementById('payment-pending-screen');
         const paymentSuccessScreen = document.getElementById('payment-success-screen');
         const sendMoneyScreen = document.getElementById('send-money-screen');
         const transactionsScreen = document.getElementById('transactions-screen');
@@ -1124,6 +1483,7 @@
         
         const backFromDeposit = document.getElementById('back-from-deposit');
         const backToDashboard = document.getElementById('back-to-dashboard');
+        const backToDashboardFromPending = document.getElementById('back-to-dashboard-from-pending');
         
         const confirmSend = document.getElementById('confirm-send');
         const backFromSend = document.getElementById('back-from-send');
@@ -1137,6 +1497,7 @@
         const transactionsList = document.getElementById('transactions-list');
         const usersList = document.getElementById('users-list');
         const adminTransactionsList = document.getElementById('admin-transactions-list');
+        const pendingDepositsList = document.getElementById('pending-deposits-list');
         
         const sendAmount = document.getElementById('send-amount');
         const recipientPhone = document.getElementById('recipient-phone');
@@ -1148,6 +1509,8 @@
         const paypalContainer = document.getElementById('paypal-container');
         const depositSuccessAmount = document.getElementById('deposit-success-amount');
         const depositMethod = document.getElementById('deposit-method');
+        const pendingDepositAmount = document.getElementById('pending-deposit-amount');
+        const pendingDepositMethod = document.getElementById('pending-deposit-method');
 
         // Payment Method Tabs
         const paypalTab = document.getElementById('paypal-tab');
@@ -1167,10 +1530,33 @@
         const portfolioCash = document.getElementById('portfolio-cash');
         const portfolioCrypto = document.getElementById('portfolio-crypto');
 
+        // Deduction Modal Elements
+        const deductionModal = document.getElementById('deduction-modal');
+        const closeDeductionModal = document.getElementById('close-deduction-modal');
+        const cancelDeduction = document.getElementById('cancel-deduction');
+        const confirmDeduction = document.getElementById('confirm-deduction');
+        const deductionAmountInput = document.getElementById('deduction-amount');
+        const deductionReasonInput = document.getElementById('deduction-reason');
+        const deductionUserInfo = document.getElementById('deduction-user-info');
+
+        // Admin Panel Control Elements
+        const showUsersBtn = document.getElementById('show-users-btn');
+        const showTransactionsBtn = document.getElementById('show-transactions-btn');
+        const showPendingBtn = document.getElementById('show-pending-btn');
+        const hideUsersBtn = document.getElementById('hide-users-btn');
+        const hideTransactionsBtn = document.getElementById('hide-transactions-btn');
+        const hidePendingBtn = document.getElementById('hide-pending-btn');
+        const userSearch = document.getElementById('user-search');
+        const transactionSearch = document.getElementById('transaction-search');
+        const usersSection = document.getElementById('users-section');
+        const transactionsSection = document.getElementById('transactions-section');
+        const pendingSection = document.getElementById('pending-section');
+
         // Firebase Database References
         const usersRef = ref(database, 'users');
         const transactionsRef = ref(database, 'transactions');
         const cryptoHoldingsRef = ref(database, 'cryptoHoldings');
+        const pendingDepositsRef = ref(database, 'pendingDeposits');
 
         // Event Listeners
         loginTab.addEventListener('click', () => {
@@ -1199,6 +1585,7 @@
 
         backFromDeposit.addEventListener('click', () => showScreen(dashboardScreen));
         backToDashboard.addEventListener('click', () => showScreen(dashboardScreen));
+        backToDashboardFromPending.addEventListener('click', () => showScreen(dashboardScreen));
 
         confirmSend.addEventListener('click', handleSendMoney);
         backFromSend.addEventListener('click', () => showScreen(dashboardScreen));
@@ -1221,6 +1608,48 @@
         // Crypto Trading Event Listeners
         cryptoSearch.addEventListener('input', filterCryptoList);
 
+        // Deduction Modal Event Listeners
+        closeDeductionModal.addEventListener('click', closeDeductionModalFunc);
+        cancelDeduction.addEventListener('click', closeDeductionModalFunc);
+        confirmDeduction.addEventListener('click', handleDeduction);
+
+        // Admin Panel Event Listeners
+        showUsersBtn.addEventListener('click', async () => {
+            await displayAllUsers();
+            usersSection.classList.remove('hidden');
+            transactionsSection.classList.add('hidden');
+            pendingSection.classList.add('hidden');
+        });
+
+        showTransactionsBtn.addEventListener('click', async () => {
+            await displayAllTransactions();
+            transactionsSection.classList.remove('hidden');
+            usersSection.classList.add('hidden');
+            pendingSection.classList.add('hidden');
+        });
+
+        showPendingBtn.addEventListener('click', async () => {
+            await displayPendingDeposits();
+            pendingSection.classList.remove('hidden');
+            usersSection.classList.add('hidden');
+            transactionsSection.classList.add('hidden');
+        });
+
+        hideUsersBtn.addEventListener('click', () => {
+            usersSection.classList.add('hidden');
+        });
+
+        hideTransactionsBtn.addEventListener('click', () => {
+            transactionsSection.classList.add('hidden');
+        });
+
+        hidePendingBtn.addEventListener('click', () => {
+            pendingSection.classList.add('hidden');
+        });
+
+        userSearch.addEventListener('input', filterUsers);
+        transactionSearch.addEventListener('input', filterTransactions);
+
         // Global event listener for trade buttons
         document.addEventListener('click', function(e) {
             if (e.target.classList.contains('btn-trade')) {
@@ -1241,212 +1670,160 @@
             }
         });
 
-        // M-Pesa Functions
-        async function getMpesaAccessToken() {
+        // Firebase Data Functions
+        async function loadUsers() {
             try {
-                const auth = btoa(`${MPESA_CONFIG.CONSUMER_KEY}:${MPESA_CONFIG.CONSUMER_SECRET}`);
-                const url = MPESA_CONFIG.ENVIRONMENT === 'sandbox' 
-                    ? 'https://sandbox.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials'
-                    : 'https://api.safaricom.co.ke/oauth/v1/generate?grant_type=client_credentials';
-                
-                const response = await fetch(url, {
-                    method: 'GET',
-                    headers: {
-                        'Authorization': `Basic ${auth}`
-                    }
-                });
-                
-                const data = await response.json();
-                mpesaAccessToken = data.access_token;
-                return mpesaAccessToken;
+                const snapshot = await get(usersRef);
+                if (snapshot.exists()) {
+                    const usersData = snapshot.val();
+                    // Convert object to array
+                    users = Object.keys(usersData).map(key => ({
+                        id: key,
+                        ...usersData[key]
+                    }));
+                } else {
+                    users = [];
+                }
+                return users;
             } catch (error) {
-                console.error('Error getting M-Pesa access token:', error);
-                throw error;
+                console.error("Error loading users:", error);
+                showNotification('Error loading users', 'error');
+                return [];
             }
         }
 
-        function generateTimestamp() {
-            const now = new Date();
-            const year = now.getFullYear();
-            const month = String(now.getMonth() + 1).padStart(2, '0');
-            const day = String(now.getDate()).padStart(2, '0');
-            const hours = String(now.getHours()).padStart(2, '0');
-            const minutes = String(now.getMinutes()).padStart(2, '0');
-            const seconds = String(now.getSeconds()).padStart(2, '0');
-            
-            return `${year}${month}${day}${hours}${minutes}${seconds}`;
-        }
-
-        function generatePassword(businessShortCode, passkey, timestamp) {
-            const stringToEncode = businessShortCode + passkey + timestamp;
-            return btoa(stringToEncode);
-        }
-
-        async function initiateSTKPush(phone, amount, accountReference) {
+        async function loadTransactions() {
             try {
-                if (!mpesaAccessToken) {
-                    await getMpesaAccessToken();
+                const snapshot = await get(transactionsRef);
+                if (snapshot.exists()) {
+                    const transactionsData = snapshot.val();
+                    // Convert object to array
+                    transactions = Object.keys(transactionsData).map(key => ({
+                        id: key,
+                        ...transactionsData[key]
+                    }));
+                    // Sort by date descending
+                    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
+                } else {
+                    transactions = [];
                 }
-
-                const timestamp = generateTimestamp();
-                const password = generatePassword(MPESA_CONFIG.BUSINESS_SHORTCODE, MPESA_CONFIG.PASSKEY, timestamp);
-                
-                // Format phone number (254 format)
-                let formattedPhone = phone.replace(/^0/, '254');
-                if (!formattedPhone.startsWith('254')) {
-                    formattedPhone = '254' + formattedPhone.slice(-9);
-                }
-
-                const stkPayload = {
-                    BusinessShortCode: MPESA_CONFIG.BUSINESS_SHORTCODE,
-                    Password: password,
-                    Timestamp: timestamp,
-                    TransactionType: "CustomerPayBillOnline",
-                    Amount: Math.round(amount),
-                    PartyA: formattedPhone,
-                    PartyB: MPESA_CONFIG.BUSINESS_SHORTCODE,
-                    PhoneNumber: formattedPhone,
-                    CallBackURL: MPESA_CONFIG.CALLBACK_URL,
-                    AccountReference: accountReference,
-                    TransactionDesc: "M-USD Deposit"
-                };
-
-                const url = MPESA_CONFIG.ENVIRONMENT === 'sandbox'
-                    ? 'https://sandbox.safaricom.co.ke/mpesa/stkpush/v1/processrequest'
-                    : 'https://api.safaricom.co.ke/mpesa/stkpush/v1/processrequest';
-
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': `Bearer ${mpesaAccessToken}`,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(stkPayload)
-                });
-
-                const data = await response.json();
-                return data;
+                return transactions;
             } catch (error) {
-                console.error('Error initiating STK Push:', error);
-                throw error;
+                console.error("Error loading transactions:", error);
+                showNotification('Error loading transactions', 'error');
+                return [];
             }
         }
 
-        // M-Pesa Deposit Handler - FIXED VERSION
-        async function handleMpesaDeposit() {
-            const amount = parseFloat(depositAmountInput.value) || 0;
-            const phone = mpesaPhoneInput.value.trim();
-
-            // Validation
-            if (!phone) {
-                showNotification('Please enter your M-Pesa phone number', 'error');
-                return;
-            }
-
-            if (amount < CONFIG.PAYMENTS.MIN_DEPOSIT) {
-                showNotification(`Minimum deposit is $${CONFIG.PAYMENTS.MIN_DEPOSIT}`, 'error');
-                return;
-            }
-
-            if (amount > CONFIG.PAYMENTS.MAX_DEPOSIT) {
-                showNotification(`Maximum deposit is $${CONFIG.PAYMENTS.MAX_DEPOSIT}`, 'error');
-                return;
-            }
-
-            if (!currentUser) {
-                showNotification('Please login first', 'error');
-                return;
-            }
-
-            showLoading();
-            mpesaStatus.classList.remove('hidden');
-            mpesaStatusText.textContent = 'Initiating M-Pesa payment...';
-
+        async function loadPendingDeposits() {
             try {
-                // For demo purposes - simulate M-Pesa payment
-                // In production, you would call your backend which calls M-Pesa API
-                await simulateMpesaSTKPush(phone, amount);
-                
+                const snapshot = await get(pendingDepositsRef);
+                if (snapshot.exists()) {
+                    const pendingData = snapshot.val();
+                    // Convert object to array
+                    pendingDeposits = Object.keys(pendingData).map(key => ({
+                        id: key,
+                        ...pendingData[key]
+                    }));
+                    // Sort by date descending
+                    pendingDeposits.sort((a, b) => new Date(b.date) - new Date(a.date));
+                } else {
+                    pendingDeposits = [];
+                }
+                return pendingDeposits;
             } catch (error) {
-                console.error('M-Pesa deposit error:', error);
-                mpesaStatusText.textContent = 'Payment failed. Please try again.';
-                showNotification('M-Pesa payment failed', 'error');
-                showScreen(depositScreen);
+                console.error("Error loading pending deposits:", error);
+                showNotification('Error loading pending deposits', 'error');
+                return [];
             }
         }
 
-        // Simulate M-Pesa STK Push (for demo - replace with actual M-Pesa API call)
-        async function simulateMpesaSTKPush(phone, amount) {
-            // Show processing status
-            mpesaStatusText.textContent = 'Sending STK Push to your phone...';
-            
-            // Simulate API call delay
-            await new Promise(resolve => setTimeout(resolve, 2000));
-            
-            // Simulate successful STK Push
-            mpesaStatusText.textContent = 'STK Push sent! Check your phone and enter M-Pesa PIN.';
-            
-            // Simulate waiting for user to complete payment
-            await new Promise(resolve => setTimeout(resolve, 5000));
-            
-            // Simulate payment confirmation
-            await completeMpesaPayment(amount);
-        }
-
-        // Complete M-Pesa payment and update balance
-        async function completeMpesaPayment(amount) {
+        async function saveUser(user) {
             try {
-                mpesaStatusText.textContent = 'Processing payment...';
-                
-                // Update user balance
-                currentUser.balance += amount;
-                
-                // Save updated user
-                await saveUser(currentUser);
-                
-                // Record transaction
-                const transaction = {
-                    from: 'MPESA',
-                    to: currentUser.phone,
-                    amount: amount,
-                    fee: 0,
-                    type: 'deposit',
-                    method: 'mpesa',
-                    date: new Date().toISOString(),
-                    userId: currentUser.id,
-                    status: 'completed'
-                };
-                
-                await saveTransaction(transaction);
-                
-                // Reload data
-                await loadUsers();
-                
-                // Update current user reference
-                currentUser = users.find(u => u.id === currentUser.id);
-                if (window.app && window.app.setCurrentUser) {
-                    window.app.setCurrentUser(currentUser);
+                if (user.id) {
+                    // Update existing user
+                    await update(ref(database, `users/${user.id}`), user);
+                } else {
+                    // Add new user
+                    const newUserRef = push(usersRef);
+                    user.id = newUserRef.key;
+                    await set(newUserRef, user);
                 }
-                
-                // Update displays
-                updateDashboard();
-                
-                // Show success screen
-                depositSuccessAmount.textContent = `USD ${amount.toFixed(2)}`;
-                if (depositMethod) {
-                    depositMethod.textContent = 'M-Pesa';
-                }
-                showScreen(paymentSuccessScreen);
-                showNotification(`M-Pesa deposit of USD ${amount.toFixed(2)} successful!`, 'success');
-                
+                return user;
             } catch (error) {
-                console.error("M-Pesa payment processing error:", error);
-                mpesaStatusText.textContent = 'Payment processing failed. Please contact support.';
-                showNotification('M-Pesa payment processing failed', 'error');
-                showScreen(depositScreen);
+                console.error("Error saving user:", error);
+                showNotification('Error saving user data', 'error');
+                return null;
             }
         }
 
+        async function saveTransaction(transaction) {
+            try {
+                const newTransactionRef = push(transactionsRef);
+                transaction.id = newTransactionRef.key;
+                await set(newTransactionRef, transaction);
+                return transaction;
+            } catch (error) {
+                console.error("Error saving transaction:", error);
+                showNotification('Error saving transaction', 'error');
+                return null;
+            }
+        }
+
+        async function savePendingDeposit(deposit) {
+            try {
+                const newDepositRef = push(pendingDepositsRef);
+                deposit.id = newDepositRef.key;
+                await set(newDepositRef, deposit);
+                return deposit;
+            } catch (error) {
+                console.error("Error saving pending deposit:", error);
+                showNotification('Error saving pending deposit', 'error');
+                return null;
+            }
+        }
+
+        async function removePendingDeposit(depositId) {
+            try {
+                await remove(ref(database, `pendingDeposits/${depositId}`));
+                return true;
+            } catch (error) {
+                console.error("Error removing pending deposit:", error);
+                showNotification('Error removing pending deposit', 'error');
+                return false;
+            }
+        }
+
+        async function loadCryptoHoldings() {
+            if (!currentUser) return {};
+            
+            try {
+                const holdingsRef = ref(database, `cryptoHoldings/${currentUser.id}`);
+                const snapshot = await get(holdingsRef);
+                if (snapshot.exists()) {
+                    cryptoHoldings = snapshot.val();
+                } else {
+                    cryptoHoldings = {};
+                }
+                return cryptoHoldings;
+            } catch (error) {
+                console.error("Error loading crypto holdings:", error);
+                return {};
+            }
+        }
+
+        async function saveCryptoHoldings(holdings) {
+            if (!currentUser) return;
+            
+            try {
+                const holdingsRef = ref(database, `cryptoHoldings/${currentUser.id}`);
+                await set(holdingsRef, holdings);
+            } catch (error) {
+                console.error("Error saving crypto holdings:", error);
+            }
+        }
+
+        // Payment Processing Functions
         function switchPaymentMethod(method) {
             if (method === 'paypal') {
                 paypalTab.classList.add('active');
@@ -1519,41 +1896,23 @@
             showLoading();
             
             try {
-                // Update user balance
-                currentUser.balance += amount;
-                
-                // Save updated user
-                await saveUser(currentUser);
-                
-                // Record transaction
-                const transaction = {
-                    from: method.toUpperCase(),
-                    to: currentUser.phone,
+                // Create pending deposit record instead of directly updating balance
+                const pendingDeposit = {
+                    userId: currentUser.id,
+                    userPhone: currentUser.phone,
                     amount: amount,
-                    fee: 0,
-                    type: 'deposit',
                     method: method,
                     date: new Date().toISOString(),
-                    userId: currentUser.id
+                    status: 'pending'
                 };
                 
-                await saveTransaction(transaction);
+                await savePendingDeposit(pendingDeposit);
                 
-                // Reload data
-                await loadUsers();
-                
-                // Update current user reference
-                currentUser = users.find(u => u.id === currentUser.id);
-                window.app.setCurrentUser(currentUser);
-                
-                // Update displays
-                updateDashboard();
-                
-                // Show success screen
-                depositSuccessAmount.textContent = `USD ${amount.toFixed(2)}`;
-                depositMethod.textContent = method === 'paypal' ? 'PayPal' : 'M-Pesa';
-                showScreen(paymentSuccessScreen);
-                showNotification(`Deposit of USD ${amount.toFixed(2)} successful!`, 'success');
+                // Show pending screen instead of success screen
+                pendingDepositAmount.textContent = `USD ${amount.toFixed(2)}`;
+                pendingDepositMethod.textContent = method === 'paypal' ? 'PayPal' : 'M-Pesa';
+                showScreen(paymentPendingScreen);
+                showNotification(`Deposit of USD ${amount.toFixed(2)} submitted for admin verification`, 'info');
             } catch (error) {
                 console.error("Payment processing error:", error);
                 showNotification('Payment processing failed. Please contact support.', 'error');
@@ -1561,109 +1920,241 @@
             }
         }
 
-        // Firebase Data Functions
-        async function loadUsers() {
+        // M-Pesa Deposit Handler
+        async function handleMpesaDeposit() {
+            const amount = parseFloat(depositAmountInput.value) || 0;
+            const phone = mpesaPhoneInput.value.trim();
+
+            // Validation
+            if (!phone) {
+                showNotification('Please enter your M-Pesa phone number', 'error');
+                return;
+            }
+
+            if (amount < CONFIG.PAYMENTS.MIN_DEPOSIT) {
+                showNotification(`Minimum deposit is $${CONFIG.PAYMENTS.MIN_DEPOSIT}`, 'error');
+                return;
+            }
+
+            if (amount > CONFIG.PAYMENTS.MAX_DEPOSIT) {
+                showNotification(`Maximum deposit is $${CONFIG.PAYMENTS.MAX_DEPOSIT}`, 'error');
+                return;
+            }
+
+            if (!currentUser) {
+                showNotification('Please login first', 'error');
+                return;
+            }
+
+            showLoading();
+            mpesaStatus.classList.remove('hidden');
+            mpesaStatusText.textContent = 'Initiating M-Pesa payment...';
+
             try {
-                const snapshot = await get(usersRef);
-                if (snapshot.exists()) {
-                    const usersData = snapshot.val();
-                    // Convert object to array
-                    users = Object.keys(usersData).map(key => ({
-                        id: key,
-                        ...usersData[key]
-                    }));
-                } else {
-                    users = [];
-                }
-                return users;
+                // For demo purposes - simulate M-Pesa payment
+                await simulateMpesaSTKPush(phone, amount);
+                
             } catch (error) {
-                console.error("Error loading users:", error);
-                showNotification('Error loading users', 'error');
-                return [];
+                console.error('M-Pesa deposit error:', error);
+                mpesaStatusText.textContent = 'Payment failed. Please try again.';
+                showNotification('M-Pesa payment failed', 'error');
+                showScreen(depositScreen);
             }
         }
 
-        async function loadTransactions() {
+        // Simulate M-Pesa STK Push (for demo - replace with actual M-Pesa API call)
+        async function simulateMpesaSTKPush(phone, amount) {
+            // Show processing status
+            mpesaStatusText.textContent = 'Sending STK Push to your phone...';
+            
+            // Simulate API call delay
+            await new Promise(resolve => setTimeout(resolve, 2000));
+            
+            // Simulate successful STK Push
+            mpesaStatusText.textContent = 'STK Push sent! Check your phone and enter M-Pesa PIN.';
+            
+            // Simulate waiting for user to complete payment
+            await new Promise(resolve => setTimeout(resolve, 5000));
+            
+            // Simulate payment confirmation
+            await completeMpesaPayment(amount);
+        }
+
+        // Complete M-Pesa payment and create pending deposit
+        async function completeMpesaPayment(amount) {
             try {
-                const snapshot = await get(transactionsRef);
-                if (snapshot.exists()) {
-                    const transactionsData = snapshot.val();
-                    // Convert object to array
-                    transactions = Object.keys(transactionsData).map(key => ({
-                        id: key,
-                        ...transactionsData[key]
-                    }));
-                    // Sort by date descending
-                    transactions.sort((a, b) => new Date(b.date) - new Date(a.date));
-                } else {
-                    transactions = [];
-                }
-                return transactions;
+                mpesaStatusText.textContent = 'Payment successful! Creating pending deposit...';
+                
+                // Create pending deposit record instead of directly updating balance
+                const pendingDeposit = {
+                    userId: currentUser.id,
+                    userPhone: currentUser.phone,
+                    amount: amount,
+                    method: 'mpesa',
+                    date: new Date().toISOString(),
+                    status: 'pending'
+                };
+                
+                await savePendingDeposit(pendingDeposit);
+                
+                // Show pending screen
+                pendingDepositAmount.textContent = `USD ${amount.toFixed(2)}`;
+                pendingDepositMethod.textContent = 'M-Pesa';
+                showScreen(paymentPendingScreen);
+                showNotification(`M-Pesa deposit of USD ${amount.toFixed(2)} submitted for admin verification`, 'info');
+                
             } catch (error) {
-                console.error("Error loading transactions:", error);
-                showNotification('Error loading transactions', 'error');
-                return [];
+                console.error("M-Pesa payment processing error:", error);
+                mpesaStatusText.textContent = 'Payment processing failed. Please contact support.';
+                showNotification('M-Pesa payment processing failed', 'error');
+                showScreen(depositScreen);
             }
         }
 
-        async function saveUser(user) {
-            try {
-                if (user.id) {
-                    // Update existing user
-                    await update(ref(database, `users/${user.id}`), user);
-                } else {
-                    // Add new user
-                    const newUserRef = push(usersRef);
-                    user.id = newUserRef.key;
-                    await set(newUserRef, user);
-                }
-                return user;
-            } catch (error) {
-                console.error("Error saving user:", error);
-                showNotification('Error saving user data', 'error');
-                return null;
+        // Admin Functions for Verifying Deposits
+        async function displayPendingDeposits() {
+            await loadPendingDeposits();
+            pendingDepositsList.innerHTML = '';
+            
+            if (pendingDeposits.length === 0) {
+                pendingDepositsList.innerHTML = '<p class="no-transactions">No pending deposits found</p>';
+                return;
             }
+            
+            pendingDeposits.forEach(deposit => {
+                const depositEl = document.createElement('div');
+                depositEl.className = 'transaction-admin-item pending-transaction-item';
+                
+                depositEl.innerHTML = `
+                    <div class="transaction-info">
+                        <div class="transaction-parties"><strong>User:</strong> ${deposit.userPhone}</div>
+                        <div class="transaction-date"><strong>Date:</strong> ${new Date(deposit.date).toLocaleString()}</div>
+                        <div class="transaction-type"><strong>Method:</strong> ${deposit.method}</div>
+                        <div class="transaction-type"><strong>Status:</strong> <span class="status-badge status-pending">Pending</span></div>
+                    </div>
+                    <div class="transaction-amounts">
+                        <div class="transaction-amount"><strong>Amount:</strong> USD ${deposit.amount.toFixed(2)}</div>
+                        <div class="pending-actions">
+                            <button class="btn-approve" data-id="${deposit.id}">Approve</button>
+                            <button class="btn-reject" data-id="${deposit.id}">Reject</button>
+                        </div>
+                    </div>
+                `;
+                
+                pendingDepositsList.appendChild(depositEl);
+            });
+            
+            // Add event listeners to approve/reject buttons
+            setTimeout(() => {
+                document.querySelectorAll('.btn-approve').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        approvePendingDeposit(btn.dataset.id);
+                    });
+                });
+                
+                document.querySelectorAll('.btn-reject').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        rejectPendingDeposit(btn.dataset.id);
+                    });
+                });
+            }, 100);
         }
 
-        async function saveTransaction(transaction) {
-            try {
-                const newTransactionRef = push(transactionsRef);
-                transaction.id = newTransactionRef.key;
-                await set(newTransactionRef, transaction);
-                return transaction;
-            } catch (error) {
-                console.error("Error saving transaction:", error);
-                showNotification('Error saving transaction', 'error');
-                return null;
+        async function approvePendingDeposit(depositId) {
+            const deposit = pendingDeposits.find(d => d.id === depositId);
+            if (!deposit) {
+                showNotification('Deposit not found', 'error');
+                return;
             }
-        }
-
-        async function loadCryptoHoldings() {
-            if (!currentUser) return {};
+            
+            showLoading();
             
             try {
-                const holdingsRef = ref(database, `cryptoHoldings/${currentUser.id}`);
-                const snapshot = await get(holdingsRef);
-                if (snapshot.exists()) {
-                    cryptoHoldings = snapshot.val();
-                } else {
-                    cryptoHoldings = {};
+                // Find the user
+                const user = users.find(u => u.id === deposit.userId);
+                if (!user) {
+                    showNotification('User not found', 'error');
+                    return;
                 }
-                return cryptoHoldings;
+                
+                // Update user balance
+                user.balance += deposit.amount;
+                await saveUser(user);
+                
+                // Record transaction for the user
+                const transaction = {
+                    from: deposit.method.toUpperCase(),
+                    to: user.phone,
+                    amount: deposit.amount,
+                    fee: 0,
+                    type: 'deposit',
+                    method: deposit.method,
+                    date: new Date().toISOString(),
+                    userId: user.id,
+                    status: 'completed'
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Remove from pending deposits
+                await removePendingDeposit(depositId);
+                
+                // Reload data
+                await loadUsers();
+                await loadPendingDeposits();
+                
+                // Update displays
+                await displayPendingDeposits();
+                
+                showNotification(`Deposit of USD ${deposit.amount.toFixed(2)} approved for ${user.phone}`, 'success');
             } catch (error) {
-                console.error("Error loading crypto holdings:", error);
-                return {};
+                console.error("Error approving deposit:", error);
+                showNotification('Error approving deposit', 'error');
+                showScreen(adminPanel);
             }
         }
 
-        async function saveCryptoHoldings(holdings) {
-            if (!currentUser) return;
+        async function rejectPendingDeposit(depositId) {
+            const deposit = pendingDeposits.find(d => d.id === depositId);
+            if (!deposit) {
+                showNotification('Deposit not found', 'error');
+                return;
+            }
+            
+            showLoading();
             
             try {
-                const holdingsRef = ref(database, `cryptoHoldings/${currentUser.id}`);
-                await set(holdingsRef, holdings);
+                // Record rejected transaction
+                const transaction = {
+                    from: deposit.method.toUpperCase(),
+                    to: deposit.userPhone,
+                    amount: deposit.amount,
+                    fee: 0,
+                    type: 'deposit',
+                    method: deposit.method,
+                    date: new Date().toISOString(),
+                    userId: deposit.userId,
+                    status: 'rejected'
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Remove from pending deposits
+                await removePendingDeposit(depositId);
+                
+                // Reload data
+                await loadPendingDeposits();
+                
+                // Update displays
+                await displayPendingDeposits();
+                
+                showNotification(`Deposit of USD ${deposit.amount.toFixed(2)} rejected for ${deposit.userPhone}`, 'info');
             } catch (error) {
-                console.error("Error saving crypto holdings:", error);
+                console.error("Error rejecting deposit:", error);
+                showNotification('Error rejecting deposit', 'error');
+                showScreen(adminPanel);
             }
         }
 
@@ -1760,24 +2251,25 @@
                 
                 const changeClass = crypto.price_change_percentage_24h >= 0 ? 'positive' : 'negative';
                 const changeIcon = crypto.price_change_percentage_24h >= 0 ? '↗' : '↘';
+                const symbol = crypto.symbol.toUpperCase();
                 
                 cryptoEl.innerHTML = `
                     <div class="crypto-info">
-                        <div class="crypto-icon">
-                            ${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : 
-                              crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : 
-                              crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : 
-                              crypto.symbol.toUpperCase() === 'SOL' ? '◎' : 
-                              crypto.symbol.toUpperCase() === 'XRP' ? '✕' : 
-                              crypto.symbol.toUpperCase() === 'ADA' ? 'A' : 
-                              crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : 
-                              crypto.symbol.toUpperCase() === 'DOT' ? '●' : 
-                              crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : 
-                              crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : '₿'}
+                        <div class="crypto-icon ${symbol}">
+                            ${symbol === 'BTC' ? '₿' : 
+                              symbol === 'ETH' ? 'Ξ' : 
+                              symbol === 'BNB' ? 'ⓑ' : 
+                              symbol === 'SOL' ? '◎' : 
+                              symbol === 'XRP' ? '✕' : 
+                              symbol === 'ADA' ? 'A' : 
+                              symbol === 'DOGE' ? 'Ð' : 
+                              symbol === 'DOT' ? '●' : 
+                              symbol === 'AVAX' ? '⛰️' : 
+                              symbol === 'LINK' ? '🔗' : '₿'}
                         </div>
                         <div class="crypto-details">
                             <div class="crypto-name">${crypto.name}</div>
-                            <div class="crypto-symbol">${crypto.symbol.toUpperCase()}</div>
+                            <div class="crypto-symbol">${symbol}</div>
                         </div>
                     </div>
                     <div class="crypto-price">
@@ -1787,8 +2279,8 @@
                         </div>
                     </div>
                     <div class="crypto-actions">
-                        <button class="btn-trade" data-symbol="${crypto.symbol.toUpperCase()}" data-action="buy">Buy</button>
-                        <button class="btn-trade" data-symbol="${crypto.symbol.toUpperCase()}" data-action="sell">Sell</button>
+                        <button class="btn-trade" data-symbol="${symbol}" data-action="buy">Buy</button>
+                        <button class="btn-trade" data-symbol="${symbol}" data-action="sell">Sell</button>
                     </div>
                 `;
                 
@@ -1815,27 +2307,28 @@
                 const value = holding.quantity * crypto.price;
                 const changeClass = crypto.change24h >= 0 ? 'positive' : 'negative';
                 const changeIcon = crypto.change24h >= 0 ? '↗' : '↘';
+                const symbol = holding.symbol;
                 
                 const holdingEl = document.createElement('div');
                 holdingEl.className = 'holding-item';
                 
                 holdingEl.innerHTML = `
                     <div class="holding-info">
-                        <div class="holding-icon">
-                            ${holding.symbol === 'BTC' ? '₿' : 
-                              holding.symbol === 'ETH' ? 'Ξ' : 
-                              holding.symbol === 'BNB' ? 'ⓑ' : 
-                              holding.symbol === 'SOL' ? '◎' : 
-                              holding.symbol === 'XRP' ? '✕' : 
-                              holding.symbol === 'ADA' ? 'A' : 
-                              holding.symbol === 'DOGE' ? 'Ð' : 
-                              holding.symbol === 'DOT' ? '●' : 
-                              holding.symbol === 'AVAX' ? '⛰️' : 
-                              holding.symbol === 'LINK' ? '🔗' : '₿'}
+                        <div class="holding-icon ${symbol}">
+                            ${symbol === 'BTC' ? '₿' : 
+                              symbol === 'ETH' ? 'Ξ' : 
+                              symbol === 'BNB' ? 'ⓑ' : 
+                              symbol === 'SOL' ? '◎' : 
+                              symbol === 'XRP' ? '✕' : 
+                              symbol === 'ADA' ? 'A' : 
+                              symbol === 'DOGE' ? 'Ð' : 
+                              symbol === 'DOT' ? '●' : 
+                              symbol === 'AVAX' ? '⛰️' : 
+                              symbol === 'LINK' ? '🔗' : '₿'}
                         </div>
                         <div class="holding-details">
                             <div class="holding-name">${crypto.name}</div>
-                            <div class="holding-symbol">${holding.symbol}</div>
+                            <div class="holding-symbol">${symbol}</div>
                         </div>
                     </div>
                     <div class="holding-quantity">
@@ -1877,24 +2370,25 @@
                 
                 const changeClass = crypto.price_change_percentage_24h >= 0 ? 'positive' : 'negative';
                 const changeIcon = crypto.price_change_percentage_24h >= 0 ? '↗' : '↘';
+                const symbol = crypto.symbol.toUpperCase();
                 
                 cryptoEl.innerHTML = `
                     <div class="crypto-info">
-                        <div class="crypto-icon">
-                            ${crypto.symbol.toUpperCase() === 'BTC' ? '₿' : 
-                              crypto.symbol.toUpperCase() === 'ETH' ? 'Ξ' : 
-                              crypto.symbol.toUpperCase() === 'BNB' ? 'ⓑ' : 
-                              crypto.symbol.toUpperCase() === 'SOL' ? '◎' : 
-                              crypto.symbol.toUpperCase() === 'XRP' ? '✕' : 
-                              crypto.symbol.toUpperCase() === 'ADA' ? 'A' : 
-                              crypto.symbol.toUpperCase() === 'DOGE' ? 'Ð' : 
-                              crypto.symbol.toUpperCase() === 'DOT' ? '●' : 
-                              crypto.symbol.toUpperCase() === 'AVAX' ? '⛰️' : 
-                              crypto.symbol.toUpperCase() === 'LINK' ? '🔗' : '₿'}
+                        <div class="crypto-icon ${symbol}">
+                            ${symbol === 'BTC' ? '₿' : 
+                              symbol === 'ETH' ? 'Ξ' : 
+                              symbol === 'BNB' ? 'ⓑ' : 
+                              symbol === 'SOL' ? '◎' : 
+                              symbol === 'XRP' ? '✕' : 
+                              symbol === 'ADA' ? 'A' : 
+                              symbol === 'DOGE' ? 'Ð' : 
+                              symbol === 'DOT' ? '●' : 
+                              symbol === 'AVAX' ? '⛰️' : 
+                              symbol === 'LINK' ? '🔗' : '₿'}
                         </div>
                         <div class="crypto-details">
                             <div class="crypto-name">${crypto.name}</div>
-                            <div class="crypto-symbol">${crypto.symbol.toUpperCase()}</div>
+                            <div class="crypto-symbol">${symbol}</div>
                         </div>
                     </div>
                     <div class="crypto-price">
@@ -1904,8 +2398,8 @@
                         </div>
                     </div>
                     <div class="crypto-actions">
-                        <button class="btn-trade" data-symbol="${crypto.symbol.toUpperCase()}" data-action="buy">Buy</button>
-                        <button class="btn-trade" data-symbol="${crypto.symbol.toUpperCase()}" data-action="sell">Sell</button>
+                        <button class="btn-trade" data-symbol="${symbol}" data-action="buy">Buy</button>
+                        <button class="btn-trade" data-symbol="${symbol}" data-action="sell">Sell</button>
                     </div>
                 `;
                 
@@ -1942,7 +2436,7 @@
                     </div>
                     <div class="modal-body">
                         <div class="crypto-info">
-                            <div class="crypto-icon" id="crypto-modal-icon">
+                            <div class="crypto-icon ${symbol}" id="crypto-modal-icon">
                                 ${symbol === 'BTC' ? '₿' : 
                                   symbol === 'ETH' ? 'Ξ' : 
                                   symbol === 'BNB' ? 'ⓑ' : 
@@ -2284,6 +2778,7 @@
             authScreen.classList.add('hidden');
             dashboardScreen.classList.add('hidden');
             depositScreen.classList.add('hidden');
+            paymentPendingScreen.classList.add('hidden');
             paymentSuccessScreen.classList.add('hidden');
             sendMoneyScreen.classList.add('hidden');
             transactionsScreen.classList.add('hidden');
@@ -2293,6 +2788,7 @@
             
             // Close any open modal
             closeCryptoModal();
+            closeDeductionModalFunc();
             
             screen.classList.remove('hidden');
         }
@@ -2301,6 +2797,7 @@
             authScreen.classList.add('hidden');
             dashboardScreen.classList.add('hidden');
             depositScreen.classList.add('hidden');
+            paymentPendingScreen.classList.add('hidden');
             paymentSuccessScreen.classList.add('hidden');
             sendMoneyScreen.classList.add('hidden');
             transactionsScreen.classList.add('hidden');
@@ -2526,18 +3023,52 @@
                 await saveUser(currentUser);
                 await saveUser(recipientUser);
                 
-                // Record transaction
-                const transaction = {
+                // Record transaction for SENDER
+                const senderTransaction = {
                     from: currentUser.phone,
                     to: recipient,
                     amount: amount,
                     fee: fee,
                     type: 'send',
                     date: new Date().toISOString(),
-                    userId: currentUser.id
+                    userId: currentUser.id,
+                    netAmount: -total, // Negative amount for sender
+                    status: 'completed'
                 };
                 
-                await saveTransaction(transaction);
+                await saveTransaction(senderTransaction);
+                
+                // Record transaction for RECEIVER
+                const receiverTransaction = {
+                    from: currentUser.phone,
+                    to: recipient,
+                    amount: amount,
+                    fee: 0, // No fee for receiver
+                    type: 'receive',
+                    date: new Date().toISOString(),
+                    userId: recipientUser.id,
+                    netAmount: amount, // Positive amount for receiver
+                    status: 'completed'
+                };
+                
+                await saveTransaction(receiverTransaction);
+                
+                // Record fee transaction for admin
+                if (adminUser && fee > 0) {
+                    const feeTransaction = {
+                        from: `${currentUser.phone} (Fee)`,
+                        to: 'ADMIN',
+                        amount: fee,
+                        fee: 0,
+                        type: 'fee',
+                        date: new Date().toISOString(),
+                        userId: adminUser.id,
+                        netAmount: fee,
+                        status: 'completed'
+                    };
+                    
+                    await saveTransaction(feeTransaction);
+                }
                 
                 // Reload data
                 await loadUsers();
@@ -2582,20 +3113,70 @@
                 const transactionEl = document.createElement('div');
                 transactionEl.className = 'transaction-item';
                 
-                const isSent = transaction.from === currentUser.phone;
-                const amountClass = isSent ? 'transaction-negative' : 'transaction-positive';
-                const amountPrefix = isSent ? '-' : '+';
-                const typeText = isSent ? 'Sent' : 'Received';
+                // Determine transaction type and styling
+                let typeText, amountClass, amountPrefix, description;
+                
+                if (transaction.type === 'send') {
+                    typeText = 'Sent Money';
+                    amountClass = 'transaction-negative';
+                    amountPrefix = '-';
+                    description = `To: ${transaction.to}`;
+                } else if (transaction.type === 'receive') {
+                    typeText = 'Received Money';
+                    amountClass = 'transaction-positive';
+                    amountPrefix = '+';
+                    description = `From: ${transaction.from}`;
+                } else if (transaction.type === 'deposit') {
+                    typeText = 'Deposit';
+                    amountClass = 'transaction-positive';
+                    amountPrefix = '+';
+                    description = `Method: ${transaction.method || 'Unknown'}`;
+                } else if (transaction.type === 'crypto_buy') {
+                    typeText = 'Crypto Buy';
+                    amountClass = 'transaction-negative';
+                    amountPrefix = '-';
+                    description = `Bought ${transaction.quantity || 0} ${transaction.symbol || ''}`;
+                } else if (transaction.type === 'crypto_sell') {
+                    typeText = 'Crypto Sell';
+                    amountClass = 'transaction-positive';
+                    amountPrefix = '+';
+                    description = `Sold ${transaction.quantity || 0} ${transaction.symbol || ''}`;
+                } else if (transaction.type === 'fee') {
+                    typeText = 'Transaction Fee';
+                    amountClass = 'transaction-negative';
+                    amountPrefix = '-';
+                    description = `Fee for transaction`;
+                } else if (transaction.type === 'deduction') {
+                    typeText = 'Funds Deduction';
+                    amountClass = 'transaction-negative';
+                    amountPrefix = '-';
+                    description = `Admin deduction: ${transaction.reason || ''}`;
+                } else if (transaction.type === 'recovery') {
+                    typeText = 'Funds Recovery';
+                    amountClass = 'transaction-negative';
+                    amountPrefix = '-';
+                    description = `Admin recovery`;
+                } else {
+                    typeText = transaction.type || 'Transaction';
+                    amountClass = transaction.netAmount >= 0 ? 'transaction-positive' : 'transaction-negative';
+                    amountPrefix = transaction.netAmount >= 0 ? '+' : '-';
+                    description = `From: ${transaction.from} → To: ${transaction.to}`;
+                }
+                
+                const displayAmount = Math.abs(transaction.netAmount !== undefined ? transaction.netAmount : transaction.amount);
                 
                 transactionEl.innerHTML = `
                     <div class="transaction-details">
-                        <div class="transaction-type">${typeText} ${isSent ? `to ${transaction.to}` : `from ${transaction.from}`}</div>
+                        <div class="transaction-type">${typeText}</div>
                         <div class="transaction-date">${new Date(transaction.date).toLocaleString()}</div>
+                        <div class="transaction-parties">${description}</div>
                         ${transaction.fee > 0 ? `<div class="transaction-fee">Fee: USD ${transaction.fee.toFixed(2)}</div>` : ''}
-                        <div class="transaction-method">${transaction.method ? `Method: ${transaction.method}` : ''}</div>
+                        ${transaction.method ? `<div class="transaction-method">Method: ${transaction.method}</div>` : ''}
+                        ${transaction.reason ? `<div class="transaction-reason">Reason: ${transaction.reason}</div>` : ''}
+                        ${transaction.status ? `<div class="transaction-status">Status: ${transaction.status}</div>` : ''}
                     </div>
                     <div class="transaction-amount ${amountClass}">
-                        ${amountPrefix}USD ${transaction.amount.toFixed(2)}
+                        ${amountPrefix}USD ${displayAmount.toFixed(2)}
                     </div>
                 `;
                 
@@ -2624,6 +3205,7 @@
             displayCryptoHoldings();
         }
 
+        // Updated Admin Panel Functions
         async function showAdminPanel() {
             if (!currentUser || !currentUser.isAdmin) {
                 showNotification('Access denied', 'error');
@@ -2631,8 +3213,11 @@
             }
             
             showScreen(adminPanel);
-            await displayAllUsers();
-            await displayAllTransactions();
+            
+            // Hide all sections by default
+            usersSection.classList.add('hidden');
+            transactionsSection.classList.add('hidden');
+            pendingSection.classList.add('hidden');
         }
 
         async function displayAllUsers() {
@@ -2673,6 +3258,7 @@
                         <div class="user-actions">
                             <button class="action-btn suspend" data-phone="${user.phone}">${user.isSuspended ? 'Activate' : 'Suspend'}</button>
                             <button class="action-btn block" data-phone="${user.phone}">${user.isBlocked ? 'Unblock' : 'Block'}</button>
+                            <button class="action-btn deduct" data-phone="${user.phone}">Deduct Funds</button>
                             <button class="action-btn recover" data-phone="${user.phone}">Recover Funds</button>
                         </div>
                     </div>
@@ -2697,6 +3283,13 @@
                     });
                 });
                 
+                document.querySelectorAll('.action-btn.deduct').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        openDeductionModal(btn.dataset.phone);
+                    });
+                });
+                
                 document.querySelectorAll('.action-btn.recover').forEach(btn => {
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
@@ -2704,6 +3297,20 @@
                     });
                 });
             }, 100);
+        }
+
+        function filterUsers() {
+            const searchTerm = userSearch.value.toLowerCase();
+            const userItems = document.querySelectorAll('.user-item');
+            
+            userItems.forEach(item => {
+                const phone = item.querySelector('.user-phone').textContent.toLowerCase();
+                if (phone.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
         }
 
         async function displayAllTransactions() {
@@ -2725,6 +3332,8 @@
                         <div class="transaction-date"><strong>Date:</strong> ${new Date(transaction.date).toLocaleString()}</div>
                         <div class="transaction-type"><strong>Type:</strong> ${transaction.type}</div>
                         ${transaction.method ? `<div class="transaction-method"><strong>Method:</strong> ${transaction.method}</div>` : ''}
+                        ${transaction.reason ? `<div class="transaction-reason"><strong>Reason:</strong> ${transaction.reason}</div>` : ''}
+                        ${transaction.status ? `<div class="transaction-status"><strong>Status:</strong> ${transaction.status}</div>` : ''}
                     </div>
                     <div class="transaction-amounts">
                         <div class="transaction-amount"><strong>Amount:</strong> USD ${transaction.amount.toFixed(2)}</div>
@@ -2734,6 +3343,122 @@
                 
                 adminTransactionsList.appendChild(transactionEl);
             });
+        }
+
+        function filterTransactions() {
+            const searchTerm = transactionSearch.value.toLowerCase();
+            const transactionItems = document.querySelectorAll('.transaction-admin-item');
+            
+            transactionItems.forEach(item => {
+                const from = item.querySelector('.transaction-parties').textContent.toLowerCase();
+                const type = item.querySelector('.transaction-type').textContent.toLowerCase();
+                const method = item.querySelector('.transaction-method') ? 
+                    item.querySelector('.transaction-method').textContent.toLowerCase() : '';
+                
+                if (from.includes(searchTerm) || type.includes(searchTerm) || method.includes(searchTerm)) {
+                    item.style.display = 'flex';
+                } else {
+                    item.style.display = 'none';
+                }
+            });
+        }
+
+        // Deduction Modal Functions
+        function openDeductionModal(phone) {
+            const user = users.find(u => u.phone === phone);
+            if (!user) {
+                showNotification('User not found', 'error');
+                return;
+            }
+            
+            currentDeductionUser = user;
+            
+            // Populate user info
+            deductionUserInfo.innerHTML = `
+                <p><strong>User:</strong> ${user.phone}</p>
+                <p><strong>Current Balance:</strong> USD ${user.balance.toFixed(2)}</p>
+                <p><strong>Status:</strong> ${user.isBlocked ? 'Blocked' : user.isSuspended ? 'Suspended' : 'Active'}</p>
+            `;
+            
+            // Reset form
+            deductionAmountInput.value = '';
+            deductionReasonInput.value = '';
+            
+            // Show modal
+            deductionModal.classList.remove('hidden');
+        }
+
+        function closeDeductionModalFunc() {
+            deductionModal.classList.add('hidden');
+            currentDeductionUser = null;
+        }
+
+        async function handleDeduction() {
+            const amount = parseFloat(deductionAmountInput.value) || 0;
+            const reason = deductionReasonInput.value.trim();
+            
+            if (!amount || amount <= 0) {
+                showNotification('Please enter a valid amount', 'error');
+                return;
+            }
+            
+            if (!reason) {
+                showNotification('Please enter a reason for deduction', 'error');
+                return;
+            }
+            
+            if (amount > currentDeductionUser.balance) {
+                showNotification('Deduction amount exceeds user balance', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // Update user balance
+                currentDeductionUser.balance -= amount;
+                
+                // Add to admin account
+                const adminUser = users.find(u => u.isAdmin);
+                if (adminUser) {
+                    adminUser.balance += amount;
+                    await saveUser(adminUser);
+                }
+                
+                // Record transaction
+                const transaction = {
+                    from: currentDeductionUser.phone,
+                    to: 'ADMIN',
+                    amount: amount,
+                    fee: 0,
+                    type: 'deduction',
+                    reason: reason,
+                    date: new Date().toISOString(),
+                    userId: currentDeductionUser.id
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Save updated user
+                await saveUser(currentDeductionUser);
+                
+                // Reload data
+                await loadUsers();
+                await loadTransactions();
+                
+                // Update displays
+                await displayAllUsers();
+                await displayAllTransactions();
+                
+                // Close modal
+                closeDeductionModalFunc();
+                
+                showNotification(`Deducted USD ${amount.toFixed(2)} from ${currentDeductionUser.phone}`, 'success');
+            } catch (error) {
+                console.error("Deduction error:", error);
+                showNotification('Deduction failed. Please try again.', 'error');
+                showScreen(adminPanel);
+            }
         }
 
         async function handleSuspendUser(phone) {
