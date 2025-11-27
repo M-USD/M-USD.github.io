@@ -1023,6 +1023,41 @@
                 gap: 10px;
             }
         }
+
+        /* Withdrawal Styles */
+        .withdrawal-tabs {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .withdrawal-tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+        }
+
+        .withdrawal-tab.active {
+            border-bottom: 3px solid var(--primary);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .exchange-rate {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 15px 0;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        .exchange-rate strong {
+            color: var(--primary);
+        }
     </style>
 </head>
 <body>
@@ -1088,7 +1123,7 @@
                     <div class="menu-icon">
                         <i class="fas fa-money-bill-wave"></i>
                     </div>
-                    <div>Deposit</div>
+                    <div>Deposit/Withdraw</div>
                 </div>
                 <div class="menu-item" id="send-money-btn">
                     <div class="menu-icon">
@@ -1119,9 +1154,15 @@
             <button class="btn btn-outline" id="logout-btn">Logout</button>
         </div>
 
-        <!-- Deposit Screen -->
+        <!-- Deposit/Withdraw Screen -->
         <div id="deposit-screen" class="card hidden">
-            <h2>Deposit Funds</h2>
+            <h2>Deposit/Withdraw Funds</h2>
+            
+            <!-- Deposit/Withdraw Tabs -->
+            <div class="withdrawal-tabs">
+                <div class="withdrawal-tab active" id="deposit-tab">Deposit</div>
+                <div class="withdrawal-tab" id="withdraw-tab">Withdraw</div>
+            </div>
             
             <!-- Payment Method Tabs -->
             <div class="payment-method-tabs">
@@ -1129,54 +1170,137 @@
                 <div class="payment-method-tab" id="mpesa-tab">M-Pesa</div>
             </div>
             
-            <div class="form-group">
-                <label for="deposit-amount">Enter Amount (USD)</label>
-                <input type="number" id="deposit-amount" class="form-control" placeholder="Enter amount" min="5" max="10000" step="0.01">
-            </div>
-            <div class="form-group">
-                <p>Minimum deposit: $5.00</p>
-                <p>Maximum deposit: $10,000.00</p>
-            </div>
-            
-            <!-- PayPal Payment Method -->
-            <div id="paypal-method">
-                <div class="paypal-container" id="paypal-container"></div>
-                <div class="payment-notice">
-                    <p><strong>Note:</strong> Your deposit will be pending until verified by admin. You'll receive a notification once approved.</p>
+            <!-- Deposit Section -->
+            <div id="deposit-section">
+                <div class="form-group">
+                    <label for="deposit-amount">Enter Amount (USD)</label>
+                    <input type="number" id="deposit-amount" class="form-control" placeholder="Enter amount" min="5" max="10000" step="0.01">
+                </div>
+                <div class="form-group">
+                    <p>Minimum deposit: $5.00</p>
+                    <p>Maximum deposit: $10,000.00</p>
+                </div>
+                
+                <!-- Exchange Rate Info for M-Pesa -->
+                <div id="deposit-exchange-rate" class="exchange-rate hidden">
+                    <p><strong>Exchange Rate:</strong> 1 USD = Ksh 135</p>
+                    <p id="deposit-ksh-amount">Equivalent: Ksh 0.00</p>
+                </div>
+                
+                <!-- PayPal Payment Method -->
+                <div id="paypal-method">
+                    <div class="paypal-container" id="paypal-container"></div>
+                    <div class="payment-notice">
+                        <p><strong>Note:</strong> Your deposit will be pending until verified by system. You'll receive a notification once approved.</p>
+                    </div>
+                </div>
+                
+                <!-- M-Pesa Payment Method -->
+                <div id="mpesa-method" class="hidden">
+                    <div class="mpesa-container">
+                        <div class="form-group mpesa-phone-input">
+                            <label for="mpesa-phone">M-Pesa Phone Number</label>
+                            <input type="tel" id="mpesa-phone" class="form-control" placeholder="2547XXXXXXXX" value="">
+                        </div>
+                        
+                        <div class="mpesa-instructions">
+                            <h4>How to deposit with M-Pesa:</h4>
+                            <ol>
+                                <li>Enter your M-Pesa phone number above</li>
+                                <li>Enter the deposit amount in USD</li>
+                                <li>Click "Deposit with M-Pesa"</li>
+                                <li>Check your phone for STK Push prompt</li>
+                                <li>Enter your M-Pesa PIN to complete payment</li>
+                                <li>Wait for system verification (usually within 24 hours)</li>
+                            </ol>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="mpesa-deposit-btn">
+                            <i class="fas fa-mobile-alt"></i> Deposit with M-Pesa
+                        </button>
+                        
+                        <div id="mpesa-status" class="mpesa-status hidden">
+                            <p id="mpesa-status-text">Processing...</p>
+                        </div>
+                        
+                        <div class="payment-notice">
+                            <p><strong>Note:</strong> Your deposit will be pending until verified by system. You'll receive a notification once approved.</p>
+                        </div>
+                    </div>
                 </div>
             </div>
             
-            <!-- M-Pesa Payment Method -->
-            <div id="mpesa-method" class="hidden">
-                <div class="mpesa-container">
-                    <div class="form-group mpesa-phone-input">
-                        <label for="mpesa-phone">M-Pesa Phone Number</label>
-                        <input type="tel" id="mpesa-phone" class="form-control" placeholder="2547XXXXXXXX" value="">
+            <!-- Withdraw Section -->
+            <div id="withdraw-section" class="hidden">
+                <div class="form-group">
+                    <label for="withdraw-amount">Enter Amount (USD)</label>
+                    <input type="number" id="withdraw-amount" class="form-control" placeholder="Enter amount" min="5" max="10000" step="0.01">
+                </div>
+                <div class="form-group">
+                    <p>Minimum withdrawal: $5.00</p>
+                    <p>Maximum withdrawal: $10,000.00</p>
+                </div>
+                
+                <!-- Exchange Rate Info for M-Pesa -->
+                <div id="withdraw-exchange-rate" class="exchange-rate hidden">
+                    <p><strong>Exchange Rate:</strong> 1 USD = Ksh 125</p>
+                    <p id="withdraw-ksh-amount">Equivalent: Ksh 0.00</p>
+                </div>
+                
+                <!-- PayPal Withdraw Method -->
+                <div id="paypal-withdraw-method">
+                    <div class="form-group">
+                        <label for="paypal-email">PayPal Email</label>
+                        <input type="email" id="paypal-email" class="form-control" placeholder="your-email@example.com">
                     </div>
                     
                     <div class="mpesa-instructions">
-                        <h4>How to deposit with M-Pesa:</h4>
+                        <h4>How to withdraw with PayPal:</h4>
                         <ol>
-                            <li>Enter your M-Pesa phone number above</li>
-                            <li>Enter the deposit amount in USD</li>
-                            <li>Click "Deposit with M-Pesa"</li>
-                            <li>Check your phone for STK Push prompt</li>
-                            <li>Enter your M-Pesa PIN to complete payment</li>
-                            <li>Wait for admin verification (usually within 24 hours)</li>
+                            <li>Enter your PayPal email address above</li>
+                            <li>Enter the withdrawal amount in USD</li>
+                            <li>Click "Withdraw with PayPal"</li>
+                            <li>Wait for system verification (usually within 24 hours)</li>
+                            <li>Funds will be sent to your PayPal account</li>
                         </ol>
                     </div>
                     
-                    <button class="btn btn-primary" id="mpesa-deposit-btn">
-                        <i class="fas fa-mobile-alt"></i> Deposit with M-Pesa
+                    <button class="btn btn-primary" id="paypal-withdraw-btn">
+                        <i class="fab fa-paypal"></i> Withdraw with PayPal
                     </button>
-                    
-                    <div id="mpesa-status" class="mpesa-status hidden">
-                        <p id="mpesa-status-text">Processing...</p>
+                </div>
+                
+                <!-- M-Pesa Withdraw Method -->
+                <div id="mpesa-withdraw-method" class="hidden">
+                    <div class="mpesa-container">
+                        <div class="form-group mpesa-phone-input">
+                            <label for="mpesa-withdraw-phone">M-Pesa Phone Number</label>
+                            <input type="tel" id="mpesa-withdraw-phone" class="form-control" placeholder="2547XXXXXXXX" value="">
+                        </div>
+                        
+                        <div class="mpesa-instructions">
+                            <h4>How to withdraw with M-Pesa:</h4>
+                            <ol>
+                                <li>Enter your M-Pesa phone number above</li>
+                                <li>Enter the withdrawal amount in USD</li>
+                                <li>Click "Withdraw with M-Pesa"</li>
+                                <li>Wait for system verification (usually within 24 hours)</li>
+                                <li>Funds will be sent to your M-Pesa account</li>
+                            </ol>
+                        </div>
+                        
+                        <button class="btn btn-primary" id="mpesa-withdraw-btn">
+                            <i class="fas fa-mobile-alt"></i> Withdraw with M-Pesa
+                        </button>
+                        
+                        <div id="mpesa-withdraw-status" class="mpesa-status hidden">
+                            <p id="mpesa-withdraw-status-text">Processing...</p>
+                        </div>
                     </div>
-                    
-                    <div class="payment-notice">
-                        <p><strong>Note:</strong> Your deposit will be pending until verified by admin. You'll receive a notification once approved.</p>
-                    </div>
+                </div>
+                
+                <div class="payment-notice">
+                    <p><strong>Note:</strong> Your withdrawal will be pending until verified by system. You'll receive a notification once approved.</p>
                 </div>
             </div>
             
@@ -1188,10 +1312,10 @@
             <div class="payment-success">
                 <i class="fas fa-clock"></i>
                 <h2>Payment Pending Verification</h2>
-                <p>Your deposit is pending admin verification.</p>
+                <p>Your <span id="pending-type">deposit</span> is pending system verification.</p>
                 <p>Amount: <span id="pending-deposit-amount">USD 0.00</span></p>
                 <p>Method: <span id="pending-deposit-method">PayPal</span></p>
-                <p>You will be notified once your deposit is approved.</p>
+                <p>You will be notified once your <span id="pending-type2">deposit</span> is approved.</p>
                 <button class="btn btn-primary" id="back-to-dashboard-from-pending">Back to Dashboard</button>
             </div>
         </div>
@@ -1201,7 +1325,7 @@
             <div class="payment-success">
                 <i class="fas fa-check-circle"></i>
                 <h2>Payment Successful!</h2>
-                <p>Your deposit has been processed successfully.</p>
+                <p>Your <span id="success-type">deposit</span> has been processed successfully.</p>
                 <p>Amount: <span id="deposit-success-amount">USD 0.00</span></p>
                 <p>Method: <span id="deposit-method">PayPal</span></p>
                 <button class="btn btn-primary" id="back-to-dashboard">Back to Dashboard</button>
@@ -1238,7 +1362,7 @@
 
         <!-- Crypto Trading Screen -->
         <div id="crypto-trading-screen" class="card hidden">
-            <h2>Cryptocurrency Trading Platform</h2>
+            <h2>📉📈Crypto Trading Platform</h2>
             
             <!-- Portfolio Summary -->
             <div class="portfolio-summary">
@@ -1300,6 +1424,9 @@
                 <button class="admin-control-btn pending" id="show-pending-btn">
                     <i class="fas fa-clock"></i> Pending Deposits
                 </button>
+                <button class="admin-control-btn pending" id="show-pending-withdrawals-btn">
+                    <i class="fas fa-clock"></i> Pending Withdrawals
+                </button>
             </div>
             
             <div class="admin-layout">
@@ -1352,6 +1479,20 @@
                     
                     <div id="pending-deposits-list">
                         <!-- Pending deposits will be populated here -->
+                    </div>
+                </div>
+                
+                <!-- Pending Withdrawals Section (Hidden by Default) -->
+                <div class="admin-section hidden" id="pending-withdrawals-section">
+                    <div class="admin-section-header">
+                        <h3>Pending Withdrawals</h3>
+                        <button class="btn btn-outline" id="hide-pending-withdrawals-btn">
+                            <i class="fas fa-times"></i> Hide Pending
+                        </button>
+                    </div>
+                    
+                    <div id="pending-withdrawals-list">
+                        <!-- Pending withdrawals will be populated here -->
                     </div>
                 </div>
             </div>
@@ -1437,7 +1578,13 @@
         const CONFIG = {
             PAYMENTS: {
                 MIN_DEPOSIT: 5,
-                MAX_DEPOSIT: 10000
+                MAX_DEPOSIT: 10000,
+                MIN_WITHDRAWAL: 5,
+                MAX_WITHDRAWAL: 10000
+            },
+            EXCHANGE_RATES: {
+                DEPOSIT: 135, // 1 USD = Ksh 135 for deposits
+                WITHDRAWAL: 125 // 1 USD = Ksh 125 for withdrawals
             }
         };
 
@@ -1445,12 +1592,14 @@
         let users = [];
         let transactions = [];
         let pendingDeposits = [];
+        let pendingWithdrawals = [];
         let currentUser = null;
         let cryptoPrices = {};
         let cryptoHoldings = {};
         let cryptoList = [];
         let currentCryptoModal = null;
         let currentDepositAmount = 0;
+        let currentWithdrawAmount = 0;
         let mpesaAccessToken = null;
         let currentDeductionUser = null;
 
@@ -1498,6 +1647,7 @@
         const usersList = document.getElementById('users-list');
         const adminTransactionsList = document.getElementById('admin-transactions-list');
         const pendingDepositsList = document.getElementById('pending-deposits-list');
+        const pendingWithdrawalsList = document.getElementById('pending-withdrawals-list');
         
         const sendAmount = document.getElementById('send-amount');
         const recipientPhone = document.getElementById('recipient-phone');
@@ -1506,21 +1656,45 @@
         
         const notification = document.getElementById('notification');
         const depositAmountInput = document.getElementById('deposit-amount');
+        const withdrawAmountInput = document.getElementById('withdraw-amount');
         const paypalContainer = document.getElementById('paypal-container');
         const depositSuccessAmount = document.getElementById('deposit-success-amount');
         const depositMethod = document.getElementById('deposit-method');
         const pendingDepositAmount = document.getElementById('pending-deposit-amount');
         const pendingDepositMethod = document.getElementById('pending-deposit-method');
+        const pendingType = document.getElementById('pending-type');
+        const pendingType2 = document.getElementById('pending-type2');
+        const successType = document.getElementById('success-type');
+
+        // Deposit/Withdraw Tabs
+        const depositTab = document.getElementById('deposit-tab');
+        const withdrawTab = document.getElementById('withdraw-tab');
+        const depositSection = document.getElementById('deposit-section');
+        const withdrawSection = document.getElementById('withdraw-section');
 
         // Payment Method Tabs
         const paypalTab = document.getElementById('paypal-tab');
         const mpesaTab = document.getElementById('mpesa-tab');
         const paypalMethod = document.getElementById('paypal-method');
         const mpesaMethod = document.getElementById('mpesa-method');
+        const paypalWithdrawMethod = document.getElementById('paypal-withdraw-method');
+        const mpesaWithdrawMethod = document.getElementById('mpesa-withdraw-method');
         const mpesaPhoneInput = document.getElementById('mpesa-phone');
         const mpesaDepositBtn = document.getElementById('mpesa-deposit-btn');
         const mpesaStatus = document.getElementById('mpesa-status');
         const mpesaStatusText = document.getElementById('mpesa-status-text');
+        const paypalWithdrawBtn = document.getElementById('paypal-withdraw-btn');
+        const mpesaWithdrawBtn = document.getElementById('mpesa-withdraw-btn');
+        const mpesaWithdrawStatus = document.getElementById('mpesa-withdraw-status');
+        const mpesaWithdrawStatusText = document.getElementById('mpesa-withdraw-status-text');
+        const paypalEmailInput = document.getElementById('paypal-email');
+        const mpesaWithdrawPhoneInput = document.getElementById('mpesa-withdraw-phone');
+
+        // Exchange Rate Elements
+        const depositExchangeRate = document.getElementById('deposit-exchange-rate');
+        const depositKshAmount = document.getElementById('deposit-ksh-amount');
+        const withdrawExchangeRate = document.getElementById('withdraw-exchange-rate');
+        const withdrawKshAmount = document.getElementById('withdraw-ksh-amount');
 
         // Crypto Trading Elements
         const cryptoListContainer = document.getElementById('crypto-list');
@@ -1543,20 +1717,24 @@
         const showUsersBtn = document.getElementById('show-users-btn');
         const showTransactionsBtn = document.getElementById('show-transactions-btn');
         const showPendingBtn = document.getElementById('show-pending-btn');
+        const showPendingWithdrawalsBtn = document.getElementById('show-pending-withdrawals-btn');
         const hideUsersBtn = document.getElementById('hide-users-btn');
         const hideTransactionsBtn = document.getElementById('hide-transactions-btn');
         const hidePendingBtn = document.getElementById('hide-pending-btn');
+        const hidePendingWithdrawalsBtn = document.getElementById('hide-pending-withdrawals-btn');
         const userSearch = document.getElementById('user-search');
         const transactionSearch = document.getElementById('transaction-search');
         const usersSection = document.getElementById('users-section');
         const transactionsSection = document.getElementById('transactions-section');
         const pendingSection = document.getElementById('pending-section');
+        const pendingWithdrawalsSection = document.getElementById('pending-withdrawals-section');
 
         // Firebase Database References
         const usersRef = ref(database, 'users');
         const transactionsRef = ref(database, 'transactions');
         const cryptoHoldingsRef = ref(database, 'cryptoHoldings');
         const pendingDepositsRef = ref(database, 'pendingDeposits');
+        const pendingWithdrawalsRef = ref(database, 'pendingWithdrawals');
 
         // Event Listeners
         loginTab.addEventListener('click', () => {
@@ -1597,13 +1775,22 @@
         sendAmount.addEventListener('input', updateTransactionDetails);
         recipientPhone.addEventListener('input', updateTransactionDetails);
         depositAmountInput.addEventListener('input', handleDepositAmountChange);
+        withdrawAmountInput.addEventListener('input', handleWithdrawAmountChange);
 
+        // Deposit/Withdraw Tabs
+        depositTab.addEventListener('click', () => switchDepositWithdrawTab('deposit'));
+        withdrawTab.addEventListener('click', () => switchDepositWithdrawTab('withdraw'));
+        
         // Payment Method Tabs
         paypalTab.addEventListener('click', () => switchPaymentMethod('paypal'));
         mpesaTab.addEventListener('click', () => switchPaymentMethod('mpesa'));
         
         // M-Pesa Deposit Button Event Listener
         mpesaDepositBtn.addEventListener('click', handleMpesaDeposit);
+        
+        // Withdrawal Button Event Listeners
+        paypalWithdrawBtn.addEventListener('click', handlePayPalWithdrawal);
+        mpesaWithdrawBtn.addEventListener('click', handleMpesaWithdrawal);
 
         // Crypto Trading Event Listeners
         cryptoSearch.addEventListener('input', filterCryptoList);
@@ -1619,6 +1806,7 @@
             usersSection.classList.remove('hidden');
             transactionsSection.classList.add('hidden');
             pendingSection.classList.add('hidden');
+            pendingWithdrawalsSection.classList.add('hidden');
         });
 
         showTransactionsBtn.addEventListener('click', async () => {
@@ -1626,6 +1814,7 @@
             transactionsSection.classList.remove('hidden');
             usersSection.classList.add('hidden');
             pendingSection.classList.add('hidden');
+            pendingWithdrawalsSection.classList.add('hidden');
         });
 
         showPendingBtn.addEventListener('click', async () => {
@@ -1633,6 +1822,15 @@
             pendingSection.classList.remove('hidden');
             usersSection.classList.add('hidden');
             transactionsSection.classList.add('hidden');
+            pendingWithdrawalsSection.classList.add('hidden');
+        });
+
+        showPendingWithdrawalsBtn.addEventListener('click', async () => {
+            await displayPendingWithdrawals();
+            pendingWithdrawalsSection.classList.remove('hidden');
+            usersSection.classList.add('hidden');
+            transactionsSection.classList.add('hidden');
+            pendingSection.classList.add('hidden');
         });
 
         hideUsersBtn.addEventListener('click', () => {
@@ -1645,6 +1843,10 @@
 
         hidePendingBtn.addEventListener('click', () => {
             pendingSection.classList.add('hidden');
+        });
+
+        hidePendingWithdrawalsBtn.addEventListener('click', () => {
+            pendingWithdrawalsSection.classList.add('hidden');
         });
 
         userSearch.addEventListener('input', filterUsers);
@@ -1738,6 +1940,29 @@
             }
         }
 
+        async function loadPendingWithdrawals() {
+            try {
+                const snapshot = await get(pendingWithdrawalsRef);
+                if (snapshot.exists()) {
+                    const pendingData = snapshot.val();
+                    // Convert object to array
+                    pendingWithdrawals = Object.keys(pendingData).map(key => ({
+                        id: key,
+                        ...pendingData[key]
+                    }));
+                    // Sort by date descending
+                    pendingWithdrawals.sort((a, b) => new Date(b.date) - new Date(a.date));
+                } else {
+                    pendingWithdrawals = [];
+                }
+                return pendingWithdrawals;
+            } catch (error) {
+                console.error("Error loading pending withdrawals:", error);
+                showNotification('Error loading pending withdrawals', 'error');
+                return [];
+            }
+        }
+
         async function saveUser(user) {
             try {
                 if (user.id) {
@@ -1783,6 +2008,19 @@
             }
         }
 
+        async function savePendingWithdrawal(withdrawal) {
+            try {
+                const newWithdrawalRef = push(pendingWithdrawalsRef);
+                withdrawal.id = newWithdrawalRef.key;
+                await set(newWithdrawalRef, withdrawal);
+                return withdrawal;
+            } catch (error) {
+                console.error("Error saving pending withdrawal:", error);
+                showNotification('Error saving pending withdrawal', 'error');
+                return null;
+            }
+        }
+
         async function removePendingDeposit(depositId) {
             try {
                 await remove(ref(database, `pendingDeposits/${depositId}`));
@@ -1790,6 +2028,17 @@
             } catch (error) {
                 console.error("Error removing pending deposit:", error);
                 showNotification('Error removing pending deposit', 'error');
+                return false;
+            }
+        }
+
+        async function removePendingWithdrawal(withdrawalId) {
+            try {
+                await remove(ref(database, `pendingWithdrawals/${withdrawalId}`));
+                return true;
+            } catch (error) {
+                console.error("Error removing pending withdrawal:", error);
+                showNotification('Error removing pending withdrawal', 'error');
                 return false;
             }
         }
@@ -1823,27 +2072,139 @@
             }
         }
 
-        // Payment Processing Functions
+        // Deposit/Withdraw Functions
+        function switchDepositWithdrawTab(tab) {
+            if (tab === 'deposit') {
+                depositTab.classList.add('active');
+                withdrawTab.classList.remove('active');
+                depositSection.classList.remove('hidden');
+                withdrawSection.classList.add('hidden');
+                
+                // Reset payment method to PayPal
+                switchPaymentMethod('paypal');
+            } else if (tab === 'withdraw') {
+                withdrawTab.classList.add('active');
+                depositTab.classList.remove('active');
+                withdrawSection.classList.remove('hidden');
+                depositSection.classList.add('hidden');
+                
+                // Reset payment method to PayPal
+                switchPaymentMethod('paypal');
+            }
+        }
+
         function switchPaymentMethod(method) {
             if (method === 'paypal') {
                 paypalTab.classList.add('active');
                 mpesaTab.classList.remove('active');
-                paypalMethod.classList.remove('hidden');
-                mpesaMethod.classList.add('hidden');
+                
+                // Show/hide appropriate sections based on deposit/withdraw tab
+                if (depositTab.classList.contains('active')) {
+                    paypalMethod.classList.remove('hidden');
+                    mpesaMethod.classList.add('hidden');
+                } else {
+                    paypalWithdrawMethod.classList.remove('hidden');
+                    mpesaWithdrawMethod.classList.add('hidden');
+                }
+                
+                // Hide exchange rate for PayPal
+                depositExchangeRate.classList.add('hidden');
+                withdrawExchangeRate.classList.add('hidden');
             } else if (method === 'mpesa') {
                 mpesaTab.classList.add('active');
                 paypalTab.classList.remove('active');
-                mpesaMethod.classList.remove('hidden');
-                paypalMethod.classList.add('hidden');
                 
-                // Pre-fill M-Pesa phone with user's phone if available
-                if (currentUser && mpesaPhoneInput) {
-                    mpesaPhoneInput.value = currentUser.phone;
+                // Show/hide appropriate sections based on deposit/withdraw tab
+                if (depositTab.classList.contains('active')) {
+                    mpesaMethod.classList.remove('hidden');
+                    paypalMethod.classList.add('hidden');
+                    
+                    // Show exchange rate for M-Pesa deposit
+                    depositExchangeRate.classList.remove('hidden');
+                    withdrawExchangeRate.classList.add('hidden');
+                    
+                    // Pre-fill M-Pesa phone with user's phone if available
+                    if (currentUser && mpesaPhoneInput) {
+                        mpesaPhoneInput.value = currentUser.phone;
+                    }
+                    
+                    // Reset M-Pesa status
+                    if (mpesaStatus) {
+                        mpesaStatus.classList.add('hidden');
+                    }
+                } else {
+                    mpesaWithdrawMethod.classList.remove('hidden');
+                    paypalWithdrawMethod.classList.add('hidden');
+                    
+                    // Show exchange rate for M-Pesa withdrawal
+                    withdrawExchangeRate.classList.remove('hidden');
+                    depositExchangeRate.classList.add('hidden');
+                    
+                    // Pre-fill M-Pesa phone with user's phone if available
+                    if (currentUser && mpesaWithdrawPhoneInput) {
+                        mpesaWithdrawPhoneInput.value = currentUser.phone;
+                    }
+                    
+                    // Reset M-Pesa status
+                    if (mpesaWithdrawStatus) {
+                        mpesaWithdrawStatus.classList.add('hidden');
+                    }
                 }
+            }
+        }
+
+        function handleDepositAmountChange() {
+            const amount = parseFloat(depositAmountInput.value) || 0;
+            
+            if (amount < CONFIG.PAYMENTS.MIN_DEPOSIT) {
+                showNotification(`Minimum deposit is $${CONFIG.PAYMENTS.MIN_DEPOSIT}`, 'error');
+                paypalContainer.innerHTML = '';
+                return;
+            }
+            
+            if (amount > CONFIG.PAYMENTS.MAX_DEPOSIT) {
+                showNotification(`Maximum deposit is $${CONFIG.PAYMENTS.MAX_DEPOSIT}`, 'error');
+                paypalContainer.innerHTML = '';
+                return;
+            }
+            
+            if (amount >= CONFIG.PAYMENTS.MIN_DEPOSIT && amount <= CONFIG.PAYMENTS.MAX_DEPOSIT) {
+                currentDepositAmount = amount;
+                initializePayPalButton(amount);
                 
-                // Reset M-Pesa status
-                if (mpesaStatus) {
-                    mpesaStatus.classList.add('hidden');
+                // Update M-Pesa equivalent amount
+                if (mpesaTab.classList.contains('active')) {
+                    const kshAmount = amount * CONFIG.EXCHANGE_RATES.DEPOSIT;
+                    depositKshAmount.textContent = `Equivalent: Ksh ${kshAmount.toFixed(2)}`;
+                }
+            }
+        }
+
+        function handleWithdrawAmountChange() {
+            const amount = parseFloat(withdrawAmountInput.value) || 0;
+            
+            if (amount < CONFIG.PAYMENTS.MIN_WITHDRAWAL) {
+                showNotification(`Minimum withdrawal is $${CONFIG.PAYMENTS.MIN_WITHDRAWAL}`, 'error');
+                return;
+            }
+            
+            if (amount > CONFIG.PAYMENTS.MAX_WITHDRAWAL) {
+                showNotification(`Maximum withdrawal is $${CONFIG.PAYMENTS.MAX_WITHDRAWAL}`, 'error');
+                return;
+            }
+            
+            if (amount > currentUser.balance) {
+                showNotification('Insufficient balance for withdrawal', 'error');
+                return;
+            }
+            
+            if (amount >= CONFIG.PAYMENTS.MIN_WITHDRAWAL && amount <= CONFIG.PAYMENTS.MAX_WITHDRAWAL) {
+                currentWithdrawAmount = amount;
+                
+                // Update M-Pesa equivalent amount
+                if (mpesaTab.classList.contains('active')) {
+                    const kshAmount = amount * CONFIG.EXCHANGE_RATES.WITHDRAWAL;
+                    withdrawKshAmount.textContent = `Equivalent: Ksh ${kshAmount.toFixed(2)}`;
                 }
             }
         }
@@ -1871,27 +2232,6 @@
             }).render("#paypal-container");
         }
 
-        function handleDepositAmountChange() {
-            const amount = parseFloat(depositAmountInput.value) || 0;
-            
-            if (amount < CONFIG.PAYMENTS.MIN_DEPOSIT) {
-                showNotification(`Minimum deposit is $${CONFIG.PAYMENTS.MIN_DEPOSIT}`, 'error');
-                paypalContainer.innerHTML = '';
-                return;
-            }
-            
-            if (amount > CONFIG.PAYMENTS.MAX_DEPOSIT) {
-                showNotification(`Maximum deposit is $${CONFIG.PAYMENTS.MAX_DEPOSIT}`, 'error');
-                paypalContainer.innerHTML = '';
-                return;
-            }
-            
-            if (amount >= CONFIG.PAYMENTS.MIN_DEPOSIT && amount <= CONFIG.PAYMENTS.MAX_DEPOSIT) {
-                currentDepositAmount = amount;
-                initializePayPalButton(amount);
-            }
-        }
-
         async function handleSuccessfulPayment(amount, method) {
             showLoading();
             
@@ -1911,6 +2251,8 @@
                 // Show pending screen instead of success screen
                 pendingDepositAmount.textContent = `USD ${amount.toFixed(2)}`;
                 pendingDepositMethod.textContent = method === 'paypal' ? 'PayPal' : 'M-Pesa';
+                pendingType.textContent = 'deposit';
+                pendingType2.textContent = 'deposit';
                 showScreen(paymentPendingScreen);
                 showNotification(`Deposit of USD ${amount.toFixed(2)} submitted for admin verification`, 'info');
             } catch (error) {
@@ -1971,7 +2313,7 @@
             await new Promise(resolve => setTimeout(resolve, 2000));
             
             // Simulate successful STK Push
-            mpesaStatusText.textContent = 'STK Push sent! Check your phone and enter M-Pesa PIN.';
+            mpesaStatusText.textContent = ' Check your phone and send the deposit amount to 0717887117.';
             
             // Simulate waiting for user to complete payment
             await new Promise(resolve => setTimeout(resolve, 5000));
@@ -2000,8 +2342,10 @@
                 // Show pending screen
                 pendingDepositAmount.textContent = `USD ${amount.toFixed(2)}`;
                 pendingDepositMethod.textContent = 'M-Pesa';
+                pendingType.textContent = 'deposit';
+                pendingType2.textContent = 'deposit';
                 showScreen(paymentPendingScreen);
-                showNotification(`M-Pesa deposit of USD ${amount.toFixed(2)} submitted for admin verification`, 'info');
+                showNotification(`M-Pesa deposit of USD ${amount.toFixed(2)} submitted for system verification`, 'info');
                 
             } catch (error) {
                 console.error("M-Pesa payment processing error:", error);
@@ -2011,7 +2355,132 @@
             }
         }
 
-        // Admin Functions for Verifying Deposits
+        // Withdrawal Functions
+        async function handlePayPalWithdrawal() {
+            const amount = parseFloat(withdrawAmountInput.value) || 0;
+            const email = paypalEmailInput.value.trim();
+
+            // Validation
+            if (!email) {
+                showNotification('Please enter your PayPal email address', 'error');
+                return;
+            }
+
+            if (amount < CONFIG.PAYMENTS.MIN_WITHDRAWAL) {
+                showNotification(`Minimum withdrawal is $${CONFIG.PAYMENTS.MIN_WITHDRAWAL}`, 'error');
+                return;
+            }
+
+            if (amount > CONFIG.PAYMENTS.MAX_WITHDRAWAL) {
+                showNotification(`Maximum withdrawal is $${CONFIG.PAYMENTS.MAX_WITHDRAWAL}`, 'error');
+                return;
+            }
+
+            if (amount > currentUser.balance) {
+                showNotification('Insufficient balance for withdrawal', 'error');
+                return;
+            }
+
+            if (!currentUser) {
+                showNotification('Please login first', 'error');
+                return;
+            }
+
+            showLoading();
+
+            try {
+                // Create pending withdrawal record
+                const pendingWithdrawal = {
+                    userId: currentUser.id,
+                    userPhone: currentUser.phone,
+                    amount: amount,
+                    method: 'paypal',
+                    email: email,
+                    date: new Date().toISOString(),
+                    status: 'pending'
+                };
+                
+                await savePendingWithdrawal(pendingWithdrawal);
+                
+                // Show pending screen
+                pendingDepositAmount.textContent = `USD ${amount.toFixed(2)}`;
+                pendingDepositMethod.textContent = 'PayPal';
+                pendingType.textContent = 'withdrawal';
+                pendingType2.textContent = 'withdrawal';
+                showScreen(paymentPendingScreen);
+                showNotification(`Withdrawal of USD ${amount.toFixed(2)} submitted for admin verification`, 'info');
+            } catch (error) {
+                console.error("PayPal withdrawal error:", error);
+                showNotification('Withdrawal request failed. Please try again.', 'error');
+                showScreen(depositScreen);
+            }
+        }
+
+        async function handleMpesaWithdrawal() {
+            const amount = parseFloat(withdrawAmountInput.value) || 0;
+            const phone = mpesaWithdrawPhoneInput.value.trim();
+
+            // Validation
+            if (!phone) {
+                showNotification('Please enter your M-Pesa phone number', 'error');
+                return;
+            }
+
+            if (amount < CONFIG.PAYMENTS.MIN_WITHDRAWAL) {
+                showNotification(`Minimum withdrawal is $${CONFIG.PAYMENTS.MIN_WITHDRAWAL}`, 'error');
+                return;
+            }
+
+            if (amount > CONFIG.PAYMENTS.MAX_WITHDRAWAL) {
+                showNotification(`Maximum withdrawal is $${CONFIG.PAYMENTS.MAX_WITHDRAWAL}`, 'error');
+                return;
+            }
+
+            if (amount > currentUser.balance) {
+                showNotification('Insufficient balance for withdrawal', 'error');
+                return;
+            }
+
+            if (!currentUser) {
+                showNotification('Please login first', 'error');
+                return;
+            }
+
+            showLoading();
+            mpesaWithdrawStatus.classList.remove('hidden');
+            mpesaWithdrawStatusText.textContent = 'Processing withdrawal request...';
+
+            try {
+                // Create pending withdrawal record
+                const pendingWithdrawal = {
+                    userId: currentUser.id,
+                    userPhone: currentUser.phone,
+                    amount: amount,
+                    method: 'mpesa',
+                    phone: phone,
+                    date: new Date().toISOString(),
+                    status: 'pending'
+                };
+                
+                await savePendingWithdrawal(pendingWithdrawal);
+                
+                // Show pending screen
+                pendingDepositAmount.textContent = `USD ${amount.toFixed(2)}`;
+                pendingDepositMethod.textContent = 'M-Pesa';
+                pendingType.textContent = 'withdrawal';
+                pendingType2.textContent = 'withdrawal';
+                showScreen(paymentPendingScreen);
+                showNotification(`M-Pesa withdrawal of USD ${amount.toFixed(2)} submitted for admin verification`, 'info');
+                
+            } catch (error) {
+                console.error("M-Pesa withdrawal error:", error);
+                mpesaWithdrawStatusText.textContent = 'Withdrawal request failed. Please try again.';
+                showNotification('M-Pesa withdrawal request failed', 'error');
+                showScreen(depositScreen);
+            }
+        }
+
+        // Admin Functions for Verifying Deposits and Withdrawals
         async function displayPendingDeposits() {
             await loadPendingDeposits();
             pendingDepositsList.innerHTML = '';
@@ -2057,6 +2526,58 @@
                     btn.addEventListener('click', (e) => {
                         e.stopPropagation();
                         rejectPendingDeposit(btn.dataset.id);
+                    });
+                });
+            }, 100);
+        }
+
+        async function displayPendingWithdrawals() {
+            await loadPendingWithdrawals();
+            pendingWithdrawalsList.innerHTML = '';
+            
+            if (pendingWithdrawals.length === 0) {
+                pendingWithdrawalsList.innerHTML = '<p class="no-transactions">No pending withdrawals found</p>';
+                return;
+            }
+            
+            pendingWithdrawals.forEach(withdrawal => {
+                const withdrawalEl = document.createElement('div');
+                withdrawalEl.className = 'transaction-admin-item pending-transaction-item';
+                
+                withdrawalEl.innerHTML = `
+                    <div class="transaction-info">
+                        <div class="transaction-parties"><strong>User:</strong> ${withdrawal.userPhone}</div>
+                        <div class="transaction-date"><strong>Date:</strong> ${new Date(withdrawal.date).toLocaleString()}</div>
+                        <div class="transaction-type"><strong>Method:</strong> ${withdrawal.method}</div>
+                        ${withdrawal.email ? `<div class="transaction-method"><strong>Email:</strong> ${withdrawal.email}</div>` : ''}
+                        ${withdrawal.phone ? `<div class="transaction-method"><strong>Phone:</strong> ${withdrawal.phone}</div>` : ''}
+                        <div class="transaction-type"><strong>Status:</strong> <span class="status-badge status-pending">Pending</span></div>
+                    </div>
+                    <div class="transaction-amounts">
+                        <div class="transaction-amount"><strong>Amount:</strong> USD ${withdrawal.amount.toFixed(2)}</div>
+                        <div class="pending-actions">
+                            <button class="btn-approve" data-id="${withdrawal.id}">Approve</button>
+                            <button class="btn-reject" data-id="${withdrawal.id}">Reject</button>
+                        </div>
+                    </div>
+                `;
+                
+                pendingWithdrawalsList.appendChild(withdrawalEl);
+            });
+            
+            // Add event listeners to approve/reject buttons
+            setTimeout(() => {
+                document.querySelectorAll('.btn-approve').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        approvePendingWithdrawal(btn.dataset.id);
+                    });
+                });
+                
+                document.querySelectorAll('.btn-reject').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        e.stopPropagation();
+                        rejectPendingWithdrawal(btn.dataset.id);
                     });
                 });
             }, 100);
@@ -2154,6 +2675,108 @@
             } catch (error) {
                 console.error("Error rejecting deposit:", error);
                 showNotification('Error rejecting deposit', 'error');
+                showScreen(adminPanel);
+            }
+        }
+
+        async function approvePendingWithdrawal(withdrawalId) {
+            const withdrawal = pendingWithdrawals.find(w => w.id === withdrawalId);
+            if (!withdrawal) {
+                showNotification('Withdrawal not found', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // Find the user
+                const user = users.find(u => u.id === withdrawal.userId);
+                if (!user) {
+                    showNotification('User not found', 'error');
+                    return;
+                }
+                
+                // Check if user has sufficient balance
+                if (user.balance < withdrawal.amount) {
+                    showNotification('User has insufficient balance for this withdrawal', 'error');
+                    return;
+                }
+                
+                // Update user balance
+                user.balance -= withdrawal.amount;
+                await saveUser(user);
+                
+                // Record transaction for the user
+                const transaction = {
+                    from: user.phone,
+                    to: withdrawal.method.toUpperCase(),
+                    amount: withdrawal.amount,
+                    fee: 0,
+                    type: 'withdrawal',
+                    method: withdrawal.method,
+                    date: new Date().toISOString(),
+                    userId: user.id,
+                    status: 'completed'
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Remove from pending withdrawals
+                await removePendingWithdrawal(withdrawalId);
+                
+                // Reload data
+                await loadUsers();
+                await loadPendingWithdrawals();
+                
+                // Update displays
+                await displayPendingWithdrawals();
+                
+                showNotification(`Withdrawal of USD ${withdrawal.amount.toFixed(2)} approved for ${user.phone}`, 'success');
+            } catch (error) {
+                console.error("Error approving withdrawal:", error);
+                showNotification('Error approving withdrawal', 'error');
+                showScreen(adminPanel);
+            }
+        }
+
+        async function rejectPendingWithdrawal(withdrawalId) {
+            const withdrawal = pendingWithdrawals.find(w => w.id === withdrawalId);
+            if (!withdrawal) {
+                showNotification('Withdrawal not found', 'error');
+                return;
+            }
+            
+            showLoading();
+            
+            try {
+                // Record rejected transaction
+                const transaction = {
+                    from: withdrawal.userPhone,
+                    to: withdrawal.method.toUpperCase(),
+                    amount: withdrawal.amount,
+                    fee: 0,
+                    type: 'withdrawal',
+                    method: withdrawal.method,
+                    date: new Date().toISOString(),
+                    userId: withdrawal.userId,
+                    status: 'rejected'
+                };
+                
+                await saveTransaction(transaction);
+                
+                // Remove from pending withdrawals
+                await removePendingWithdrawal(withdrawalId);
+                
+                // Reload data
+                await loadPendingWithdrawals();
+                
+                // Update displays
+                await displayPendingWithdrawals();
+                
+                showNotification(`Withdrawal of USD ${withdrawal.amount.toFixed(2)} rejected for ${withdrawal.userPhone}`, 'info');
+            } catch (error) {
+                console.error("Error rejecting withdrawal:", error);
+                showNotification('Error rejecting withdrawal', 'error');
                 showScreen(adminPanel);
             }
         }
@@ -2946,9 +3569,15 @@
         function showDepositScreen() {
             showScreen(depositScreen);
             depositAmountInput.value = '';
+            withdrawAmountInput.value = '';
             paypalContainer.innerHTML = '';
             currentDepositAmount = 0;
+            currentWithdrawAmount = 0;
             mpesaStatus.classList.add('hidden');
+            mpesaWithdrawStatus.classList.add('hidden');
+            
+            // Reset to deposit tab by default
+            switchDepositWithdrawTab('deposit');
         }
 
         function showSendMoneyScreen() {
@@ -3131,6 +3760,11 @@
                     amountClass = 'transaction-positive';
                     amountPrefix = '+';
                     description = `Method: ${transaction.method || 'Unknown'}`;
+                } else if (transaction.type === 'withdrawal') {
+                    typeText = 'Withdrawal';
+                    amountClass = 'transaction-negative';
+                    amountPrefix = '-';
+                    description = `Method: ${transaction.method || 'Unknown'}`;
                 } else if (transaction.type === 'crypto_buy') {
                     typeText = 'Crypto Buy';
                     amountClass = 'transaction-negative';
@@ -3218,6 +3852,7 @@
             usersSection.classList.add('hidden');
             transactionsSection.classList.add('hidden');
             pendingSection.classList.add('hidden');
+            pendingWithdrawalsSection.classList.add('hidden');
         }
 
         async function displayAllUsers() {
