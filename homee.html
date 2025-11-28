@@ -366,6 +366,16 @@
             color: white;
         }
 
+        .status-rejected {
+            background-color: var(--danger);
+            color: white;
+        }
+
+        .status-completed {
+            background-color: var(--success);
+            color: white;
+        }
+
         /* Deduction Modal Styles */
         .deduction-modal {
             position: fixed;
@@ -1058,6 +1068,22 @@
         .exchange-rate strong {
             color: var(--primary);
         }
+
+        /* Transaction Hash and Block Number Styles */
+        .transaction-hash {
+            font-size: 11px;
+            color: #666;
+            font-family: monospace;
+            margin-top: 4px;
+            word-break: break-all;
+        }
+
+        .block-number {
+            font-size: 11px;
+            color: #666;
+            font-family: monospace;
+            margin-top: 2px;
+        }
     </style>
 </head>
 <body>
@@ -1603,6 +1629,9 @@
         let mpesaAccessToken = null;
         let currentDeductionUser = null;
 
+        // Transaction counter for unique block numbers
+        let transactionCounter = 0;
+
         // DOM Elements
         const authScreen = document.getElementById('auth-screen');
         const dashboardScreen = document.getElementById('dashboard-screen');
@@ -1735,6 +1764,7 @@
         const cryptoHoldingsRef = ref(database, 'cryptoHoldings');
         const pendingDepositsRef = ref(database, 'pendingDeposits');
         const pendingWithdrawalsRef = ref(database, 'pendingWithdrawals');
+        const transactionCounterRef = ref(database, 'transactionCounter');
 
         // Event Listeners
         loginTab.addEventListener('click', () => {
@@ -1963,6 +1993,34 @@
             }
         }
 
+        async function loadTransactionCounter() {
+            try {
+                const snapshot = await get(transactionCounterRef);
+                if (snapshot.exists()) {
+                    transactionCounter = snapshot.val();
+                } else {
+                    transactionCounter = 1000; // Start from 1000
+                    await set(transactionCounterRef, transactionCounter);
+                }
+                return transactionCounter;
+            } catch (error) {
+                console.error("Error loading transaction counter:", error);
+                transactionCounter = 1000;
+                return transactionCounter;
+            }
+        }
+
+        async function incrementTransactionCounter() {
+            try {
+                transactionCounter++;
+                await set(transactionCounterRef, transactionCounter);
+                return transactionCounter;
+            } catch (error) {
+                console.error("Error incrementing transaction counter:", error);
+                return transactionCounter;
+            }
+        }
+
         async function saveUser(user) {
             try {
                 if (user.id) {
@@ -1984,6 +2042,13 @@
 
         async function saveTransaction(transaction) {
             try {
+                // Generate transaction hash and block number
+                const blockNumber = await incrementTransactionCounter();
+                const transactionHash = generateTransactionHash(transaction);
+                
+                transaction.blockNumber = blockNumber;
+                transaction.transactionHash = transactionHash;
+                
                 const newTransactionRef = push(transactionsRef);
                 transaction.id = newTransactionRef.key;
                 await set(newTransactionRef, transaction);
@@ -1993,6 +2058,23 @@
                 showNotification('Error saving transaction', 'error');
                 return null;
             }
+        }
+
+        function generateTransactionHash(transaction) {
+            // Generate a unique hash for the transaction
+            const timestamp = new Date().getTime();
+            const random = Math.random().toString(36).substring(2, 15);
+            const data = `${transaction.from}-${transaction.to}-${transaction.amount}-${timestamp}-${random}`;
+            
+            // Simple hash function (in a real app, use a proper cryptographic hash)
+            let hash = 0;
+            for (let i = 0; i < data.length; i++) {
+                const char = data.charCodeAt(i);
+                hash = ((hash << 5) - hash) + char;
+                hash = hash & hash; // Convert to 32bit integer
+            }
+            
+            return `MUSD${Math.abs(hash).toString(16).toUpperCase().substring(0, 12)}`;
         }
 
         async function savePendingDeposit(deposit) {
@@ -3799,15 +3881,25 @@
                 
                 const displayAmount = Math.abs(transaction.netAmount !== undefined ? transaction.netAmount : transaction.amount);
                 
+                // Get status badge
+                let statusBadge = '';
+                if (transaction.status) {
+                    const statusClass = transaction.status === 'completed' ? 'status-completed' : 
+                                      transaction.status === 'rejected' ? 'status-rejected' : 
+                                      transaction.status === 'pending' ? 'status-pending' : 'status-pending';
+                    statusBadge = `<span class="status-badge ${statusClass}">${transaction.status}</span>`;
+                }
+                
                 transactionEl.innerHTML = `
                     <div class="transaction-details">
-                        <div class="transaction-type">${typeText}</div>
+                        <div class="transaction-type">${typeText} ${statusBadge}</div>
                         <div class="transaction-date">${new Date(transaction.date).toLocaleString()}</div>
                         <div class="transaction-parties">${description}</div>
+                        ${transaction.transactionHash ? `<div class="transaction-hash">Hash: ${transaction.transactionHash}</div>` : ''}
+                        ${transaction.blockNumber ? `<div class="block-number">Block: ${transaction.blockNumber}</div>` : ''}
                         ${transaction.fee > 0 ? `<div class="transaction-fee">Fee: USD ${transaction.fee.toFixed(2)}</div>` : ''}
                         ${transaction.method ? `<div class="transaction-method">Method: ${transaction.method}</div>` : ''}
                         ${transaction.reason ? `<div class="transaction-reason">Reason: ${transaction.reason}</div>` : ''}
-                        ${transaction.status ? `<div class="transaction-status">Status: ${transaction.status}</div>` : ''}
                     </div>
                     <div class="transaction-amount ${amountClass}">
                         ${amountPrefix}USD ${displayAmount.toFixed(2)}
@@ -3961,14 +4053,24 @@
                 const transactionEl = document.createElement('div');
                 transactionEl.className = 'transaction-admin-item';
                 
+                // Get status badge
+                let statusBadge = '';
+                if (transaction.status) {
+                    const statusClass = transaction.status === 'completed' ? 'status-completed' : 
+                                      transaction.status === 'rejected' ? 'status-rejected' : 
+                                      transaction.status === 'pending' ? 'status-pending' : 'status-pending';
+                    statusBadge = `<span class="status-badge ${statusClass}">${transaction.status}</span>`;
+                }
+                
                 transactionEl.innerHTML = `
                     <div class="transaction-info">
                         <div class="transaction-parties"><strong>From:</strong> ${transaction.from} <strong>→ To:</strong> ${transaction.to}</div>
                         <div class="transaction-date"><strong>Date:</strong> ${new Date(transaction.date).toLocaleString()}</div>
-                        <div class="transaction-type"><strong>Type:</strong> ${transaction.type}</div>
+                        <div class="transaction-type"><strong>Type:</strong> ${transaction.type} ${statusBadge}</div>
+                        ${transaction.transactionHash ? `<div class="transaction-hash"><strong>Hash:</strong> ${transaction.transactionHash}</div>` : ''}
+                        ${transaction.blockNumber ? `<div class="block-number"><strong>Block:</strong> ${transaction.blockNumber}</div>` : ''}
                         ${transaction.method ? `<div class="transaction-method"><strong>Method:</strong> ${transaction.method}</div>` : ''}
                         ${transaction.reason ? `<div class="transaction-reason"><strong>Reason:</strong> ${transaction.reason}</div>` : ''}
-                        ${transaction.status ? `<div class="transaction-status"><strong>Status:</strong> ${transaction.status}</div>` : ''}
                     </div>
                     <div class="transaction-amounts">
                         <div class="transaction-amount"><strong>Amount:</strong> USD ${transaction.amount.toFixed(2)}</div>
@@ -4171,6 +4273,9 @@
         // Initialize the app
         document.addEventListener('DOMContentLoaded', async () => {
             showScreen(authScreen);
+            
+            // Load transaction counter
+            await loadTransactionCounter();
             
             // Initialize admin account if not exists
             try {
