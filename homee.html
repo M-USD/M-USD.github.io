@@ -1084,6 +1084,60 @@
             font-family: monospace;
             margin-top: 2px;
         }
+
+        /* Blocked User Contact Styles */
+        .blocked-user-screen {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .blocked-user-screen i {
+            font-size: 64px;
+            color: var(--danger);
+            margin-bottom: 20px;
+        }
+
+        .contact-admin-options {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .contact-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 8px;
+            text-align: left;
+        }
+
+        .contact-icon {
+            font-size: 24px;
+            color: var(--primary);
+        }
+
+        .contact-details h4 {
+            margin: 0 0 5px 0;
+        }
+
+        .contact-details p {
+            margin: 0;
+            color: #666;
+            font-size: 14px;
+        }
+
+        .copy-btn {
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            padding: 5px 10px;
+            cursor: pointer;
+            font-size: 12px;
+        }
     </style>
 </head>
 <body>
@@ -1133,6 +1187,52 @@
                     <input type="password" id="confirm-pin" class="form-control" placeholder="Confirm PIN" maxlength="4">
                 </div>
                 <button class="btn btn-primary" id="register-btn">Register</button>
+            </div>
+        </div>
+
+        <!-- Blocked User Screen -->
+        <div id="blocked-user-screen" class="card hidden">
+            <div class="blocked-user-screen">
+                <i class="fas fa-ban"></i>
+                <h2>Account Blocked</h2>
+                <p>Your account has been blocked. Please contact support to resolve this issue.</p>
+                
+                <div class="contact-admin-options">
+                    <div class="contact-option">
+                        <div class="contact-icon">
+                            <i class="fas fa-phone"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Call Support</h4>
+                            <p>+254 700 000 000</p>
+                        </div>
+                        <button class="copy-btn" data-text="+254700000000">Copy</button>
+                    </div>
+                    
+                    <div class="contact-option">
+                        <div class="contact-icon">
+                            <i class="fas fa-envelope"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>Email Support</h4>
+                            <p>support@m-usd.com</p>
+                        </div>
+                        <button class="copy-btn" data-text="support@m-usd.com">Copy</button>
+                    </div>
+                    
+                    <div class="contact-option">
+                        <div class="contact-icon">
+                            <i class="fab fa-whatsapp"></i>
+                        </div>
+                        <div class="contact-details">
+                            <h4>WhatsApp</h4>
+                            <p>+254 700 000 000</p>
+                        </div>
+                        <button class="copy-btn" data-text="+254700000000">Copy</button>
+                    </div>
+                </div>
+                
+                <button class="btn btn-outline" id="back-to-login-from-blocked">Back to Login</button>
             </div>
         </div>
 
@@ -1634,6 +1734,7 @@
 
         // DOM Elements
         const authScreen = document.getElementById('auth-screen');
+        const blockedUserScreen = document.getElementById('blocked-user-screen');
         const dashboardScreen = document.getElementById('dashboard-screen');
         const depositScreen = document.getElementById('deposit-screen');
         const paymentPendingScreen = document.getElementById('payment-pending-screen');
@@ -1652,6 +1753,7 @@
         const loginBtn = document.getElementById('login-btn');
         const registerBtn = document.getElementById('register-btn');
         const logoutBtn = document.getElementById('logout-btn');
+        const backToLoginFromBlocked = document.getElementById('back-to-login-from-blocked');
         
         const depositBtn = document.getElementById('deposit-btn');
         const sendMoneyBtn = document.getElementById('send-money-btn');
@@ -1784,6 +1886,7 @@
         loginBtn.addEventListener('click', handleLogin);
         registerBtn.addEventListener('click', handleRegister);
         logoutBtn.addEventListener('click', handleLogout);
+        backToLoginFromBlocked.addEventListener('click', () => showScreen(authScreen));
 
         depositBtn.addEventListener('click', showDepositScreen);
         sendMoneyBtn.addEventListener('click', showSendMoneyScreen);
@@ -1881,6 +1984,19 @@
 
         userSearch.addEventListener('input', filterUsers);
         transactionSearch.addEventListener('input', filterTransactions);
+
+        // Copy contact info buttons
+        document.addEventListener('click', function(e) {
+            if (e.target.classList.contains('copy-btn')) {
+                const text = e.target.dataset.text;
+                navigator.clipboard.writeText(text).then(() => {
+                    showNotification('Contact info copied to clipboard', 'success');
+                }).catch(err => {
+                    console.error('Failed to copy: ', err);
+                    showNotification('Failed to copy contact info', 'error');
+                });
+            }
+        });
 
         // Global event listener for trade buttons
         document.addEventListener('click', function(e) {
@@ -3481,6 +3597,7 @@
 
         function showScreen(screen) {
             authScreen.classList.add('hidden');
+            blockedUserScreen.classList.add('hidden');
             dashboardScreen.classList.add('hidden');
             depositScreen.classList.add('hidden');
             paymentPendingScreen.classList.add('hidden');
@@ -3500,6 +3617,7 @@
 
         function showLoading() {
             authScreen.classList.add('hidden');
+            blockedUserScreen.classList.add('hidden');
             dashboardScreen.classList.add('hidden');
             depositScreen.classList.add('hidden');
             paymentPendingScreen.classList.add('hidden');
@@ -3539,8 +3657,7 @@
                 }
                 
                 if (user.isBlocked) {
-                    showNotification('Your account has been blocked. Contact support.', 'error');
-                    showScreen(authScreen);
+                    showScreen(blockedUserScreen);
                     return;
                 }
                 
@@ -4049,6 +4166,7 @@
                 return;
             }
             
+            // Display ALL transactions without filtering by user ID
             transactions.forEach(transaction => {
                 const transactionEl = document.createElement('div');
                 transactionEl.className = 'transaction-admin-item';
@@ -4162,8 +4280,11 @@
                     await saveUser(adminUser);
                 }
                 
-                // Record transaction
-                const transaction = {
+                // Save updated user
+                await saveUser(currentDeductionUser);
+                
+                // Record transaction for the user who was deducted
+                const userTransaction = {
                     from: currentDeductionUser.phone,
                     to: 'ADMIN',
                     amount: amount,
@@ -4171,13 +4292,26 @@
                     type: 'deduction',
                     reason: reason,
                     date: new Date().toISOString(),
-                    userId: currentDeductionUser.id
+                    userId: currentDeductionUser.id,
+                    status: 'completed'
                 };
                 
-                await saveTransaction(transaction);
+                await saveTransaction(userTransaction);
                 
-                // Save updated user
-                await saveUser(currentDeductionUser);
+                // Record transaction for the admin who received the deduction
+                const adminTransaction = {
+                    from: currentDeductionUser.phone,
+                    to: 'ADMIN',
+                    amount: amount,
+                    fee: 0,
+                    type: 'deduction_received',
+                    reason: reason,
+                    date: new Date().toISOString(),
+                    userId: adminUser.id, // This is the key fix - saving with admin's ID
+                    status: 'completed'
+                };
+                
+                await saveTransaction(adminTransaction);
                 
                 // Reload data
                 await loadUsers();
@@ -4232,8 +4366,8 @@
                     await saveUser(adminUser);
                 }
                 
-                // Record transaction
-                const transaction = {
+                // Record transaction for user
+                const userTransaction = {
                     from: user.phone,
                     to: 'ADMIN',
                     amount: amount,
@@ -4243,7 +4377,20 @@
                     userId: user.id
                 };
                 
-                await saveTransaction(transaction);
+                await saveTransaction(userTransaction);
+                
+                // Record transaction for admin
+                const adminTransaction = {
+                    from: user.phone,
+                    to: 'ADMIN',
+                    amount: amount,
+                    fee: 0,
+                    type: 'recovery_received',
+                    date: new Date().toISOString(),
+                    userId: adminUser.id
+                };
+                
+                await saveTransaction(adminTransaction);
                 
                 // Reset user balance
                 user.balance = 0;
