@@ -1194,7 +1194,7 @@
         <div id="blocked-user-screen" class="card hidden">
             <div class="blocked-user-screen">
                 <i class="fas fa-ban"></i>
-                <h2>Account Blocked</h2>
+                <h2>📵Account Blocked</h2>
                 <p>Your account has been blocked. Please contact support to resolve this issue.</p>
                 
                 <div class="contact-admin-options">
@@ -1203,7 +1203,7 @@
                             <i class="fas fa-phone"></i>
                         </div>
                         <div class="contact-details">
-                            <h4>Call Support</h4>
+                            <h4>📞Call Support</h4>
                             <p>+254 700 000 000</p>
                         </div>
                         <button class="copy-btn" data-text="+254700000000">Copy</button>
@@ -1214,7 +1214,7 @@
                             <i class="fas fa-envelope"></i>
                         </div>
                         <div class="contact-details">
-                            <h4>Email Support</h4>
+                            <h4>📥Email Support</h4>
                             <p>support@m-usd.com</p>
                         </div>
                         <button class="copy-btn" data-text="support@m-usd.com">Copy</button>
@@ -1249,7 +1249,7 @@
                     <div class="menu-icon">
                         <i class="fas fa-money-bill-wave"></i>
                     </div>
-                    <div>Deposit/Withdraw</div>
+                    <div>(Deposit)◼️(Withdraw)</div>
                 </div>
                 <div class="menu-item" id="send-money-btn">
                     <div class="menu-icon">
@@ -1282,18 +1282,18 @@
 
         <!-- Deposit/Withdraw Screen -->
         <div id="deposit-screen" class="card hidden">
-            <h2>Deposit/Withdraw Funds</h2>
+            <h2>(Deposit)🔘(Withdraw)</h2>
             
             <!-- Deposit/Withdraw Tabs -->
             <div class="withdrawal-tabs">
-                <div class="withdrawal-tab active" id="deposit-tab">Deposit</div>
-                <div class="withdrawal-tab" id="withdraw-tab">Withdraw</div>
+                <div class="withdrawal-tab active" id="deposit-tab">🟢Deposit</div>
+                <div class="withdrawal-tab" id="withdraw-tab">🔴Withdraw</div>
             </div>
             
             <!-- Payment Method Tabs -->
             <div class="payment-method-tabs">
-                <div class="payment-method-tab active" id="paypal-tab">PayPal</div>
-                <div class="payment-method-tab" id="mpesa-tab">M-Pesa</div>
+                <div class="payment-method-tab active" id="paypal-tab">💶PayPal</div>
+                <div class="payment-method-tab" id="mpesa-tab">💵M-Pesa</div>
             </div>
             
             <!-- Deposit Section -->
@@ -1303,21 +1303,22 @@
                     <input type="number" id="deposit-amount" class="form-control" placeholder="Enter amount" min="5" max="10000" step="0.01">
                 </div>
                 <div class="form-group">
-                    <p>Minimum deposit: $5.00</p>
-                    <p>Maximum deposit: $10,000.00</p>
+                    <p>▪️Minimum deposit: $5.00</p>
+                    <p>◼️Maximum deposit: $10,000.00</p>
                 </div>
                 
                 <!-- Exchange Rate Info for M-Pesa -->
                 <div id="deposit-exchange-rate" class="exchange-rate hidden">
-                    <p><strong>Exchange Rate:</strong> 1 USD = Ksh 135</p>
-                    <p id="deposit-ksh-amount">Equivalent: Ksh 0.00</p>
+                    <p><strong>📊Exchange Rate:</strong> 1 USD = Ksh 135</p>
+                    <p id="deposit-ksh-amount">
+                        🌀Equivalent: Ksh 0.00</p>
                 </div>
                 
                 <!-- PayPal Payment Method -->
                 <div id="paypal-method">
                     <div class="paypal-container" id="paypal-container"></div>
                     <div class="payment-notice">
-                        <p><strong>Note:</strong> Your deposit will be pending until verified by system. You'll receive a notification once approved.</p>
+                        <p><strong>📌Note:</strong> Your PayPal deposit will be pending until verified by system.You'll receive a notification once approved.</p>
                     </div>
                 </div>
                 
@@ -1332,25 +1333,23 @@
                         <div class="mpesa-instructions">
                             <h4>How to deposit with M-Pesa:</h4>
                             <ol>
-                                <li>Enter your M-Pesa phone number above</li>
-                                <li>Enter the deposit amount in USD</li>
-                                <li>Click "Deposit with M-Pesa"</li>
-                                <li>Check your phone for STK Push prompt</li>
+                                <li>Go to your M-Pesa send money</li>
+                                <li>Enter the deposit amount in Ksh as show in the converter to 0746500025</li>
                                 <li>Enter your M-Pesa PIN to complete payment</li>
                                 <li>Wait for system verification (usually within 24 hours)</li>
                             </ol>
                         </div>
                         
                         <button class="btn btn-primary" id="mpesa-deposit-btn">
-                            <i class="fas fa-mobile-alt"></i> Deposit with M-Pesa
+                            <i class="fas fa-mobile-alt"></i> 🟢Deposit with M-Pesa
                         </button>
                         
                         <div id="mpesa-status" class="mpesa-status hidden">
-                            <p id="mpesa-status-text">Processing...</p>
+                            <p id="mpesa-status-text">⏳Processing...</p>
                         </div>
                         
                         <div class="payment-notice">
-                            <p><strong>Note:</strong> Your deposit will be pending until verified by system. You'll receive a notification once approved.</p>
+                            <p><strong>⚙️Note:</strong> Your deposit will be pending until verified by system. You'll receive a notification once approved.</p>
                         </div>
                     </div>
                 </div>
@@ -1363,20 +1362,21 @@
                     <input type="number" id="withdraw-amount" class="form-control" placeholder="Enter amount" min="5" max="10000" step="0.01">
                 </div>
                 <div class="form-group">
-                    <p>Minimum withdrawal: $5.00</p>
-                    <p>Maximum withdrawal: $10,000.00</p>
+                    <p>▪️Minimum withdrawal: $5.00</p>
+                    <p>◼️Maximum withdrawal: $10,000.00</p>
                 </div>
                 
                 <!-- Exchange Rate Info for M-Pesa -->
                 <div id="withdraw-exchange-rate" class="exchange-rate hidden">
-                    <p><strong>Exchange Rate:</strong> 1 USD = Ksh 125</p>
-                    <p id="withdraw-ksh-amount">Equivalent: Ksh 0.00</p>
+                    <p><strong>📊Exchange Rate:</strong> 1 USD = Ksh 125</p>
+                    <p id="withdraw-ksh-amount">
+                        🌀Equivalent: Ksh 0.00</p>
                 </div>
                 
                 <!-- PayPal Withdraw Method -->
                 <div id="paypal-withdraw-method">
                     <div class="form-group">
-                        <label for="paypal-email">PayPal Email</label>
+                        <label for="paypal-email">🅿️PayPal Email</label>
                         <input type="email" id="paypal-email" class="form-control" placeholder="your-email@example.com">
                     </div>
                     
@@ -1411,7 +1411,7 @@
                                 <li>Enter the withdrawal amount in USD</li>
                                 <li>Click "Withdraw with M-Pesa"</li>
                                 <li>Wait for system verification (usually within 24 hours)</li>
-                                <li>Funds will be sent to your M-Pesa account</li>
+                                <li>Funds will be sent to your M-Pesa account in Ksh </li>
                             </ol>
                         </div>
                         
@@ -1420,13 +1420,13 @@
                         </button>
                         
                         <div id="mpesa-withdraw-status" class="mpesa-status hidden">
-                            <p id="mpesa-withdraw-status-text">Processing...</p>
+                            <p id="mpesa-withdraw-status-text">⏳Processing...</p>
                         </div>
                     </div>
                 </div>
                 
                 <div class="payment-notice">
-                    <p><strong>Note:</strong> Your withdrawal will be pending until verified by system. You'll receive a notification once approved.</p>
+                    <p><strong>⚙️Note:</strong> Your withdrawal will be pending until verified by system. You'll receive a notification once approved.</p>
                 </div>
             </div>
             
@@ -1437,7 +1437,7 @@
         <div id="payment-pending-screen" class="card hidden">
             <div class="payment-success">
                 <i class="fas fa-clock"></i>
-                <h2>Payment Pending Verification</h2>
+                <h2>⏳Payment Pending Verification</h2>
                 <p>Your <span id="pending-type">deposit</span> is pending system verification.</p>
                 <p>Amount: <span id="pending-deposit-amount">USD 0.00</span></p>
                 <p>Method: <span id="pending-deposit-method">PayPal</span></p>
@@ -1450,7 +1450,7 @@
         <div id="payment-success-screen" class="card hidden">
             <div class="payment-success">
                 <i class="fas fa-check-circle"></i>
-                <h2>Payment Successful!</h2>
+                <h2>✅Payment Successful!</h2>
                 <p>Your <span id="success-type">deposit</span> has been processed successfully.</p>
                 <p>Amount: <span id="deposit-success-amount">USD 0.00</span></p>
                 <p>Method: <span id="deposit-method">PayPal</span></p>
@@ -1479,7 +1479,7 @@
 
         <!-- Transactions Screen -->
         <div id="transactions-screen" class="card hidden">
-            <h2>Transaction History</h2>
+            <h2>📑Transaction History</h2>
             <div id="transactions-list">
                 <!-- Transactions will be populated here -->
             </div>
@@ -1493,7 +1493,7 @@
             <!-- Portfolio Summary -->
             <div class="portfolio-summary">
                 <div class="portfolio-card">
-                    <h3>Your Portfolio</h3>
+                    <h3>⚫🔴⚪Your Portfolio</h3>
                     <div class="portfolio-balance">
                         <div class="total-value">
                             <span class="label">Total Value:</span>
@@ -1501,11 +1501,11 @@
                         </div>
                         <div class="breakdown">
                             <div class="breakdown-item">
-                                <span class="label">Cash Balance:</span>
+                                <span class="label">🥇Cash Balance:</span>
                                 <span class="amount" id="portfolio-cash">USD 0.00</span>
                             </div>
                             <div class="breakdown-item">
-                                <span class="label">Crypto Value:</span>
+                                <span class="label">🥈Crypto Value:</span>
                                 <span class="amount" id="portfolio-crypto">USD 0.00</span>
                             </div>
                         </div>
@@ -1515,7 +1515,7 @@
             
             <!-- Crypto Holdings -->
             <div class="crypto-holdings">
-                <h3>Your Crypto Holdings</h3>
+                <h3>🏧Your Crypto Holdings</h3>
                 <div id="crypto-holdings-list">
                     <!-- Crypto holdings will be populated here -->
                 </div>
@@ -1523,7 +1523,7 @@
             
             <!-- Top Cryptocurrencies -->
             <div class="crypto-market">
-                <h3>Top Cryptocurrencies</h3>
+                <h3>Top 10 Cryptocurrencies</h3>
                 <div class="search-bar">
                     <input type="text" id="crypto-search" class="form-control" placeholder="Search cryptocurrencies...">
                 </div>
@@ -1630,7 +1630,7 @@
         <div id="loading-screen" class="card hidden">
             <div class="loading">
                 <div class="spinner"></div>
-                <p>Loading...</p>
+                <p>⏳Loading...</p>
             </div>
         </div>
     </div>
@@ -1664,7 +1664,7 @@
     <div id="notification" class="notification"></div>
 
     <div class="footer">
-        <p>🇺🇸M-USD &copy; 2026 | Transparent•Simple•Honest</p>
+        <p>🇺🇸M-USD &copy; 2025-2026 | Transparent•Simple•Honest</p>
     </div>
 
     <!-- PayPal SDK -->
@@ -2452,7 +2452,7 @@
                 pendingType.textContent = 'deposit';
                 pendingType2.textContent = 'deposit';
                 showScreen(paymentPendingScreen);
-                showNotification(`Deposit of USD ${amount.toFixed(2)} submitted for admin verification`, 'info');
+                showNotification(`Deposit of USD ${amount.toFixed(2)} submitted for system verification`, 'info');
             } catch (error) {
                 console.error("Payment processing error:", error);
                 showNotification('Payment processing failed. Please contact support.', 'error');
@@ -2523,7 +2523,7 @@
         // Complete M-Pesa payment and create pending deposit
         async function completeMpesaPayment(amount) {
             try {
-                mpesaStatusText.textContent = 'Payment successful! Creating pending deposit...';
+                mpesaStatusText.textContent = 'Payment successful created! Creating pending deposit...';
                 
                 // Create pending deposit record instead of directly updating balance
                 const pendingDeposit = {
@@ -2606,7 +2606,7 @@
                 pendingType.textContent = 'withdrawal';
                 pendingType2.textContent = 'withdrawal';
                 showScreen(paymentPendingScreen);
-                showNotification(`Withdrawal of USD ${amount.toFixed(2)} submitted for admin verification`, 'info');
+                showNotification(`Withdrawal of USD ${amount.toFixed(2)} submitted for system verification`, 'info');
             } catch (error) {
                 console.error("PayPal withdrawal error:", error);
                 showNotification('Withdrawal request failed. Please try again.', 'error');
@@ -2668,7 +2668,7 @@
                 pendingType.textContent = 'withdrawal';
                 pendingType2.textContent = 'withdrawal';
                 showScreen(paymentPendingScreen);
-                showNotification(`M-Pesa withdrawal of USD ${amount.toFixed(2)} submitted for admin verification`, 'info');
+                showNotification(`M-Pesa withdrawal of USD ${amount.toFixed(2)} submitted for sys verification`, 'info');
                 
             } catch (error) {
                 console.error("M-Pesa withdrawal error:", error);
