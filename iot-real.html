@@ -3,11 +3,15 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Real IoT Sensor Dashboard - Complete System</title>
+    <title>📡 M-USD Sensor Dashboard</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://unpkg.com/mqtt/dist/mqtt.min.js"></script>
-    <style>
+    
+    
+    
+    
+<style>
         * {
             margin: 0;
             padding: 0;
@@ -21,16 +25,18 @@
             --success: #48bb78;
             --warning: #ed8936;
             --danger: #f56565;
-            --dark: #66FF00;
-            --darker: #66ff00;
+            --dark: #2d3748;
+            --darker: #1a202c;
             --light: #e2e8f0;
             --lighter: #f7fafc;
             --gray: #718096;
+            --text-dark: #000000;
+            --text-light: #4a5568;
         }
         
         body {
-            background: linear-gradient(135deg, var(--darker) 0%, var(--dark) 100%);
-            color: var(--light);
+            background: #8D9097;
+            color: var(--text-dark);
             min-height: 100vh;
             overflow-x: hidden;
         }
@@ -39,11 +45,16 @@
             max-width: 1800px;
             margin: 0 auto;
             padding: 15px;
+            background: #B5AFAF;
+            border-radius: 15px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            margin-top: 10px;
+            margin-bottom: 10px;
         }
         
         /* Navigation */
         .navbar {
-            background: rgba(0, 0, 0, 1);
+            background: #FFFFFE;
             backdrop-filter: blur(10px);
             border-radius: 15px;
             padding: 15px 20px;
@@ -51,8 +62,8 @@
             display: flex;
             flex-direction: column;
             gap: 15px;
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
         }
         
         .brand {
@@ -83,7 +94,7 @@
             padding: 10px 15px;
             background: transparent;
             border: 2px solid transparent;
-            color: #cbd5e0;
+            color: var(--text-light);
             border-radius: 8px;
             cursor: pointer;
             font-weight: 500;
@@ -111,12 +122,13 @@
             display: flex;
             align-items: center;
             gap: 8px;
-            background: rgba(45, 55, 72, 0.8);
+            background: #f8f9fa;
             padding: 8px 15px;
             border-radius: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             white-space: nowrap;
             justify-content: center;
+            color: var(--text-dark);
         }
         
         .status-dot {
@@ -153,6 +165,7 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            color: var(--text-dark);
         }
         
         .sensor-active {
@@ -176,13 +189,14 @@
         
         /* Sidebar */
         .sidebar {
-            background: rgba(26, 32, 44, 0.9);
+            background: #ffffff;
             border-radius: 15px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             height: fit-content;
             margin-bottom: 20px;
             width: 100%;
+            color: var(--text-dark);
         }
         
         .sidebar-section {
@@ -200,19 +214,20 @@
         
         /* Sensor Cards */
         .sensor-card {
-            background: rgba(45, 55, 72, 0.8);
+            background: #f8f9fa;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             transition: all 0.3s;
             touch-action: manipulation;
+            color: var(--text-dark);
         }
         
         .sensor-card:active {
             border-color: var(--primary);
             transform: scale(0.98);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.2);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
         }
         
         .sensor-card.active {
@@ -232,6 +247,7 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            color: var(--text-dark);
         }
         
         .sensor-value {
@@ -239,11 +255,12 @@
             font-weight: 700;
             text-align: center;
             margin: 10px 0;
+            color: var(--text-dark);
         }
         
         .sensor-unit {
             font-size: 0.8rem;
-            color: #a0aec0;
+            color: var(--text-light);
             margin-left: 2px;
         }
         
@@ -255,7 +272,7 @@
             display: flex;
             justify-content: space-between;
             font-size: 0.75rem;
-            color: #a0aec0;
+            color: var(--text-light);
         }
         
         .sensor-details {
@@ -264,16 +281,18 @@
             gap: 8px;
             margin: 10px 0;
             font-size: 0.8rem;
+            color: var(--text-dark);
         }
         
         /* Charts Container */
         .charts-container {
-            background: rgba(26, 32, 44, 0.9);
+            background: #ffffff;
             border-radius: 15px;
             padding: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             min-height: 500px;
             width: 100%;
+            color: var(--text-dark);
         }
         
         .chart-header {
@@ -286,12 +305,12 @@
         .chart-title {
             font-size: 1.2rem;
             font-weight: 600;
-            color: var(--light);
+            color: var(--text-dark);
             text-align: center;
         }
         
         .chart-container {
-            background: rgba(45, 55, 72, 0.5);
+            background: #f8f9fa;
             border-radius: 10px;
             padding: 15px;
             margin-bottom: 20px;
@@ -309,12 +328,13 @@
         }
         
         .dashboard-card {
-            background: rgba(45, 55, 72, 0.8);
+            background: #f8f9fa;
             border-radius: 12px;
             padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             transition: all 0.3s;
             touch-action: manipulation;
+            color: var(--text-dark);
         }
         
         .dashboard-card:active {
@@ -326,7 +346,7 @@
             font-size: 0.95rem;
             font-weight: 600;
             margin-bottom: 15px;
-            color: var(--primary);
+            color: var(--text-dark);
             display: flex;
             align-items: center;
             gap: 8px;
@@ -334,13 +354,14 @@
         
         /* Real-time Data Stream */
         .data-stream {
-            background: rgba(45, 55, 72, 0.5);
+            background: #f8f9fa;
             border-radius: 10px;
             padding: 15px;
             margin-top: 20px;
             max-height: 200px;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
+            color: var(--text-dark);
         }
         
         .data-stream-header {
@@ -348,18 +369,20 @@
             justify-content: space-between;
             align-items: center;
             margin-bottom: 15px;
+            color: var(--text-dark);
         }
         
         .data-entry {
             padding: 8px 12px;
             margin-bottom: 6px;
-            background: rgba(26, 32, 44, 0.6);
+            background: #ffffff;
             border-radius: 8px;
             border-left: 4px solid var(--primary);
             font-family: 'Courier New', monospace;
             font-size: 0.8rem;
             animation: slideIn 0.3s ease;
             word-break: break-word;
+            color: var(--text-dark);
         }
         
         .data-entry.sensor { border-left-color: var(--success); }
@@ -376,14 +399,15 @@
         }
         
         .control-card {
-            background: rgba(45, 55, 72, 0.8);
+            background: #f8f9fa;
             border-radius: 10px;
             padding: 15px;
             text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
             transition: all 0.3s;
             cursor: pointer;
             touch-action: manipulation;
+            color: var(--text-dark);
         }
         
         .control-card:active {
@@ -466,18 +490,19 @@
         }
         
         .alert {
-            background: rgba(45, 55, 72, 0.95);
+            background: #ffffff;
             border-radius: 10px;
             padding: 12px;
             margin-bottom: 8px;
             border-left: 5px solid var(--warning);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             animation: slideInRight 0.3s ease;
             backdrop-filter: blur(10px);
             display: flex;
             justify-content: space-between;
             align-items: center;
             word-break: break-word;
+            color: var(--text-dark);
         }
         
         .alert-success { border-left-color: var(--success); }
@@ -527,15 +552,16 @@
         }
         
         .modal-content {
-            background: rgba(26, 32, 44, 0.95);
+            background: #ffffff;
             border-radius: 15px;
             padding: 20px;
             width: 100%;
             max-width: 500px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
             max-height: 85vh;
             overflow-y: auto;
+            color: var(--text-dark);
         }
         
         .modal-header {
@@ -548,7 +574,7 @@
         .modal-title {
             font-size: 1.2rem;
             font-weight: 600;
-            color: var(--primary);
+            color: var(--text-dark);
         }
         
         /* Forms */
@@ -560,17 +586,17 @@
             display: block;
             margin-bottom: 6px;
             font-weight: 500;
-            color: #cbd5e0;
+            color: var(--text-dark);
             font-size: 0.9rem;
         }
         
         .form-control {
             width: 100%;
             padding: 10px 12px;
-            background: rgba(26, 32, 44, 0.8);
-            border: 2px solid #4a5568;
+            background: #f8f9fa;
+            border: 2px solid #d1d5db;
             border-radius: 8px;
-            color: white;
+            color: #000000;
             font-size: 0.95rem;
             transition: border-color 0.3s;
             touch-action: manipulation;
@@ -580,6 +606,7 @@
             outline: none;
             border-color: var(--primary);
             box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
+            background: #ffffff;
         }
         
         textarea.form-control {
@@ -599,10 +626,11 @@
         }
         
         .sensor-detail-card {
-            background: rgba(45, 55, 72, 0.8);
+            background: #f8f9fa;
             border-radius: 10px;
             padding: 15px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            color: var(--text-dark);
         }
         
         .sensor-actions {
@@ -637,7 +665,7 @@
         /* Progress Bars */
         .progress-bar {
             height: 6px;
-            background: rgba(255, 255, 255, 0.1);
+            background: rgba(0, 0, 0, 0.1);
             border-radius: 4px;
             overflow: hidden;
             margin: 10px 0;
@@ -684,7 +712,7 @@
         /* Tabs */
         .tabs {
             display: flex;
-            border-bottom: 2px solid rgba(255, 255, 255, 0.1);
+            border-bottom: 2px solid rgba(0, 0, 0, 0.1);
             margin-bottom: 15px;
             overflow-x: auto;
             -webkit-overflow-scrolling: touch;
@@ -711,7 +739,7 @@
         }
         
         .tab:active {
-            color: var(--light);
+            color: var(--text-dark);
         }
         
         .tab.active {
@@ -755,12 +783,12 @@
             border-radius: 4px;
         }
         
-        ::-webkit-scrollbar-thumb {
+        ::webkit-scrollbar-thumb {
             background: var(--primary);
             border-radius: 4px;
         }
         
-        ::-webkit-scrollbar-thumb:hover {
+        ::webkit-scrollbar-thumb:hover {
             background: #3182ce;
         }
         
@@ -833,6 +861,14 @@
             display: none !important;
         }
     </style>
+    
+    
+    
+    
+    
+    
+    
+
 </head>
 <body>
     <!-- Alerts Container -->
@@ -3635,7 +3671,7 @@
             if (RealIoT.sensors.size === 0 || !RealIoT.isConnected) {
                 const mockData = {
                     deviceId: 'sim-sensor-01',
-                    deviceName: 'Simulated Sensor',
+                    deviceName: 'M-USD Sensor',
                     temperature: 22 + Math.random() * 3,
                     humidity: 60 + Math.random() * 10,
                     motion: Math.random() > 0.9,
@@ -3644,9 +3680,115 @@
                     timestamp: new Date().toISOString()
                 };
                 
-                processSensorData('simulation/sensor', mockData);
+                processSensorData('M-USD/sensor', mockData);
             }
         }
+        
+        
+// Handle browser back button
+window.addEventListener('load', function() {
+// Store initial page
+const initialPage = document.querySelector('.nav-btn.active')?.getAttribute('data-page') || 'dashboard';
+
+// Add to history
+window.history.replaceState({
+page: initialPage,
+fromHome: false
+}, '', '');
+
+// Add a new state
+window.history.pushState({
+page: initialPage,
+fromHome: false
+}, '', '');
+});
+
+// Intercept back button
+window.addEventListener('popstate', function(event) {
+console.log('Back button pressed, state:', event.state);
+
+// Check if we're going back to home
+if (!event.state || !event.state.fromHome) {
+// Show confirmation
+const userConfirmed = confirm('Go back to home page?');
+
+if (userConfirmed) {
+// Navigate to home
+window.location.href = 'homee.html';
+} else {
+// Stay on current page
+const currentPage = document.querySelector('.nav-btn.active')?.getAttribute('data-page') || 'dashboard';
+window.history.pushState({
+page: currentPage,
+fromHome: false
+}, '', '');
+}
+}
+});
+
+// Also add this to prevent accidental navigation
+window.onbeforeunload = function(e) {
+// Save any data before leaving
+saveConfiguration();
+
+// Optional: Show confirmation
+// const message = 'Changes you made may not be saved.';
+// e.returnValue = message;
+// return message;
+};
+
+
+
+// Simple back button setup
+function setupSimpleBackButton() {
+const homePageUrl = 'homee.html';
+
+// Create and add back button
+const backBtn = document.createElement('button');
+backBtn.id = 'simpleBackBtn';
+backBtn.className = 'btn btn-outline';
+backBtn.innerHTML = '<i class="fas fa-home"></i> Main page';
+backBtn.style.marginLeft = 'auto';
+backBtn.style.display = 'none'; // Hidden by default
+
+// Add click handler
+backBtn.addEventListener('click', function() {
+window.location.href = homePageUrl;
+});
+
+// Add to navbar
+const navbar = document.querySelector('.navbar');
+if (navbar) {
+navbar.appendChild(backBtn);
+}
+
+// Show button on all pages except dashboard
+const showPageOriginal = window.showPage;
+window.showPage = function(pageId) {
+showPageOriginal(pageId);
+
+// Show back button on all pages except dashboard
+if (backBtn) {
+backBtn.style.display = pageId === 'dashboard' ? 'none' : 'flex';
+}
+};
+
+// Initialize
+setTimeout(() => {
+const currentPage = document.querySelector('.nav-btn.active')?.getAttribute('data-page') || 'dashboard';
+backBtn.style.display = currentPage === 'dashboard' ? 'none' : 'flex';
+}, 100);
+}
+
+// Add to your initialization
+document.addEventListener('DOMContentLoaded', function() {
+// ... your existing code ...
+setupSimpleBackButton();
+});
+
+
+
+
         
         // ====================================================================
         // GLOBAL FUNCTIONS
@@ -3666,7 +3808,7 @@
         window.performCalibration = performCalibration;
         window.updateCharts = updateCharts;
         
-        console.log("✅ Real IoT Sensor Dashboard COMPLETE and READY!");
+        console.log("✅ M-USD Real IoT Sensor Dashboard COMPLETE and READY!");
         console.log("📊 Features:");
         console.log("  • Real-time MQTT communication");
         console.log("  • Sensor auto-discovery");
