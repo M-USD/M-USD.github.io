@@ -1,0 +1,2943 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FireChat - Professional Chat System</title>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-storage-compat.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* ===== RESET & BASE STYLES ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #0ABB40;
+            --primary-dark: #0Abb40;
+            --secondary: #0abb40;
+            --success: #4cc9f0;
+            --danger: #f72585;
+            --warning: #f8961e;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+            --gray-light: #e9ecef;
+            --border: #dee2e6;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.15);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --sidebar-width: 800px;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #CDCED5 0%, #cdced5 100%);
+            min-height: 100vh;
+            color: var(--dark);
+            line-height: 1.6;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .app-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 10px;
+            height: calc(100vh - 40px);
+        }
+
+        .app-wrapper {
+            display: flex;
+            height: 100%;
+            background: white;
+            border-radius: var(--radius);
+            overflow: hidden;
+            box-shadow: var(--shadow-lg);
+        }
+
+        /* ===== SIDEBAR ===== */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: var(--light);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        /* ===== HEADER ===== */
+        .app-header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            padding: 25px 20px;
+            text-align: center;
+        }
+
+        .app-header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 5px;
+            letter-spacing: -0.5px;
+        }
+
+        .app-header p {
+            opacity: 0.9;
+            font-size: 14px;
+            font-weight: 400;
+        }
+
+        /* ===== CONTENT AREAS ===== */
+        .content-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .screen {
+            display: none;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .screen.active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* ===== AUTH SCREENS ===== */
+        .auth-screen, .welcome-screen, .register-screen {
+            padding: 40px 30px;
+            text-align: center;
+        }
+
+        .screen-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            color: var(--dark);
+        }
+
+        .screen-description {
+            color: var(--gray);
+            margin-bottom: 35px;
+            font-size: 15px;
+        }
+
+        /* ===== FORM STYLES ===== */
+        .form-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+
+        .form-label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            color: var(--dark);
+            font-size: 14px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            transition: all 0.3s;
+            background: white;
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        /* ===== BUTTON STYLES ===== */
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 14px 24px;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-decoration: none;
+            width: 100%;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+
+        .btn-secondary {
+            background: var(--gray-light);
+            color: var(--dark);
+        }
+
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+
+        .btn-success {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--danger);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 16px;
+            font-size: 13px;
+            width: auto;
+        }
+
+        .btn-icon {
+            padding: 10px;
+            width: 40px;
+            height: 40px;
+        }
+
+        /* ===== DASHBOARD ===== */
+        .dashboard-screen {
+            padding: 0;
+            height: 100%;
+        }
+
+        .user-info {
+            padding: 20px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .user-details {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 16px;
+            color: var(--dark);
+        }
+
+        .user-status {
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .status-indicator {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4CAF50;
+            margin-right: 6px;
+        }
+
+        /* ===== TABS ===== */
+        .tabs {
+            display: flex;
+            background: var(--light);
+            border-bottom: 1px solid var(--border);
+        }
+
+        .tab {
+            flex: 1;
+            padding: 18px 20px;
+            text-align: center;
+            font-weight: 500;
+            color: var(--gray);
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 3px solid transparent;
+            font-size: 14px;
+        }
+
+        .tab:hover {
+            color: var(--dark);
+            background: rgba(255, 255, 255, 0.5);
+        }
+
+        .tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+            background: white;
+        }
+
+        .tab-content {
+            flex: 1;
+            overflow-y: auto;
+            padding: 20px;
+        }
+
+        /* ===== GROUP LIST ===== */
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .search-box {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .search-input {
+            padding: 12px 16px 12px 40px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            width: 100%;
+            font-size: 14px;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--gray);
+        }
+
+        .group-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .group-item {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 16px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .group-item:hover {
+            border-color: var(--primary);
+            box-shadow: var(--shadow);
+            transform: translateY(-2px);
+        }
+
+        .group-item.active {
+            border-color: var(--primary);
+            background: rgba(67, 97, 238, 0.05);
+        }
+
+        .group-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 8px;
+        }
+
+        .group-name {
+            font-weight: 600;
+            color: var(--dark);
+            font-size: 16px;
+        }
+
+        .group-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 12px;
+            color: var(--gray);
+        }
+
+        .group-badge {
+            background: var(--primary);
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 11px;
+            font-weight: 500;
+        }
+
+        .group-badge.private {
+            background: var(--danger);
+        }
+
+        .group-description {
+            color: var(--gray);
+            font-size: 14px;
+            margin-top: 8px;
+            line-height: 1.5;
+        }
+
+        /* ===== CHAT AREA ===== */
+        .chat-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: white;
+        }
+
+        .no-chat-selected {
+            flex: 1;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 5px;
+            text-align: center;
+        }
+
+        .no-chat-icon {
+            font-size: 64px;
+            color: var(--gray-light);
+            margin-bottom: 20px;
+        }
+
+        .no-chat-title {
+            font-size: 22px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 10px;
+        }
+
+        .no-chat-description {
+            color: var(--gray);
+            max-width: 400px;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        /* ===== CHAT HEADER ===== */
+        .chat-header {
+            padding: 18px 24px;
+            background: white;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-info h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--dark);
+            margin-bottom: 4px;
+        }
+
+        .chat-members {
+            font-size: 13px;
+            color: var(--gray);
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chat-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        /* ===== MESSAGES AREA ===== */
+        .messages-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 24px;
+            background: #fafafa;
+            background-image: 
+                linear-gradient(rgba(255,255,255,0.9), rgba(255,255,255,0.9)),
+                url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23667eea' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+        }
+
+        .message {
+            margin-bottom: 10px;
+            max-width: 75%;
+            animation: slideIn 0.3s ease;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.sent {
+            margin-left: auto;
+        }
+
+        .message-bubble {
+            padding: 14px 18px;
+            border-radius: 18px;
+            background: white;
+            border: 1px solid var(--border);
+            display: inline-block;
+            max-width: 100%;
+            word-wrap: break-word;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+
+        .message.sent .message-bubble {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+            color: white;
+            border: none;
+        }
+
+        .message.system .message-bubble {
+            background: var(--light);
+            color: var(--gray);
+            font-style: italic;
+            border: 1px dashed var(--border);
+        }
+
+        .message-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 6px;
+        }
+
+        .message-sender {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--dark);
+        }
+
+        .message.sent .message-sender {
+            color: rgba(255,255,255,0.9);
+        }
+
+        .message-time {
+            font-size: 11px;
+            color: var(--gray);
+            opacity: 0.8;
+        }
+
+        .message.sent .message-time {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .message-content {
+            line-height: 1.5;
+            font-size: 15px;
+        }
+
+        /* ===== CHAT INPUT AREA ===== */
+        .chat-input-area {
+            padding: 15px 24px;
+            background: white;
+            border-top: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .input-wrapper {
+            flex: 1;
+            display: flex;
+            gap: 12px;
+            align-items: center;
+        }
+
+        .message-input {
+            flex: 1;
+            padding: 14px 18px;
+            border: 1px solid var(--border);
+            border-radius: var(--radius-sm);
+            font-size: 15px;
+            resize: none;
+            min-height: 48px;
+            max-height: 120px;
+            font-family: inherit;
+        }
+
+        .message-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+        }
+
+        /* ===== FILE UPLOAD STYLES ===== */
+        .upload-btn {
+            padding: 12px;
+            background: var(--gray-light);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--dark);
+        }
+
+        .upload-btn:hover {
+            background: var(--border);
+        }
+
+        .file-preview {
+            background: var(--light);
+            border: 2px solid var(--border);
+            border-radius: var(--radius-sm);
+            padding: 15px;
+            margin-top: 10px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .file-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .file-actions {
+            display: flex;
+            gap: 10px;
+            margin-left: auto;
+        }
+
+        .message-file {
+            margin: 10px 0;
+        }
+
+        .file-meta {
+            margin-top: 5px;
+            display: flex;
+            justify-content: space-between;
+            color: var(--gray);
+            font-size: 12px;
+        }
+
+        .file-download {
+            padding: 10px;
+            background: var(--light);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: background 0.3s;
+        }
+
+        .file-download:hover {
+            background: var(--gray-light);
+        }
+
+        /* ===== MODALS ===== */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal.active {
+            display: flex;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal-content {
+            background: white;
+            border-radius: var(--radius);
+            padding: 30px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: var(--shadow-lg);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: var(--dark);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 24px;
+            color: var(--gray);
+            cursor: pointer;
+            padding: 0;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+        }
+
+        .modal-close:hover {
+            background: var(--gray-light);
+        }
+
+        /* ===== LOADING STATES ===== */
+        .loading {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .loading-spinner {
+            width: 40px;
+            height: 40px;
+            border: 3px solid var(--gray-light);
+            border-top-color: var(--primary);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 15px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            font-size: 14px;
+        }
+
+        /* ===== EMPTY STATES ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--gray);
+        }
+
+        .empty-state-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.5;
+        }
+
+        .empty-state-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+            color: var(--dark);
+        }
+
+        .empty-state-description {
+            font-size: 14px;
+            margin-bottom: 20px;
+        }
+
+        /* ===== ALERTS ===== */
+        .alert {
+            padding: 14px 18px;
+            border-radius: var(--radius-sm);
+            margin-bottom: 20px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .alert.show {
+            display: block;
+            animation: slideDown 0.3s ease;
+        }
+
+        @keyframes slideDown {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .alert-error {
+            background: #fee;
+            border: 1px solid #fcc;
+            color: #c33;
+        }
+
+        .alert-success {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+
+        /* ===== FIX FOR SCREEN OVERLAP ===== */
+        /* Hide chat area when auth screens are active */
+        #welcomeScreen.active ~ .chat-area,
+        #authScreen.active ~ .chat-area,
+        #registrationScreen.active ~ .chat-area {
+            display: none;
+        }
+
+        /* Show chat area when dashboard is active */
+        #dashboardScreen.active ~ .chat-area {
+            display: none;
+        }
+
+        /* ===== RESPONSIVE ===== */
+        @media (max-width: 50px) {
+            .app-wrapper {
+                flex-direction: column;
+            }
+            
+            .sidebar {
+                width: 20%;
+                height: 200px;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            
+            .chat-area {
+                height: calc(100vh - 1000px);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .app-container {
+                padding: 10px;
+                height: calc(100vh - 20px);
+            }
+            
+            .user-info {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .chat-header {
+                flex-direction: column;
+                gap: 15px;
+                align-items: flex-start;
+            }
+            
+            .chat-actions {
+                width: 100%;
+                justify-content: flex-end;
+            }
+            
+            .message {
+                max-width: 90%;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="app-container">
+        <div class="app-wrapper">
+            <!-- SIDEBAR -->
+            <div class="sidebar">
+                <!-- Header -->
+                <div class="app-header">
+                    <h1><i class="fas fa-comments"></i> M-USD</h1>
+                    <p>Chat system</p>
+                </div>
+
+                <!-- Screens -->
+                <div class="content-area">
+                    <!-- Welcome Screen -->
+                    <div id="welcomeScreen" class="screen active">
+                        <div class="welcome-screen">
+                            <div class="screen-title">Welcome to FireChat</div>
+                            <p class="screen-description">
+                                Connect with friends and colleagues in real-time. Join existing groups or create your own.
+                            </p>
+                            <div class="form-group">
+                                <button class="btn btn-primary" onclick="showScreen('authScreen')">
+                                    <i class="fas fa-sign-in-alt"></i> Sign In
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Auth Screen -->
+                    <div id="authScreen" class="screen">
+                        <div class="auth-screen">
+                            <div class="screen-title">Sign In to M-USD Chat</div>
+                            <div class="form-group">
+                                <label class="form-label">Email Address</label>
+                                <input type="email" id="email" class="form-control" placeholder="you@example.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Password</label>
+                                <input type="password" id="password" class="form-control" placeholder="••••••••">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" onclick="signIn()">
+                                    <i class="fas fa-sign-in-alt"></i> Sign In
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-secondary" onclick="signUp()">
+                                    <i class="fas fa-user-plus"></i> Create Account
+                                </button>
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-secondary" onclick="showScreen('welcomeScreen')">
+                                    <i class="fas fa-arrow-left"></i> Back
+                                </button>
+                            </div>
+                            <div id="authAlert" class="alert"></div>
+                        </div>
+                    </div>
+
+                    <!-- Registration Screen -->
+                    <div id="registrationScreen" class="screen">
+                        <div class="register-screen">
+                            <div class="screen-title">Complete Your Profile</div>
+                            <p class="screen-description">
+                                Choose a username that will be visible to other users in chat.
+                            </p>
+                            <div class="form-group">
+                                <label class="form-label">Username</label>
+                                <input type="text" id="username" class="form-control" placeholder="Enter username (3-30 chars)" maxlength="30">
+                            </div>
+                            <div class="form-group">
+                                <button class="btn btn-primary" onclick="completeRegistration()">
+                                    <i class="fas fa-check"></i> Complete Registration
+                                </button>
+                            </div>
+                            <div id="regAlert" class="alert"></div>
+                        </div>
+                    </div>
+
+                    <!-- Dashboard Screen -->
+                    <div id="dashboardScreen" class="screen">
+                        <!-- User Info -->
+                        <div class="user-info">
+                            <div class="user-details">
+                                <div class="user-avatar" id="userAvatar">U</div>
+                                <div>
+                                    <div class="user-name" id="userName">User</div>
+                                    <div class="user-status">
+                                        <span class="status-indicator"></span>
+                                        <span id="userStatusText">Online</span>
+                                    </div>
+                                </div>
+                            </div>
+                            <button class="btn btn-sm btn-danger" onclick="signOut()">
+                                <i class="fas fa-sign-out-alt"></i> Sign Out
+                            </button>
+                        </div>
+
+                        <!-- Tabs -->
+                        <div class="tabs">
+                            <div class="tab active" onclick="showTab('myGroupsTab')">My Groups</div>
+                            <div class="tab" onclick="showTab('publicGroupsTab')">Public</div>
+                            <div class="tab" onclick="showTab('globalChatTab')">Global</div>
+                        </div>
+
+                        <!-- Tab Contents -->
+                        <div class="tab-content">
+                            <!-- My Groups Tab -->
+                            <div id="myGroupsTab" class="tab-pane active">
+                                <div class="section-header">
+                                    <div class="section-title">My Groups</div>
+                                    <div>
+                                        <button class="btn btn-sm btn-success" onclick="searchAndJoinGroup()" style="margin-right: 8px;">
+                                            <i class="fas fa-search"></i> Search Groups
+                                        </button>
+                                        <button class="btn btn-sm btn-primary" onclick="showCreateGroupModal()">
+                                            <i class="fas fa-plus"></i> New Group
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="search-box">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" class="search-input" id="searchMyGroups" placeholder="Search my groups..." oninput="searchMyGroups()">
+                                </div>
+                                <div id="groupsList" class="group-list">
+                                    <div class="empty-state">
+                                        <div class="empty-state-icon">💬</div>
+                                        <div class="empty-state-title">No Groups Yet</div>
+                                        <p class="empty-state-description">You haven't joined any groups. Create or join one to get started!</p>
+                                        <div class="action-buttons">
+                                            <button class="btn btn-sm btn-primary" onclick="showCreateGroupModal()">
+                                                <i class="fas fa-plus"></i> Create Group
+                                            </button>
+                                            <button class="btn btn-sm btn-success" onclick="searchAndJoinGroup()">
+                                                <i class="fas fa-search"></i> Search Groups
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Public Groups Tab -->
+                            <div id="publicGroupsTab" class="tab-pane" style="display: none;">
+                                <div class="section-header">
+                                    <div class="section-title">Public Groups</div>
+                                    <div>
+                                        <button id="searchAllGroupsBtn" class="btn btn-sm btn-success" onclick="searchAndJoinGroup()" style="margin-right: 8px;">
+                                            <i class="fas fa-search"></i> Search All
+                                        </button>
+                                        <button class="btn btn-sm btn-secondary" onclick="refreshPublicGroups()">
+                                            <i class="fas fa-sync"></i> Refresh
+                                        </button>
+                                    </div>
+                                </div>
+                                <div class="search-box">
+                                    <i class="fas fa-search search-icon"></i>
+                                    <input type="text" class="search-input" id="searchPublicGroups" placeholder="Search public groups..." oninput="searchPublicGroups()">
+                                </div>
+                                <div id="publicGroupsList" class="group-list">
+                                    <div class="loading">
+                                        <div class="loading-spinner"></div>
+                                        <div class="loading-text">Loading public groups...</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Global Chat Tab -->
+                            <div id="globalChatTab" class="tab-pane" style="display: none;">
+                                <div class="section-header">
+                                    <div class="section-title">Global Chat</div>
+                                    <button class="btn btn-sm btn-success" onclick="joinGlobalChat()">
+                                        <i class="fas fa-globe"></i> Join Chat
+                                    </button>
+                                </div>
+                                <div class="empty-state">
+                                    <div class="empty-state-icon">🌐</div>
+                                    <div class="empty-state-title">Global Chat Room</div>
+                                    <p class="empty-state-description">Connect with everyone in the global chat room. Join to start chatting!</p>
+                                    <button class="btn btn-primary" onclick="joinGlobalChat()">
+                                        <i class="fas fa-globe"></i> Join Global Chat
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- CHAT AREA -->
+            <div class="chat-area">
+
+                <!-- Group Chat -->
+                <div id="groupChatScreen" class="screen">
+                    <div class="chat-header">
+                        <div class="chat-info">
+                            <h2 id="chatGroupName">Group Name</h2>
+                            <div class="chat-members">
+                                <i class="fas fa-users"></i>
+                                <span id="chatMemberCount">0 members</span>
+                            </div>
+                        </div>
+                        <div class="chat-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="showGroupInfoModal()">
+                                <i class="fas fa-info-circle"></i> Info
+                            </button>
+                      
+                                                        <button class="btn btn-sm btn-danger" onclick="leaveGlobalChat()">
+                                <i class="fas fa-sign-out-alt"></i> Leave
+                            </button>
+                            
+                            
+                        </div>
+                    </div>
+
+                    <div id="groupChatMessages" class="messages-area">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">💬</div>
+                            <div class="empty-state-title">No Messages Yet</div>
+                            <p class="empty-state-description">Send the first message to start the conversation!</p>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <div id="groupFilePreviewArea" style="display: none;"></div>
+                        <div class="input-wrapper">
+                            <input type="file" id="groupFileInput" style="display: none;" onchange="handleFileSelect(event, 'group')">
+                            <button class="btn btn-icon upload-btn" onclick="openFilePicker('group')" title="Attach file">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <textarea class="message-input" id="groupMessageInput" placeholder="Type your message here..." rows="1"></textarea>
+                            <button class="btn btn-primary btn-icon" onclick="sendGroupMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Global Chat -->
+                <div id="globalChatScreen" class="screen">
+                    <div class="chat-header">
+                        <div class="chat-info">
+                            <h2><i class="fas fa-globe"></i> Global Chat</h2>
+                            <div class="chat-members">
+                                <i class="fas fa-users"></i>
+                                <span id="globalUserCount">0 users online</span>
+                            </div>
+                        </div>
+                        <div class="chat-actions">
+                            <button class="btn btn-sm btn-secondary" onclick="showGlobalChatInfo()">
+                                <i class="fas fa-info-circle"></i> Info
+                            </button>
+                            <button class="btn btn-sm btn-danger" onclick="leaveGlobalChat()">
+                                <i class="fas fa-sign-out-alt"></i> Leave
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="globalChatMessages" class="messages-area">
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🌐</div>
+                            <div class="empty-state-title">Global Chat Room</div>
+                            <p class="empty-state-description">Welcome to the global chat! Be respectful and follow community guidelines.</p>
+                        </div>
+                    </div>
+
+                    <div class="chat-input-area">
+                        <div id="globalFilePreviewArea" style="display: none;"></div>
+                        <div class="input-wrapper">
+                            <input type="file" id="globalFileInput" style="display: none;" onchange="handleFileSelect(event, 'global')">
+                            <button class="btn btn-icon upload-btn" onclick="openFilePicker('global')" title="Attach file">
+                                <i class="fas fa-paperclip"></i>
+                            </button>
+                            <textarea class="message-input" id="globalMessageInput" placeholder="Type your message to everyone..." rows="1"></textarea>
+                            <button class="btn btn-primary btn-icon" onclick="sendGlobalMessage()">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- No Chat Selected -->
+                <div id="noChatSelected" class="screen active">
+                    <div class="no-chat-selected">
+                        <div class="no-chat-icon">
+                            <i class="fas fa-comment-alt"></i>
+                        </div>
+                        <div class="no-chat-title">Select a Chat</div>
+                        <p class="no-chat-description">
+                            Choose a group from the sidebar or join the global chat to start messaging.
+                        </p>
+                        <div class="action-buttons">
+                            <button class="btn btn-primary" onclick="showTab('myGroupsTab')">
+                                <i class="fas fa-users"></i> My Groups
+                            </button>
+                            <button class="btn btn-success" onclick="joinGlobalChat()">
+                                <i class="fas fa-globe"></i> Global Chat
+                            </button>
+                            <button class="btn btn-secondary" onclick="showCreateGroupModal()">
+                                <i class="fas fa-plus"></i> Create Group
+                            </button>
+                            <button class="btn btn-success" onclick="searchAndJoinGroup()">
+                                <i class="fas fa-search"></i> Search Groups
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODALS -->
+    <!-- Create Group Modal -->
+    <div id="createGroupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Create New Group</div>
+                <button class="modal-close" onclick="hideCreateGroupModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Group Name</label>
+                <input type="text" id="groupName" class="form-control" placeholder="Enter group name">
+            </div>
+            <div class="form-group">
+                <label class="form-label">Description (Optional)</label>
+                <textarea id="groupDescription" class="form-control" placeholder="Describe your group..." rows="3"></textarea>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Group Type</label>
+                <select id="groupType" class="form-control">
+                    <option value="public">Public - Anyone can join</option>
+                    <option value="private">Private - Invite only</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-primary" onclick="createGroup()">
+                    <i class="fas fa-plus"></i> Create Group
+                </button>
+            </div>
+            <div id="createGroupAlert" class="alert"></div>
+        </div>
+    </div>
+
+    <!-- Join Group Modal -->
+    <div id="joinGroupModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title">Join a Group</div>
+                <button class="modal-close" onclick="hideJoinGroupModal()">×</button>
+            </div>
+            <div class="form-group">
+                <label class="form-label">Group ID</label>
+                <input type="text" id="joinGroupId" class="form-control" placeholder="Enter group ID (e.g., abc123)">
+            </div>
+            <p style="color: var(--gray); font-size: 14px; margin-bottom: 20px;">
+                Ask the group owner for the Group ID, or browse public groups to find one to join.
+            </p>
+            <div class="form-group">
+                <button class="btn btn-primary" onclick="joinGroup()">
+                    <i class="fas fa-sign-in-alt"></i> Join Group
+                </button>
+            </div>
+            <div class="form-group">
+                <button class="btn btn-secondary" onclick="showTab('publicGroupsTab'); hideJoinGroupModal();">
+                    <i class="fas fa-search"></i> Browse Public Groups
+                </button>
+            </div>
+            <div id="joinGroupAlert" class="alert"></div>
+        </div>
+    </div>
+
+    <!-- Group Info Modal -->
+    <div id="groupInfoModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="groupInfoTitle">Group Information</div>
+                <button class="modal-close" onclick="hideGroupInfoModal()">×</button>
+            </div>
+            <div id="groupInfoContent">
+                <div class="loading">
+                    <div class="loading-spinner"></div>
+                    <div class="loading-text">Loading group information...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase & App Script -->
+    <script>
+        // ==================== FIREBASE CONFIGURATION ====================
+        const firebaseConfig = {
+            apiKey: "AIzaSyDfP7BSZB7kufh4yrSdpDn14kIdbF9SJdc",
+            authDomain: "m-usd-e3555.firebaseapp.com",
+            databaseURL: "https://m-usd-e3555-default-rtdb.firebaseio.com",
+            projectId: "m-usd-e3555",
+            storageBucket: "m-usd-e3555.firebasestorage.app",
+            messagingSenderId: "966918203590",
+            appId: "1:966918203590:web:b19913384b906a472d0fc7",
+            measurementId: "G-Y3X5T8GSNC"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // Initialize global chat if needed
+        async function initializeGlobalChat() {
+            try {
+                const globalChatRef = db.collection('global_chat');
+                const snapshot = await globalChatRef.limit(1).get();
+                
+                if (snapshot.empty) {
+                    await globalChatRef.add({
+                        senderId: 'system',
+                        senderName: 'System',
+                        text: 'Welcome to Global Chat! Be respectful and follow community guidelines.',
+                        timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                        type: 'system'
+                    });
+                }
+            } catch (error) {
+                console.log('Global chat initialization:', error);
+            }
+        }
+
+        // ==================== APP STATE ====================
+        let currentUser = null;
+        let userProfile = null;
+        let currentGroup = null;
+        let currentGroupType = null; // 'group' or 'global'
+        let messagesListener = null;
+        let globalChatListener = null;
+        
+        // File upload state
+        let selectedFile = null;
+        let currentChatType = ''; // 'group' or 'global'
+        
+        // Cache for public groups
+        window.publicGroupsCache = [];
+
+        // Call initialization
+        initializeGlobalChat();
+
+        // ==================== UI FUNCTIONS ====================
+        function showScreen(screenId) {
+            console.log('Showing screen:', screenId);
+            
+            // Hide all screens in sidebar
+            document.querySelectorAll('.sidebar .screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show target screen in sidebar
+            const screen = document.getElementById(screenId);
+            if (screen) {
+                screen.classList.add('active');
+            }
+            
+            // Clear alerts
+            document.querySelectorAll('.alert').forEach(alert => {
+                alert.classList.remove('show');
+                alert.textContent = '';
+            });
+            
+            // Handle chat area visibility
+            if (screenId === 'dashboardScreen') {
+                showChatScreen('noChatSelected');
+            } else {
+                hideAllChatScreens();
+            }
+        }
+
+        function showChatScreen(screenId) {
+            console.log('Showing chat screen:', screenId);
+            
+            // Hide all chat screens
+            document.querySelectorAll('.chat-area .screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+            
+            // Show target chat screen
+            const screen = document.getElementById(screenId);
+            if (screen) {
+                screen.classList.add('active');
+            }
+        }
+
+        function hideAllChatScreens() {
+            document.querySelectorAll('.chat-area .screen').forEach(screen => {
+                screen.classList.remove('active');
+            });
+        }
+
+        function showTab(tabId) {
+            console.log('Showing tab:', tabId);
+            
+            // Update tabs
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            
+            // Find clicked tab and activate it
+            const tabs = document.querySelectorAll('.tab');
+            for (let tab of tabs) {
+                if (tab.textContent.includes(tabId.replace('Tab', '').replace(/([A-Z])/g, ' $1').trim())) {
+                    tab.classList.add('active');
+                    break;
+                }
+            }
+            
+            // Show tab content
+            document.querySelectorAll('.tab-pane').forEach(pane => {
+                pane.style.display = 'none';
+            });
+            
+            const pane = document.getElementById(tabId);
+            if (pane) {
+                pane.style.display = 'block';
+            }
+            
+            // Load content if needed
+            if (tabId === 'publicGroupsTab') {
+                loadPublicGroups();
+            }
+        }
+
+        function showAlert(elementId, message, type = 'error') {
+            const alert = document.getElementById(elementId);
+            if (alert) {
+                if (message.includes('permission-denied')) {
+                    message = 'Permission denied. Please check if you are signed in and have proper access.';
+                } else if (message.includes('failed-precondition')) {
+                    message = 'Database index needed. Please create composite index in Firebase Console.';
+                }
+                
+                alert.textContent = message;
+                alert.className = `alert alert-${type} show`;
+                setTimeout(() => {
+                    alert.classList.remove('show');
+                }, 5000);
+            }
+        }
+
+        // ==================== MODAL FUNCTIONS ====================
+        function showCreateGroupModal() {
+            document.getElementById('createGroupModal').classList.add('active');
+        }
+
+        function hideCreateGroupModal() {
+            document.getElementById('createGroupModal').classList.remove('active');
+            document.getElementById('groupName').value = '';
+            document.getElementById('groupDescription').value = '';
+            document.getElementById('createGroupAlert').classList.remove('show');
+        }
+
+        function showJoinGroupModal() {
+            document.getElementById('joinGroupModal').classList.add('active');
+        }
+
+        function hideJoinGroupModal() {
+            document.getElementById('joinGroupModal').classList.remove('active');
+            document.getElementById('joinGroupId').value = '';
+            document.getElementById('joinGroupAlert').classList.remove('show');
+        }
+
+        function showGroupInfoModal() {
+            document.getElementById('groupInfoModal').classList.add('active');
+            loadGroupInfo();
+        }
+
+        function hideGroupInfoModal() {
+            document.getElementById('groupInfoModal').classList.remove('active');
+        }
+
+        // ==================== AUTHENTICATION ====================
+        auth.onAuthStateChanged(async (user) => {
+            currentUser = user;
+            
+            if (user) {
+                console.log('User signed in:', user.uid);
+                
+                // Check if user has profile
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    
+                    if (userDoc.exists) {
+                        userProfile = userDoc.data();
+                        updateUserUI();
+                        showScreen('dashboardScreen');
+                        loadUserGroups();
+                    } else {
+                        showScreen('registrationScreen');
+                    }
+                } catch (error) {
+                    console.error('Error checking user profile:', error);
+                    showScreen('registrationScreen');
+                }
+            } else {
+                console.log('No user signed in');
+                showScreen('welcomeScreen');
+            }
+        });
+
+        function updateUserUI() {
+            if (userProfile) {
+                document.getElementById('userName').textContent = userProfile.username || 'User';
+                document.getElementById('userAvatar').textContent = userProfile.username ? userProfile.username.charAt(0).toUpperCase() : 'U';
+            }
+        }
+
+        async function signIn() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showAlert('authAlert', 'Please enter both email and password', 'error');
+                return;
+            }
+            
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                showAlert('authAlert', 'Signed in successfully!', 'success');
+            } catch (error) {
+                showAlert('authAlert', error.message, 'error');
+            }
+        }
+
+        async function signUp() {
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            if (!email || !password) {
+                showAlert('authAlert', 'Please enter both email and password', 'error');
+                return;
+            }
+            
+            if (password.length < 6) {
+                showAlert('authAlert', 'Password must be at least 6 characters', 'error');
+                return;
+            }
+            
+            try {
+                await auth.createUserWithEmailAndPassword(email, password);
+                showAlert('authAlert', 'Account created! Please complete your profile.', 'success');
+            } catch (error) {
+                showAlert('authAlert', error.message, 'error');
+            }
+        }
+
+        async function signOut() {
+            try {
+                // Stop listeners
+                if (messagesListener) {
+                    messagesListener();
+                    messagesListener = null;
+                }
+                if (globalChatListener) {
+                    globalChatListener();
+                    globalChatListener = null;
+                }
+                
+                await auth.signOut();
+                showScreen('welcomeScreen');
+            } catch (error) {
+                console.error('Sign out error:', error);
+            }
+        }
+
+        async function completeRegistration() {
+            const username = document.getElementById('username').value.trim();
+            
+            if (!username || username.length < 3 || username.length > 30) {
+                showAlert('regAlert', 'Username must be 3-30 characters', 'error');
+                return;
+            }
+            
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Not authenticated');
+                
+                await db.collection('users').doc(user.uid).set({
+                    username: username,
+                    email: user.email || '',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    uid: user.uid,
+                    status: 'online'
+                });
+                
+                userProfile = { username: username };
+                updateUserUI();
+                showScreen('dashboardScreen');
+                loadUserGroups();
+                
+            } catch (error) {
+                showAlert('regAlert', error.message, 'error');
+            }
+        }
+
+        // ==================== FILE UPLOAD FUNCTIONS ====================
+        function openFilePicker(type) {
+            currentChatType = type;
+            const fileInput = type === 'group' ? document.getElementById('groupFileInput') : document.getElementById('globalFileInput');
+            fileInput.click();
+        }
+
+        function handleFileSelect(event, type) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            // Validate file size (10MB max)
+            if (file.size > 10 * 1024 * 1024) {
+                alert('File size too large. Maximum size is 10MB.');
+                return;
+            }
+            
+            selectedFile = file;
+            currentChatType = type;
+            
+            // Create preview
+            const previewArea = type === 'group' ? document.getElementById('groupFilePreviewArea') : document.getElementById('globalFilePreviewArea');
+            const reader = new FileReader();
+            
+            reader.onload = function(e) {
+                let previewHTML = '';
+                const fileType = file.type;
+                
+                if (fileType.startsWith('image/')) {
+                    previewHTML = `
+                        <div class="file-preview">
+                            <img src="${e.target.result}" alt="Preview" style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                            <div class="file-info">
+                                <span>${file.name}</span>
+                                <button class="btn btn-sm btn-danger" onclick="removeFilePreview('${type}')" style="margin-left: 10px;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else if (fileType.startsWith('video/')) {
+                    previewHTML = `
+                        <div class="file-preview">
+                            <video controls style="max-width: 200px; max-height: 200px; border-radius: 8px;">
+                                <source src="${e.target.result}" type="${fileType}">
+                            </video>
+                            <div class="file-info">
+                                <span>${file.name}</span>
+                                <button class="btn btn-sm btn-danger" onclick="removeFilePreview('${type}')" style="margin-left: 10px;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                } else {
+                    previewHTML = `
+                        <div class="file-preview">
+                            <div class="file-icon" style="font-size: 48px; color: var(--primary);">
+                                <i class="fas fa-file"></i>
+                            </div>
+                            <div class="file-info">
+                                <span>${file.name} (${formatFileSize(file.size)})</span>
+                                <button class="btn btn-sm btn-danger" onclick="removeFilePreview('${type}')" style="margin-left: 10px;">
+                                    <i class="fas fa-times"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                }
+                
+                previewArea.innerHTML = previewHTML;
+                previewArea.style.display = 'block';
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        function removeFilePreview(type) {
+            selectedFile = null;
+            const previewArea = type === 'group' ? document.getElementById('groupFilePreviewArea') : document.getElementById('globalFilePreviewArea');
+            const fileInput = type === 'group' ? document.getElementById('groupFileInput') : document.getElementById('globalFileInput');
+            
+            previewArea.style.display = 'none';
+            previewArea.innerHTML = '';
+            fileInput.value = '';
+        }
+
+        function formatFileSize(bytes) {
+            if (bytes === 0) return '0 Bytes';
+            const k = 1024;
+            const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+            const i = Math.floor(Math.log(bytes) / Math.log(k));
+            return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+        }
+
+        async function uploadFile() {
+            if (!selectedFile) return null;
+            
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Not authenticated');
+                
+                const timestamp = Date.now();
+                const fileName = `${user.uid}_${timestamp}_${selectedFile.name}`;
+                const storageRef = storage.ref(`uploads/${fileName}`);
+                
+                // Show uploading indicator
+                const uploadBtn = document.querySelector('.upload-btn');
+                const originalText = uploadBtn.innerHTML;
+                uploadBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+                uploadBtn.disabled = true;
+                
+                // Upload file
+                const snapshot = await storageRef.put(selectedFile);
+                const downloadURL = await snapshot.ref.getDownloadURL();
+                
+                // Reset button
+                uploadBtn.innerHTML = originalText;
+                uploadBtn.disabled = false;
+                
+                return {
+                    url: downloadURL,
+                    name: selectedFile.name,
+                    type: selectedFile.type,
+                    size: selectedFile.size
+                };
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                alert('Upload failed: ' + error.message);
+                return null;
+            }
+        }
+
+        // ==================== GROUP MANAGEMENT ====================
+        async function createGroup() {
+            const name = document.getElementById('groupName').value.trim();
+            const description = document.getElementById('groupDescription').value.trim();
+            const type = document.getElementById('groupType').value;
+            
+            if (!name) {
+                showAlert('createGroupAlert', 'Group name is required', 'error');
+                return;
+            }
+            
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Not authenticated');
+                
+                const username = userProfile?.username || user.email || 'Anonymous';
+                
+                // Create group document
+                const groupRef = db.collection('groups').doc();
+                const groupId = groupRef.id;
+                
+                const groupData = {
+                    id: groupId,
+                    name: name,
+                    description: description,
+                    ownerId: user.uid,
+                    ownerName: username,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    memberCount: 1,
+                    isPublic: type === 'public',
+                    type: type,
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                
+                await groupRef.set(groupData);
+                
+                // Add creator as member
+                await groupRef.collection('members').doc(user.uid).set({
+                    userId: user.uid,
+                    username: username,
+                    joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    role: 'admin'
+                });
+                
+                // Add welcome message
+                await groupRef.collection('messages').add({
+                    senderId: 'system',
+                    senderName: 'System',
+                    text: `${username} created the group "${name}"`,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    type: 'system'
+                });
+                
+                showAlert('createGroupAlert', `Group "${name}" created successfully!`, 'success');
+                
+                setTimeout(() => {
+                    hideCreateGroupModal();
+                    loadUserGroups();
+                    joinGroupChat(groupId, name);
+                }, 1500);
+                
+            } catch (error) {
+                showAlert('createGroupAlert', error.message, 'error');
+            }
+        }
+
+        async function joinGroup() {
+            const groupId = document.getElementById('joinGroupId').value.trim();
+            
+            if (!groupId) {
+                showAlert('joinGroupAlert', 'Please enter a Group ID', 'error');
+                return;
+            }
+            
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Not authenticated');
+                
+                // Check if group exists
+                const groupRef = db.collection('groups').doc(groupId);
+                const groupDoc = await groupRef.get();
+                
+                if (!groupDoc.exists) {
+                    throw new Error('Group not found. Check the Group ID.');
+                }
+                
+                const groupData = groupDoc.data();
+                
+                // Check if already a member
+                const memberRef = groupRef.collection('members').doc(user.uid);
+                const memberDoc = await memberRef.get();
+                
+                if (memberDoc.exists) {
+                    throw new Error('You are already a member of this group');
+                }
+                
+                const username = userProfile?.username || user.email || 'Anonymous';
+                
+                // Join group
+                await memberRef.set({
+                    userId: user.uid,
+                    username: username,
+                    joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    role: 'member'
+                });
+                
+                // Update member count
+                await groupRef.update({
+                    memberCount: firebase.firestore.FieldValue.increment(1),
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Add join message
+                await groupRef.collection('messages').add({
+                    senderId: 'system',
+                    senderName: 'System',
+                    text: `${username} joined the group`,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    type: 'system'
+                });
+                
+                hideJoinGroupModal();
+                loadUserGroups();
+                joinGroupChat(groupId, groupData.name);
+                
+            } catch (error) {
+                showAlert('joinGroupAlert', error.message, 'error');
+            }
+        }
+
+        async function loadUserGroups() {
+            const groupsList = document.getElementById('groupsList');
+            
+            try {
+                const user = auth.currentUser;
+                if (!user) return;
+                
+                // Get all groups where user is a member
+                const groupsSnapshot = await db.collection('groups').get();
+                const userGroups = [];
+                
+                for (const groupDoc of groupsSnapshot.docs) {
+                    const memberDoc = await db.collection('groups').doc(groupDoc.id).collection('members').doc(user.uid).get();
+                    if (memberDoc.exists) {
+                        userGroups.push({
+                            id: groupDoc.id,
+                            ...groupDoc.data()
+                        });
+                    }
+                }
+                
+                if (userGroups.length === 0) {
+                    groupsList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">💬</div>
+                            <div class="empty-state-title">No Groups Yet</div>
+                            <p class="empty-state-description">You haven't joined any groups. Create or join one to get started!</p>
+                            <div class="action-buttons">
+                                <button class="btn btn-sm btn-primary" onclick="showCreateGroupModal()">
+                                    <i class="fas fa-plus"></i> Create Group
+                                </button>
+                                <button class="btn btn-sm btn-success" onclick="searchAndJoinGroup()">
+                                    <i class="fas fa-search"></i> Search Groups
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Sort by last activity
+                userGroups.sort((a, b) => {
+                    const timeA = a.lastActivity?.toDate?.() || a.createdAt?.toDate?.() || new Date(0);
+                    const timeB = b.lastActivity?.toDate?.() || b.createdAt?.toDate?.() || new Date(0);
+                    return timeB - timeA;
+                });
+                
+                // Render groups
+                groupsList.innerHTML = userGroups.map(group => `
+                    <div class="group-item ${currentGroup === group.id ? 'active' : ''}" 
+                         onclick="joinGroupChat('${group.id}', '${group.name.replace(/'/g, "\\'")}')">
+                        <div class="group-header">
+                            <div class="group-name">${group.name}</div>
+                            <div class="group-meta">
+                                ${!group.isPublic ? '<span class="group-badge private">Private</span>' : ''}
+                                <span>${group.memberCount || 0} members</span>
+                                <span>•</span>
+                                <span>${formatDate(group.lastActivity?.toDate?.() || group.createdAt?.toDate?.())}</span>
+                            </div>
+                        </div>
+                        ${group.description ? `<div class="group-description">${group.description}</div>` : ''}
+                    </div>
+                `).join('');
+                
+            } catch (error) {
+                console.error('Error loading groups:', error);
+                groupsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <div class="empty-state-title">Error Loading Groups</div>
+                        <p class="empty-state-description">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function loadPublicGroups() {
+            const publicGroupsList = document.getElementById('publicGroupsList');
+            
+            try {
+                // Clear previous content
+                publicGroupsList.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div class="loading-text">Loading public groups...</div></div>';
+                
+                // Get public groups
+                const snapshot = await db.collection('groups')
+                    .where('isPublic', '==', true)
+                    .orderBy('lastActivity', 'desc')
+                    .limit(50)
+                    .get();
+                
+                if (snapshot.empty) {
+                    publicGroupsList.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">🌍</div>
+                            <div class="empty-state-title">No Public Groups Found</div>
+                            <p class="empty-state-description">Be the first to create a public group!</p>
+                            <div class="action-buttons" style="margin-top: 20px;">
+                                <button class="btn btn-sm btn-primary" onclick="showCreateGroupModal()">
+                                    <i class="fas fa-plus"></i> Create Group
+                                </button>
+                                <button class="btn btn-sm btn-success" onclick="searchAndJoinGroup()">
+                                    <i class="fas fa-search"></i> Search All Groups
+                                </button>
+                            </div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const groups = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                // Store groups in global variable for search
+                window.publicGroupsCache = groups;
+                
+                // Render public groups
+                renderPublicGroups(groups);
+                
+            } catch (error) {
+                console.error('Error loading public groups:', error);
+                
+                let errorMessage = error.message;
+                if (error.code === 'failed-precondition') {
+                    errorMessage = "Firestore index needed. Please create composite index: Collection: groups, Fields: isPublic (Ascending), lastActivity (Descending)";
+                }
+                
+                publicGroupsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <div class="empty-state-title">Error Loading Groups</div>
+                        <p class="empty-state-description">${errorMessage}</p>
+                        <div class="action-buttons" style="margin-top: 20px;">
+                            <button class="btn btn-sm btn-secondary" onclick="loadPublicGroups()">
+                                <i class="fas fa-sync"></i> Try Again
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="searchAndJoinGroup()">
+                                <i class="fas fa-search"></i> Search Groups
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        function renderPublicGroups(groups) {
+            const publicGroupsList = document.getElementById('publicGroupsList');
+            
+            publicGroupsList.innerHTML = groups.map(group => `
+                <div class="group-item" data-group-id="${group.id}">
+                    <div class="group-header">
+                        <div class="group-name">${group.name}</div>
+                        <div class="group-meta">
+                            <span class="group-badge">${group.isPublic ? 'Public' : 'Private'}</span>
+                            <span>${group.memberCount || 0} members</span>
+                            <span>•</span>
+                            <span>${formatDate(group.lastActivity?.toDate?.() || group.createdAt?.toDate?.())}</span>
+                        </div>
+                    </div>
+                    ${group.description ? `<div class="group-description">${group.description}</div>` : ''}
+                    <div class="group-actions" style="margin-top: 12px; display: flex; gap: 8px;">
+                        <button class="btn btn-sm btn-primary" onclick="joinPublicGroup('${group.id}')">
+                            <i class="fas fa-sign-in-alt"></i> Join Group
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="viewGroupDetails('${group.id}')">
+                            <i class="fas fa-info-circle"></i> Details
+                        </button>
+                        <button class="btn btn-sm btn-secondary" onclick="copyGroupId('${group.id}')">
+                            <i class="fas fa-copy"></i> Copy ID
+                        </button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        async function joinPublicGroup(groupId) {
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Please sign in first');
+                
+                const groupRef = db.collection('groups').doc(groupId);
+                const groupDoc = await groupRef.get();
+                
+                if (!groupDoc.exists) {
+                    throw new Error('Group not found');
+                }
+                
+                const groupData = groupDoc.data();
+                const username = userProfile?.username || user.email || 'Anonymous';
+                
+                // Check if already a member
+                const memberDoc = await groupRef.collection('members').doc(user.uid).get();
+                if (memberDoc.exists) {
+                    joinGroupChat(groupId, groupData.name);
+                    return;
+                }
+                
+                // Join group
+                await groupRef.collection('members').doc(user.uid).set({
+                    userId: user.uid,
+                    username: username,
+                    joinedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    role: 'member'
+                });
+                
+                // Update member count
+                await groupRef.update({
+                    memberCount: firebase.firestore.FieldValue.increment(1),
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Add join message
+                await groupRef.collection('messages').add({
+                    senderId: 'system',
+                    senderName: 'System',
+                    text: `${username} joined the group`,
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    type: 'system'
+                });
+                
+                alert(`Joined "${groupData.name}" successfully!`);
+                loadUserGroups();
+                joinGroupChat(groupId, groupData.name);
+                
+            } catch (error) {
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        // ==================== ENHANCED GROUP SEARCH FUNCTIONS ====================
+
+        async function searchAndJoinGroup() {
+            const searchTerm = prompt("Enter group name or ID to search:");
+            if (!searchTerm) return;
+            
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Please sign in first');
+                
+                // Search by group name
+                const snapshot = await db.collection('groups')
+                    .where('name', '>=', searchTerm)
+                    .where('name', '<=', searchTerm + '\uf8ff')
+                    .limit(10)
+                    .get();
+                
+                if (snapshot.empty) {
+                    alert(`No groups found matching "${searchTerm}"`);
+                    return;
+                }
+                
+                const groups = snapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
+                
+                // Create a list for user to choose from
+                let groupList = "Select a group to join:\n\n";
+                groups.forEach((group, index) => {
+                    groupList += `${index + 1}. ${group.name} (${group.isPublic ? 'Public' : 'Private'}) - ${group.memberCount || 0} members\n`;
+                });
+                
+                const choice = prompt(groupList + "\nEnter the group number:");
+                if (!choice || isNaN(choice) || choice < 1 || choice > groups.length) {
+                    return;
+                }
+                
+                const selectedGroup = groups[choice - 1];
+                await joinPublicGroup(selectedGroup.id);
+                
+            } catch (error) {
+                console.error('Search error:', error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        async function viewGroupDetails(groupId) {
+            try {
+                const groupDoc = await db.collection('groups').doc(groupId).get();
+                if (!groupDoc.exists) {
+                    alert('Group not found');
+                    return;
+                }
+                
+                const group = groupDoc.data();
+                const membersSnapshot = await db.collection('groups').doc(groupId).collection('members').limit(10).get();
+                const members = membersSnapshot.docs.map(doc => doc.data());
+                
+                let details = `
+                    Group: ${group.name}
+                    ${group.description ? `\nDescription: ${group.description}` : ''}
+                    Type: ${group.isPublic ? 'Public' : 'Private'}
+                    Owner: ${group.ownerName}
+                    Members: ${group.memberCount || 0}
+                    Created: ${group.createdAt?.toDate?.().toLocaleDateString() || 'Unknown'}
+                    
+                    Recent Members:
+                `;
+                
+                members.slice(0, 5).forEach(member => {
+                    details += `\n• ${member.username} (${member.role})`;
+                });
+                
+                if (group.memberCount > 5) {
+                    details += `\n... and ${group.memberCount - 5} more`;
+                }
+                
+                const join = confirm(`${details}\n\nDo you want to join this group?`);
+                if (join) {
+                    await joinPublicGroup(groupId);
+                }
+                
+            } catch (error) {
+                console.error('Error viewing group details:', error);
+                alert(`Error: ${error.message}`);
+            }
+        }
+
+        function copyGroupId(groupId) {
+            navigator.clipboard.writeText(groupId)
+                .then(() => {
+                    alert(`Group ID copied to clipboard: ${groupId}`);
+                })
+                .catch(err => {
+                    console.error('Copy failed:', err);
+                    prompt('Group ID (copy manually):', groupId);
+                });
+        }
+
+        function searchMyGroups() {
+            const searchTerm = document.getElementById('searchMyGroups').value.toLowerCase();
+            const groups = document.querySelectorAll('#groupsList .group-item');
+            
+            groups.forEach(group => {
+                const name = group.querySelector('.group-name').textContent.toLowerCase();
+                const description = group.querySelector('.group-description')?.textContent.toLowerCase() || '';
+                
+                if (name.includes(searchTerm) || description.includes(searchTerm)) {
+                    group.style.display = 'flex';
+                } else {
+                    group.style.display = 'none';
+                }
+            });
+        }
+
+        function searchPublicGroups() {
+            const searchTerm = document.getElementById('searchPublicGroups').value.toLowerCase();
+            const groups = window.publicGroupsCache || [];
+            
+            const filteredGroups = groups.filter(group => 
+                group.name.toLowerCase().includes(searchTerm) || 
+                (group.description && group.description.toLowerCase().includes(searchTerm))
+            );
+            
+            if (filteredGroups.length === 0) {
+                const publicGroupsList = document.getElementById('publicGroupsList');
+                publicGroupsList.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">🔍</div>
+                        <div class="empty-state-title">No Groups Found</div>
+                        <p class="empty-state-description">No public groups match "${searchTerm}"</p>
+                        <div class="action-buttons" style="margin-top: 20px;">
+                            <button class="btn btn-sm btn-primary" onclick="showCreateGroupModal()">
+                                <i class="fas fa-plus"></i> Create Group
+                            </button>
+                            <button class="btn btn-sm btn-success" onclick="searchAndJoinGroup()">
+                                <i class="fas fa-search"></i> Search All Groups
+                            </button>
+                        </div>
+                    </div>
+                `;
+                return;
+            }
+            
+            renderPublicGroups(filteredGroups);
+        }
+
+        function refreshPublicGroups() {
+            loadPublicGroups();
+        }
+
+        // ==================== CHAT FUNCTIONS ====================
+        function joinGroupChat(groupId, groupName) {
+            // Stop previous listeners
+            if (messagesListener) {
+                messagesListener();
+                messagesListener = null;
+            }
+            if (globalChatListener) {
+                globalChatListener();
+                globalChatListener = null;
+            }
+            
+            currentGroup = groupId;
+            currentGroupType = 'group';
+            
+            // Update UI
+            document.getElementById('chatGroupName').textContent = groupName;
+            document.getElementById('groupChatMessages').innerHTML = '<div class="loading"><div class="loading-spinner"></div><div class="loading-text">Loading messages...</div></div>';
+            
+            // Show only group chat screen
+            showChatScreen('groupChatScreen');
+            
+            // Load messages
+            loadGroupMessages();
+            
+            // Update active group in sidebar
+            document.querySelectorAll('.group-item').forEach(item => {
+                item.classList.remove('active');
+            });
+            
+            // Highlight current group
+            const currentGroupElement = document.querySelector(`.group-item[onclick*="${groupId}"]`);
+            if (currentGroupElement) {
+                currentGroupElement.classList.add('active');
+            }
+            
+            // Focus on input
+            setTimeout(() => {
+                document.getElementById('groupMessageInput').focus();
+            }, 100);
+        }
+
+        function loadGroupMessages() {
+            if (!currentGroup || currentGroupType !== 'group') return;
+            
+            const messagesArea = document.getElementById('groupChatMessages');
+            
+            // Listen for messages
+            messagesListener = db.collection('groups').doc(currentGroup).collection('messages')
+                .orderBy('timestamp', 'asc')
+                .limitToLast(100)
+                .onSnapshot((snapshot) => {
+                    const messages = snapshot.docs.map(doc => ({
+                        id: doc.id,
+                        ...doc.data(),
+                        timestamp: doc.data().timestamp?.toDate()
+                    }));
+                    
+                    renderMessages(messagesArea, messages, 'group');
+                    
+                    // Scroll to bottom
+                    setTimeout(() => {
+                        messagesArea.scrollTop = messagesArea.scrollHeight;
+                    }, 100);
+                    
+                }, (error) => {
+                    console.error('Error loading messages:', error);
+                    messagesArea.innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">⚠️</div>
+                            <div class="empty-state-title">Error Loading Messages</div>
+                            <p class="empty-state-description">${error.message}</p>
+                        </div>
+                    `;
+                });
+        }
+
+        async function sendGroupMessage() {
+            const input = document.getElementById('groupMessageInput');
+            const text = input.value.trim();
+            
+            if (!text && !selectedFile) return;
+            
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Not authenticated');
+                
+                const username = userProfile?.username || user.email || 'Anonymous';
+                
+                let fileData = null;
+                if (selectedFile && currentChatType === 'group') {
+                    fileData = await uploadFile();
+                    if (!fileData) {
+                        alert('File upload failed');
+                        return;
+                    }
+                }
+                
+                // Send message
+                await db.collection('groups').doc(currentGroup).collection('messages').add({
+                    senderId: user.uid,
+                    senderName: username,
+                    text: text || '',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    type: fileData ? 'file' : 'text',
+                    file: fileData || null
+                });
+                
+                // Update last activity
+                await db.collection('groups').doc(currentGroup).update({
+                    lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                
+                // Clear input and file preview
+                input.value = '';
+                input.style.height = 'auto';
+                if (currentChatType === 'group') {
+                    removeFilePreview('group');
+                }
+                
+            } catch (error) {
+                console.error('Send error:', error);
+                alert(`Error sending message: ${error.message}`);
+            }
+        }
+
+        // ==================== GLOBAL CHAT ====================
+        function joinGlobalChat() {
+            // Stop previous listeners
+            if (messagesListener) {
+                messagesListener();
+                messagesListener = null;
+            }
+            if (globalChatListener) {
+                globalChatListener();
+                globalChatListener = null;
+            }
+            
+            currentGroup = 'global';
+            currentGroupType = 'global';
+            
+            // Show only global chat screen
+            showChatScreen('globalChatScreen');
+            
+            // Load global messages
+            loadGlobalMessages();
+            
+            // Focus on input
+            setTimeout(() => {
+                document.getElementById('globalMessageInput').focus();
+            }, 100);
+        }
+
+        function loadGlobalMessages() {
+            const messagesArea = document.getElementById('globalChatMessages');
+            messagesArea.innerHTML = '<div class="loading"><div class="loading-spinner"></div><div class="loading-text">Loading global chat...</div></div>';
+            
+            try {
+                // Listen for global messages
+                globalChatListener = db.collection('global_chat')
+                    .orderBy('timestamp', 'asc')
+                    .limitToLast(50)
+                    .onSnapshot((snapshot) => {
+                        const messages = snapshot.docs.map(doc => ({
+                            id: doc.id,
+                            ...doc.data(),
+                            timestamp: doc.data().timestamp?.toDate()
+                        }));
+                        
+                        renderMessages(messagesArea, messages, 'global');
+                        
+                        // Scroll to bottom
+                        setTimeout(() => {
+                            messagesArea.scrollTop = messagesArea.scrollHeight;
+                        }, 100);
+                        
+                    }, (error) => {
+                        console.error('Error loading global messages:', error);
+                        messagesArea.innerHTML = `
+                            <div class="empty-state">
+                                <div class="empty-state-icon">⚠️</div>
+                                <div class="empty-state-title">Error Loading Chat</div>
+                                <p class="empty-state-description">${error.message}</p>
+                                <button class="btn btn-sm btn-secondary" onclick="loadGlobalMessages()">
+                                    <i class="fas fa-sync"></i> Try Again
+                                </button>
+                            </div>
+                        `;
+                    });
+            } catch (error) {
+                console.error('Global chat error:', error);
+                messagesArea.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <div class="empty-state-title">Error Loading Chat</div>
+                        <p class="empty-state-description">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        async function sendGlobalMessage() {
+            const input = document.getElementById('globalMessageInput');
+            const text = input.value.trim();
+            
+            if (!text && !selectedFile) return;
+            
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Please sign in first');
+                
+                const username = userProfile?.username || user.email || 'Anonymous';
+                
+                let fileData = null;
+                if (selectedFile && currentChatType === 'global') {
+                    fileData = await uploadFile();
+                    if (!fileData) {
+                        alert('File upload failed');
+                        return;
+                    }
+                }
+                
+                // Send global message
+                await db.collection('global_chat').add({
+                    senderId: user.uid,
+                    senderName: username,
+                    text: text || '',
+                    timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                    type: fileData ? 'file' : 'text',
+                    file: fileData || null
+                });
+                
+                // Clear input and file preview
+                input.value = '';
+                input.style.height = 'auto';
+                if (currentChatType === 'global') {
+                    removeFilePreview('global');
+                }
+                
+            } catch (error) {
+                console.error('Send error:', error);
+                alert(`Error sending message: ${error.message}`);
+            }
+        }
+
+        function leaveGlobalChat() {
+            if (globalChatListener) {
+                globalChatListener();
+                globalChatListener = null;
+            }
+            
+            currentGroup = null;
+            currentGroupType = null;
+            
+            showChatScreen('noChatSelected');
+        }
+
+        function showGlobalChatInfo() {
+            alert('🌐 Global Chat Room\n\n• Everyone can participate\n• Be respectful and follow community guidelines\n• No spam or offensive content\n• Have fun chatting with people from around the world!');
+        }
+
+        // ==================== ENHANCED LEAVE GROUP ====================
+
+        async function leaveGroupConfirm() {
+            if (!currentGroup || currentGroupType !== 'group') {
+                alert('No group selected');
+                return;
+            }
+            
+            if (!confirm('Are you sure you want to leave this group? You will need to be re-invited to join again.')) {
+                return;
+            }
+            
+            try {
+                const user = auth.currentUser;
+                if (!user) throw new Error('Not authenticated');
+                
+                const groupRef = db.collection('groups').doc(currentGroup);
+                const groupDoc = await groupRef.get();
+                
+                if (!groupDoc.exists) {
+                    throw new Error('Group not found');
+                }
+                
+                const groupData = groupDoc.data();
+                const username = userProfile?.username || user.email || 'Anonymous';
+                
+                // Check if user is owner
+                if (groupData.ownerId === user.uid) {
+                    const action = prompt(`You are the owner of "${groupData.name}".\n\nOptions:\n1. Delete group\n2. Transfer ownership\n3. Leave as owner (group will be orphaned)\n\nEnter 1, 2, or 3:`);
+                    
+                    switch(action) {
+                        case '1':
+                            // Delete group
+                            await deleteGroup(currentGroup);
+                            alert('Group deleted successfully');
+                            break;
+                            
+                        case '2':
+                            // Transfer ownership
+                            const newOwnerId = prompt('Enter the user ID of the new owner:');
+                            if (newOwnerId) {
+                                await transferOwnership(currentGroup, newOwnerId);
+                                alert('Ownership transferred successfully');
+                            }
+                            break;
+                            
+                        case '3':
+                            // Leave without transferring
+                            await leaveGroupAsOwner(currentGroup, user.uid, username);
+                            alert('You have left the group');
+                            break;
+                            
+                        default:
+                            alert('Action cancelled');
+                            return;
+                    }
+                } else {
+                    // Regular member leaving
+                    await leaveGroupAsMember(currentGroup, user.uid, username);
+                    alert('You have left the group');
+                }
+                
+                // Clean up and update UI
+                cleanupAfterLeaving();
+                
+            } catch (error) {
+                alert(`Error leaving group: ${error.message}`);
+            }
+        }
+
+        async function deleteGroup(groupId) {
+            const groupRef = db.collection('groups').doc(groupId);
+            
+            // Delete all messages
+            const messagesSnapshot = await groupRef.collection('messages').get();
+            const messageDeletes = messagesSnapshot.docs.map(doc => doc.ref.delete());
+            await Promise.all(messageDeletes);
+            
+            // Delete all members
+            const membersSnapshot = await groupRef.collection('members').get();
+            const memberDeletes = membersSnapshot.docs.map(doc => doc.ref.delete());
+            await Promise.all(memberDeletes);
+            
+            // Delete group document
+            await groupRef.delete();
+        }
+
+        async function transferOwnership(groupId, newOwnerId) {
+            const groupRef = db.collection('groups').doc(groupId);
+            
+            // Get new owner info
+            const newOwnerDoc = await db.collection('users').doc(newOwnerId).get();
+            if (!newOwnerDoc.exists) {
+                throw new Error('New owner not found');
+            }
+            const newOwnerData = newOwnerDoc.data();
+            
+            // Update group owner
+            await groupRef.update({
+                ownerId: newOwnerId,
+                ownerName: newOwnerData.username
+            });
+            
+            // Update member roles
+            await groupRef.collection('members').doc(newOwnerId).update({
+                role: 'admin'
+            });
+            
+            // Add system message
+            await groupRef.collection('messages').add({
+                senderId: 'system',
+                senderName: 'System',
+                text: `Group ownership transferred to ${newOwnerData.username}`,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                type: 'system'
+            });
+        }
+
+        async function leaveGroupAsMember(groupId, userId, username) {
+            const groupRef = db.collection('groups').doc(groupId);
+            
+            // Remove from members
+            await groupRef.collection('members').doc(userId).delete();
+            
+            // Update member count
+            await groupRef.update({
+                memberCount: firebase.firestore.FieldValue.increment(-1),
+                lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Add leave message
+            await groupRef.collection('messages').add({
+                senderId: 'system',
+                senderName: 'System',
+                text: `${username} left the group`,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                type: 'system'
+            });
+        }
+
+        async function leaveGroupAsOwner(groupId, userId, username) {
+            const groupRef = db.collection('groups').doc(groupId);
+            
+            // Remove from members
+            await groupRef.collection('members').doc(userId).delete();
+            
+            // Update member count
+            await groupRef.update({
+                memberCount: firebase.firestore.FieldValue.increment(-1),
+                lastActivity: firebase.firestore.FieldValue.serverTimestamp()
+            });
+            
+            // Add leave message
+            await groupRef.collection('messages').add({
+                senderId: 'system',
+                senderName: 'System',
+                text: `${username} (owner) left the group. Group is now ownerless.`,
+                timestamp: firebase.firestore.FieldValue.serverTimestamp(),
+                type: 'system'
+            });
+        }
+
+        function cleanupAfterLeaving() {
+            // Stop message listener
+            if (messagesListener) {
+                messagesListener();
+                messagesListener = null;
+            }
+            
+            // Reset current group
+            currentGroup = null;
+            currentGroupType = null;
+            
+            // Update UI
+            showChatScreen('noChatSelected');
+            
+            // Reload groups list
+            loadUserGroups();
+        }
+
+        // ==================== MESSAGE RENDERING ====================
+        function renderMessages(container, messages, type) {
+            if (messages.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">💬</div>
+                        <div class="empty-state-title">No Messages Yet</div>
+                        <p class="empty-state-description">Send the first message to start the conversation!</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            container.innerHTML = messages.map(message => {
+                const isCurrentUser = message.senderId === currentUser?.uid;
+                const isSystem = message.type === 'system';
+                
+                if (isSystem) {
+                    return `
+                        <div class="message system">
+                            <div class="message-bubble">${message.text}</div>
+                        </div>
+                    `;
+                }
+                
+                let content = '';
+                if (message.type === 'file' && message.file) {
+                    const file = message.file;
+                    if (file.type.startsWith('image/')) {
+                        content = `
+                            <div class="message-file">
+                                <img src="${file.url}" alt="${file.name}" style="max-width: 300px; max-height: 300px; border-radius: 8px; cursor: pointer;" 
+                                     onclick="openFileModal('${file.url}', '${file.name}', 'image')">
+                                <div class="file-meta">
+                                    <small>${file.name}</small>
+                                    <small>${formatFileSize(file.size)}</small>
+                                </div>
+                            </div>
+                        `;
+                    } else if (file.type.startsWith('video/')) {
+                        content = `
+                            <div class="message-file">
+                                <video controls style="max-width: 300px; max-height: 300px; border-radius: 8px;">
+                                    <source src="${file.url}" type="${file.type}">
+                                    Your browser does not support the video tag.
+                                </video>
+                                <div class="file-meta">
+                                    <small>${file.name}</small>
+                                    <small>${formatFileSize(file.size)}</small>
+                                </div>
+                            </div>
+                        `;
+                    } else {
+                        content = `
+                            <div class="message-file">
+                                <div class="file-download" onclick="window.open('${file.url}', '_blank')" 
+                                     style="padding: 10px; background: var(--light); border-radius: 8px; cursor: pointer; display: flex; align-items: center; gap: 10px;">
+                                    <i class="fas fa-file" style="font-size: 24px; color: var(--primary);"></i>
+                                    <div>
+                                        <div><strong>${file.name}</strong></div>
+                                        <small>${formatFileSize(file.size)}</small>
+                                    </div>
+                                    <i class="fas fa-download" style="margin-left: auto;"></i>
+                                </div>
+                            </div>
+                        `;
+                    }
+                }
+                
+                if (message.text) {
+                    content += `<div class="message-content">${message.text}</div>`;
+                }
+                
+                return `
+                    <div class="message ${isCurrentUser ? 'sent' : ''}">
+                        <div class="message-bubble">
+                            <div class="message-header">
+                                <div class="message-sender">${message.senderName}</div>
+                                <div class="message-time">${formatTime(message.timestamp)}</div>
+                            </div>
+                            ${content}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        // ==================== FILE MODAL ====================
+        function openFileModal(url, name, type) {
+            const modalHTML = `
+                <div id="fileModal" class="modal active">
+                    <div class="modal-content" style="max-width: 90vw; max-height: 90vh; padding: 0;">
+                        <div class="modal-header" style="padding: 15px 20px; border-bottom: 1px solid var(--border);">
+                            <div class="modal-title">${name}</div>
+                            <button class="modal-close" onclick="closeFileModal()">×</button>
+                        </div>
+                        <div style="padding: 20px; text-align: center; overflow: auto;">
+                            ${type === 'image' ? 
+                                `<img src="${url}" alt="${name}" style="max-width: 100%; max-height: 70vh;">` : 
+                                type === 'video' ?
+                                `<video controls autoplay style="max-width: 100%; max-height: 70vh;">
+                                    <source src="${url}" type="video/mp4">
+                                </video>` :
+                                `<div style="padding: 40px;">
+                                    <i class="fas fa-file" style="font-size: 64px; color: var(--primary);"></i>
+                                    <p>${name}</p>
+                                    <a href="${url}" target="_blank" class="btn btn-primary">
+                                        <i class="fas fa-download"></i> Download File
+                                    </a>
+                                </div>`
+                            }
+                        </div>
+                    </div>
+                </div>
+            `;
+            
+            // Remove existing modal if any
+            const existingModal = document.getElementById('fileModal');
+            if (existingModal) {
+                existingModal.remove();
+            }
+            
+            // Add new modal
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+
+        function closeFileModal() {
+            const modal = document.getElementById('fileModal');
+            if (modal) {
+                modal.remove();
+            }
+        }
+
+        // ==================== GROUP INFO ====================
+        async function loadGroupInfo() {
+            if (!currentGroup || currentGroupType !== 'group') return;
+            
+            try {
+                const groupDoc = await db.collection('groups').doc(currentGroup).get();
+                if (!groupDoc.exists) {
+                    document.getElementById('groupInfoContent').innerHTML = `
+                        <div class="empty-state">
+                            <div class="empty-state-icon">⚠️</div>
+                            <div class="empty-state-title">Group Not Found</div>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                const groupData = groupDoc.data();
+                
+                // Get members
+                const membersSnapshot = await db.collection('groups').doc(currentGroup).collection('members').get();
+                const members = membersSnapshot.docs.map(doc => doc.data());
+                
+                document.getElementById('groupInfoTitle').textContent = groupData.name;
+                document.getElementById('groupInfoContent').innerHTML = `
+                    <div style="margin-bottom: 25px;">
+                        <p><strong>Description:</strong> ${groupData.description || 'No description'}</p>
+                        <p><strong>Created:</strong> ${groupData.createdAt?.toDate?.().toLocaleDateString() || 'Unknown'}</p>
+                        <p><strong>Type:</strong> ${groupData.isPublic ? 'Public' : 'Private'}</p>
+                        <p><strong>Owner:</strong> ${groupData.ownerName}</p>
+                        <p><strong>Members:</strong> ${groupData.memberCount || 0}</p>
+                    </div>
+                    
+                    <div>
+                        <h4 style="margin-bottom: 15px; color: var(--dark);">Members (${members.length})</h4>
+                        <div style="max-height: 300px; overflow-y: auto;">
+                            ${members.map(member => `
+                                <div style="padding: 10px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px;">
+                                    <div style="width: 32px; height: 32px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: white; font-weight: 600;">
+                                        ${member.username ? member.username.charAt(0).toUpperCase() : 'U'}
+                                    </div>
+                                    <div>
+                                        <div style="font-weight: 600;">${member.username}</div>
+                                        <div style="font-size: 12px; color: var(--gray);">
+                                            ${member.role === 'admin' ? '👑 Admin' : 'Member'}
+                                        </div>
+                                    </div>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Error loading group info:', error);
+                document.getElementById('groupInfoContent').innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-state-icon">⚠️</div>
+                        <div class="empty-state-title">Error Loading Info</div>
+                        <p class="empty-state-description">${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // ==================== UTILITY FUNCTIONS ====================
+        function formatDate(date) {
+            if (!date) return 'Recently';
+            
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / 60000);
+            const diffHours = Math.floor(diffMs / 3600000);
+            const diffDays = Math.floor(diffMs / 86400000);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins}m ago`;
+            if (diffHours < 24) return `${diffHours}h ago`;
+            if (diffDays < 7) return `${diffDays}d ago`;
+            return date.toLocaleDateString();
+        }
+
+        function formatTime(date) {
+            if (!date) return '';
+            return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+
+        // ==================== INITIALIZATION ====================
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('FireChat Professional with Enhanced Search & Group Management initialized');
+            
+            // Initialize app
+            showScreen('welcomeScreen');
+            
+            // Auto-resize textareas
+            const textareas = document.querySelectorAll('.message-input');
+            textareas.forEach(textarea => {
+                textarea.addEventListener('input', function() {
+                    this.style.height = 'auto';
+                    this.style.height = (this.scrollHeight) + 'px';
+                });
+            });
+            
+            // Auto-focus on inputs when modals open
+            const modals = ['createGroupModal', 'joinGroupModal', 'groupInfoModal'];
+            modals.forEach(modalId => {
+                const modal = document.getElementById(modalId);
+                if (modal) {
+                    modal.addEventListener('click', function(e) {
+                        if (e.target === this) {
+                            this.classList.remove('active');
+                        }
+                    });
+                }
+            });
+            
+            // Handle Enter key for sending messages
+            document.getElementById('groupMessageInput')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendGroupMessage();
+                }
+            });
+            
+            document.getElementById('globalMessageInput')?.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    sendGlobalMessage();
+                }
+            });
+            
+            // Update online status
+            setInterval(() => {
+                if (currentUser) {
+                    db.collection('users').doc(currentUser.uid).update({
+                        lastSeen: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                }
+            }, 30000);
+        });
+    </script>
+</body>
+</html>
