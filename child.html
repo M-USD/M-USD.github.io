@@ -717,225 +717,1180 @@
 
         // Game Implementations
         
-        function playFootball() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 800;
-            canvas.height = 350;
-            gameContainer.appendChild(canvas);
-            const ctx = canvas.getContext('2d');
-            
-            gameState = {
-                playerX: 100,
-                playerY: 250,
-                ballX: 150,
-                ballY: 240,
-                ballSpeedX: 0,
-                ballSpeedY: 0,
-                goalY: 220,
-                goalkeeperX: 650,
-                goalkeeperY: 220,
-                goalkeeperSpeed: 2
-            };
-            
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Field
-                ctx.fillStyle = '#2ecc71';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Field lines
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
-                ctx.beginPath();
-                ctx.moveTo(canvas.width / 2, 20);
-                ctx.lineTo(canvas.width / 2, canvas.height - 20);
-                ctx.stroke();
-                
-                // Goals
-                ctx.fillStyle = '#fff';
-                ctx.fillRect(10, 200, 10, 100);
-                ctx.fillRect(canvas.width - 20, 200, 10, 100);
-                
-                // Player
-                ctx.fillStyle = '#3498db';
-                ctx.fillRect(gameState.playerX, gameState.playerY, 30, 30);
-                
-                // Ball
-                ctx.fillStyle = '#fff';
-                ctx.beginPath();
-                ctx.arc(gameState.ballX, gameState.ballY, 10, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Goalkeeper
-                ctx.fillStyle = '#e74c3c';
-                ctx.fillRect(gameState.goalkeeperX, gameState.goalkeeperY, 30, 60);
-            }
-            
-            function update() {
-                // Move player
-                if (keys['ArrowLeft'] && gameState.playerX > 20) gameState.playerX -= 5;
-                if (keys['ArrowRight'] && gameState.playerX < 300) gameState.playerX += 5;
-                
-                // Move goalkeeper
-                gameState.goalkeeperY += gameState.goalkeeperSpeed;
-                if (gameState.goalkeeperY > 280 || gameState.goalkeeperY < 160) {
-                    gameState.goalkeeperSpeed *= -1;
-                }
-                
-                // Move ball
-                gameState.ballX += gameState.ballSpeedX;
-                gameState.ballY += gameState.ballSpeedY;
-                
-                // Physics
-                if (gameState.ballY > 340 || gameState.ballY < 10) gameState.ballSpeedY *= -0.9;
-                if (gameState.ballX > 780 || gameState.ballX < 10) gameState.ballSpeedX *= -0.9;
-                gameState.ballSpeedY += 0.2;
-                gameState.ballSpeedX *= 0.99;
-                gameState.ballSpeedY *= 0.99;
-                
-                // Kick ball
-                const dist = Math.sqrt(
-                    Math.pow(gameState.playerX - gameState.ballX, 2) + 
-                    Math.pow(gameState.playerY - gameState.ballY, 2)
-                );
-                if (keys[' '] && dist < 40) {
-                    gameState.ballSpeedX = 8;
-                    gameState.ballSpeedY = -8;
-                    keys[' '] = false;
-                }
-                
-                // Score goal
-                if (gameState.ballX > 770 && gameState.ballY > 200 && gameState.ballY < 300) {
-                    score += 100;
-                    updateScore();
-                    resetBall();
-                }
-                
-                // Reset ball
-                if (gameState.ballX < 10 || gameState.ballX > 790) {
-                    resetBall();
-                }
-            }
-            
-            function resetBall() {
-                gameState.ballX = gameState.playerX + 40;
-                gameState.ballY = gameState.playerY;
-                gameState.ballSpeedX = 0;
-                gameState.ballSpeedY = 0;
-            }
-            
-            gameInterval = setInterval(() => {
-                update();
-                draw();
-            }, 1000/60);
+        
+        
+        
+function playFootball() {
+    // Clear previous game if any
+    gameContainer.innerHTML = '';
+    
+    // Create game container with controls
+    const gameUI = document.createElement('div');
+    gameUI.style.cssText = `
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 20px;
+        padding: 20px;
+    `;
+    gameContainer.appendChild(gameUI);
+    
+    // Create control buttons
+    const controlsDiv = document.createElement('div');
+    controlsDiv.style.cssText = `
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        justify-content: center;
+    `;
+    
+    // Difficulty buttons
+    const difficultyDiv = document.createElement('div');
+    difficultyDiv.innerHTML = `
+        <h3 style="margin: 10px 0; color: white; text-align: center;">Difficulty:</h3>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button id="easyBtn" style="padding: 10px 20px; background: #27ae60; color: white; border: none; border-radius: 5px; cursor: pointer;">Easy</button>
+            <button id="mediumBtn" style="padding: 10px 20px; background: #f39c12; color: white; border: none; border-radius: 5px; cursor: pointer;">Medium</button>
+            <button id="hardBtn" style="padding: 10px 20px; background: #e74c3c; color: white; border: none; border-radius: 5px; cursor: pointer;">Hard</button>
+        </div>
+    `;
+    
+    // Player selection buttons
+    const playerSelectDiv = document.createElement('div');
+    playerSelectDiv.innerHTML = `
+        <h3 style="margin: 10px 0; color: white; text-align: center;">Select Player:</h3>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button id="player1Btn" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Player 1 (Striker)</button>
+            <button id="player2Btn" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Player 2 (Mid)</button>
+            <button id="player3Btn" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Player 3 (Mid)</button>
+            <button id="player4Btn" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Player 4 (Def)</button>
+            <button id="player5Btn" style="padding: 10px 20px; background: #3498db; color: white; border: none; border-radius: 5px; cursor: pointer;">Player 5 (Def)</button>
+        </div>
+    `;
+    
+    // Action buttons
+    const actionDiv = document.createElement('div');
+    actionDiv.innerHTML = `
+        <h3 style="margin: 10px 0; color: white; text-align: center;">Actions:</h3>
+        <div style="display: flex; gap: 10px; justify-content: center;">
+            <button id="shootBtn" style="padding: 10px 20px; background: #9b59b6; color: white; border: none; border-radius: 5px; cursor: pointer;">Shoot (Space)</button>
+            <button id="passBtn" style="padding: 10px 20px; background: #2ecc71; color: white; border: none; border-radius: 5px; cursor: pointer;">Pass (P)</button>
+            <button id="resetBtn" style="padding: 10px 20px; background: #95a5a6; color: white; border: none; border-radius: 5px; cursor: pointer;">Reset Ball</button>
+        </div>
+    `;
+    
+    controlsDiv.appendChild(difficultyDiv);
+    controlsDiv.appendChild(playerSelectDiv);
+    controlsDiv.appendChild(actionDiv);
+    gameUI.appendChild(controlsDiv);
+    
+    // Create canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = 1000;
+    canvas.height = 600;
+    canvas.style.cssText = `
+        border: 3px solid #2c3e50;
+        border-radius: 10px;
+        background: #27ae60;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    `;
+    gameUI.appendChild(canvas);
+    
+    // Instructions
+    const instructions = document.createElement('div');
+    instructions.innerHTML = `
+        <div style="color: white; text-align: center; margin-top: 10px;">
+            <p><strong>Controls:</strong> WASD/Arrows = Move | 1-5 = Select Player | Space = Kick/Shoot | P = Pass</p>
+            <p><strong>Passing:</strong> Select a player with number keys, then press P to pass to them</p>
+        </div>
+    `;
+    gameUI.appendChild(instructions);
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Game settings
+    const TEAM_SIZE = 5;
+    const DIFFICULTY = {
+        EASY: { 
+            goalkeeperSpeed: 2, 
+            aiReaction: 0.3,
+            goalkeeperRange: 40,
+            goalWidth: 120
+        },
+        MEDIUM: { 
+            goalkeeperSpeed: 3, 
+            aiReaction: 0.5,
+            goalkeeperRange: 30,
+            goalWidth: 100
+        },
+        HARD: { 
+            goalkeeperSpeed: 4, 
+            aiReaction: 0.8,
+            goalkeeperRange: 25,
+            goalWidth: 80
         }
+    };
+    
+    // Animation state
+    let frameCount = 0;
+    let selectedPlayer = 0;
+    let currentDifficulty = DIFFICULTY.MEDIUM;
+    let gameRunning = true;
+    
+    // Game state
+    gameState = {
+        players: [],
+        ballX: 200,
+        ballY: 300,
+        ballSpeedX: 0,
+        ballSpeedY: 0,
+        goalkeeperX: 900,
+        goalkeeperY: 250,
+        goalkeeperSpeed: 3,
+        possession: -1,
+        gameTime: 0,
+        shots: 0,
+        goals: 0,
+        passes: 0
+    };
+    
+    // Initialize players
+    function initializePlayers() {
+        gameState.players = [];
+        
+        // Player team (blue)
+        const playerPositions = [
+            { x: 150, y: 300, role: 'striker', jersey: 9 },
+            { x: 250, y: 200, role: 'midfielder', jersey: 7 },
+            { x: 250, y: 400, role: 'midfielder', jersey: 8 },
+            { x: 350, y: 250, role: 'defender', jersey: 4 },
+            { x: 350, y: 350, role: 'defender', jersey: 5 }
+        ];
+        
+        for (let i = 0; i < TEAM_SIZE; i++) {
+            gameState.players.push({
+                x: playerPositions[i].x,
+                y: playerPositions[i].y,
+                team: 'player',
+                color: '#3498db',
+                jerseyNumber: playerPositions[i].jersey,
+                role: playerPositions[i].role,
+                speed: 4,
+                animationFrame: 0,
+                targetX: playerPositions[i].x,
+                targetY: playerPositions[i].y,
+                isMoving: false,
+                direction: 'right',
+                stamina: 100
+            });
+        }
+        
+        // AI team (red)
+        const aiPositions = [
+            { x: 750, y: 300, role: 'defender', jersey: 3 },
+            { x: 650, y: 200, role: 'midfielder', jersey: 6 },
+            { x: 650, y: 400, role: 'midfielder', jersey: 10 },
+            { x: 550, y: 250, role: 'defender', jersey: 2 },
+            { x: 550, y: 350, role: 'defender', jersey: 1 }
+        ];
+        
+        for (let i = 0; i < TEAM_SIZE; i++) {
+            gameState.players.push({
+                x: aiPositions[i].x,
+                y: aiPositions[i].y,
+                team: 'ai',
+                color: '#e74c3c',
+                jerseyNumber: aiPositions[i].jersey,
+                role: aiPositions[i].role,
+                speed: 3.5,
+                animationFrame: 0,
+                targetX: aiPositions[i].x,
+                targetY: aiPositions[i].y,
+                isMoving: false,
+                direction: 'left',
+                stamina: 100
+            });
+        }
+    }
+    
+    initializePlayers();
+    
+    // Update button styles
+    function updateButtonStyles() {
+        // Update difficulty buttons
+        document.getElementById('easyBtn').style.opacity = currentDifficulty === DIFFICULTY.EASY ? '1' : '0.6';
+        document.getElementById('mediumBtn').style.opacity = currentDifficulty === DIFFICULTY.MEDIUM ? '1' : '0.6';
+        document.getElementById('hardBtn').style.opacity = currentDifficulty === DIFFICULTY.HARD ? '1' : '0.6';
+        
+        // Update player selection buttons
+        for (let i = 1; i <= 5; i++) {
+            const btn = document.getElementById(`player${i}Btn`);
+            if (btn) {
+                if (selectedPlayer === i - 1) {
+                    btn.style.background = '#1abc9c';
+                    btn.style.transform = 'scale(1.05)';
+                } else {
+                    btn.style.background = '#3498db';
+                    btn.style.transform = 'scale(1)';
+                }
+            }
+        }
+    }
+    
+    // Draw functions
+    function drawPlayer(player, isSelected = false) {
+        ctx.save();
+        ctx.translate(player.x, player.y);
+        
+        if (player.direction === 'left') {
+            ctx.scale(-1, 1);
+        }
+        
+        // Shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.beginPath();
+        ctx.ellipse(0, 40, 15, 5, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Animation
+        const bodyBob = player.isMoving ? Math.sin(frameCount * 0.2 + player.animationFrame) * 3 : 0;
+        const legOffset = player.isMoving ? Math.sin(frameCount * 0.3 + player.animationFrame) * 10 : 0;
+        const armOffset = player.isMoving ? Math.sin(frameCount * 0.3 + player.animationFrame) * 15 : 0;
+        
+        // Legs
+        ctx.fillStyle = player.team === 'player' ? '#2980b9' : '#c0392b';
+        ctx.fillRect(-5, 15 + bodyBob + legOffset, 8, 25);
+        ctx.fillRect(5, 15 + bodyBob - legOffset, 8, 25);
+        
+        // Body
+        ctx.fillStyle = player.color;
+        ctx.fillRect(-12, -15 + bodyBob, 24, 30);
+        
+        // Jersey number
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 12px Arial';
+        ctx.textAlign = 'center';
+        ctx.fillText(player.jerseyNumber, 0, -5 + bodyBob);
+        
+        // Arms
+        ctx.fillStyle = '#ecf0f1';
+        ctx.fillRect(-15, -10 + bodyBob - armOffset, 6, 20);
+        ctx.fillRect(9, -10 + bodyBob + armOffset, 6, 20);
+        
+        // Head
+        ctx.fillStyle = '#fad7a0';
+        ctx.beginPath();
+        ctx.arc(0, -30 + bodyBob, 12, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Face
+        ctx.fillStyle = '#34495e';
+        ctx.beginPath();
+        ctx.arc(-3, -33 + bodyBob, 2, 0, Math.PI * 2);
+        ctx.arc(3, -33 + bodyBob, 2, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Selection indicator
+        if (isSelected) {
+            ctx.strokeStyle = '#f1c40f';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.arc(0, 0, 25, 0, Math.PI * 2);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Passing indicators
+            ctx.strokeStyle = 'rgba(46, 204, 113, 0.5)';
+            ctx.lineWidth = 1;
+            gameState.players.forEach((p, index) => {
+                if (p.team === 'player' && index !== selectedPlayer) {
+                    const dx = p.x - player.x;
+                    const dy = p.y - player.y;
+                    const distance = Math.sqrt(dx * dx + dy * dy);
+                    
+                    if (distance < 150) {
+                        ctx.beginPath();
+                        ctx.moveTo(0, 0);
+                        ctx.lineTo(dx, dy);
+                        ctx.stroke();
+                        
+                        ctx.fillStyle = 'rgba(46, 204, 113, 0.7)';
+                        ctx.beginPath();
+                        ctx.arc(dx, dy, 8, 0, Math.PI * 2);
+                        ctx.fill();
+                        
+                        ctx.fillStyle = 'white';
+                        ctx.font = '10px Arial';
+                        const teammateIndex = index % TEAM_SIZE;
+                        ctx.fillText((teammateIndex + 1).toString(), dx - 3, dy + 3);
+                    }
+                }
+            });
+        }
+        
+        // Stamina bar (if moving)
+        if (player.isMoving && player.team === 'player') {
+            ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+            ctx.fillRect(-15, -45, 30, 4);
+            ctx.fillStyle = player.stamina > 50 ? '#2ecc71' : player.stamina > 20 ? '#f39c12' : '#e74c3c';
+            ctx.fillRect(-14, -44, (player.stamina / 100) * 28, 2);
+        }
+        
+        ctx.restore();
+    }
+    
+    function draw() {
+        // Background
+        ctx.fillStyle = '#27ae60';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Grass pattern
+        ctx.fillStyle = '#2ecc71';
+        for (let i = 0; i < canvas.width; i += 40) {
+            for (let j = 0; j < canvas.height; j += 40) {
+                if ((i + j) % 80 === 0) {
+                    ctx.fillRect(i, j, 40, 40);
+                }
+            }
+        }
+        
+        // Field markings
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(20, 20, canvas.width - 40, canvas.height - 40);
+        ctx.beginPath();
+        ctx.moveTo(canvas.width / 2, 20);
+        ctx.lineTo(canvas.width / 2, canvas.height - 20);
+        ctx.stroke();
+        ctx.beginPath();
+        ctx.arc(canvas.width / 2, canvas.height / 2, 50, 0, Math.PI * 2);
+        ctx.stroke();
+        
+        // Goals
+        ctx.fillStyle = 'white';
+        const goalWidth = currentDifficulty.goalWidth;
+        const goalTop = canvas.height / 2 - goalWidth / 2;
+        
+        // Left goal
+        ctx.fillRect(10, goalTop, 10, goalWidth);
+        ctx.fillRect(10, goalTop, 40, 5);
+        ctx.fillRect(10, goalTop + goalWidth - 5, 40, 5);
+        ctx.fillRect(45, goalTop, 5, goalWidth);
+        
+        // Right goal
+        ctx.fillRect(canvas.width - 20, goalTop, 10, goalWidth);
+        ctx.fillRect(canvas.width - 50, goalTop, 40, 5);
+        ctx.fillRect(canvas.width - 50, goalTop + goalWidth - 5, 40, 5);
+        ctx.fillRect(canvas.width - 50, goalTop, 5, goalWidth);
+        
+        // Draw all players
+        gameState.players.forEach((player, index) => {
+            drawPlayer(player, index === selectedPlayer);
+        });
+        
+        // Goalkeeper
+        ctx.save();
+        ctx.translate(gameState.goalkeeperX, gameState.goalkeeperY);
+        ctx.fillStyle = '#f39c12';
+        ctx.fillRect(-15, -20, 30, 40);
+        ctx.fillStyle = '#d68910';
+        ctx.fillRect(-20, -15, 10, 25);
+        ctx.fillRect(10, -15, 10, 25);
+        ctx.fillRect(-10, 20, 8, 20);
+        ctx.fillRect(2, 20, 8, 20);
+        ctx.fillStyle = '#fad7a0';
+        ctx.beginPath();
+        ctx.arc(0, -30, 10, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+        
+        // Ball
+        // Shadow
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.beginPath();
+        ctx.ellipse(gameState.ballX, gameState.ballY + 5, 12, 4, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Ball with rotation
+        ctx.save();
+        ctx.translate(gameState.ballX, gameState.ballY);
+        const rotation = frameCount * 0.1 * (Math.abs(gameState.ballSpeedX) + Math.abs(gameState.ballSpeedY)) * 0.1;
+        ctx.rotate(rotation);
+        
+        const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 10);
+        gradient.addColorStop(0, 'white');
+        gradient.addColorStop(1, '#95a5a6');
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(0, 0, 10, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.strokeStyle = 'black';
+        ctx.lineWidth = 1;
+        ctx.beginPath();
+        ctx.moveTo(-8, 0);
+        ctx.lineTo(8, 0);
+        ctx.moveTo(0, -8);
+        ctx.lineTo(0, 8);
+        ctx.arc(0, 0, 8, 0, Math.PI * 2);
+        ctx.stroke();
+        ctx.restore();
+        
+        // UI overlay
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(10, 10, 250, 150);
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 16px Arial';
+        ctx.fillText(`Score: ${score}`, 20, 35);
+        ctx.fillText(`Goals: ${gameState.goals}/${gameState.shots}`, 20, 60);
+        ctx.fillText(`Passes: ${gameState.passes}`, 20, 85);
+        ctx.fillText(`Time: ${Math.floor(gameState.gameTime / 60)}:${(gameState.gameTime % 60).toString().padStart(2, '0')}`, 20, 110);
+        ctx.fillText(`Player: ${selectedPlayer + 1} (${gameState.players[selectedPlayer].role})`, 20, 135);
+        ctx.fillText(`Difficulty: ${Object.keys(DIFFICULTY).find(key => DIFFICULTY[key] === currentDifficulty)}`, 20, 160);
+        
+        // Possession indicator
+        if (gameState.possession >= 0) {
+            const player = gameState.players[gameState.possession];
+            ctx.fillStyle = 'rgba(46, 204, 113, 0.3)';
+            ctx.beginPath();
+            ctx.arc(player.x, player.y, 30, 0, Math.PI * 2);
+            ctx.fill();
+        }
+    }
+    
+    function update() {
+        if (!gameRunning) return;
+        
+        gameState.gameTime++;
+        
+        // Move selected player
+        const currentPlayer = gameState.players[selectedPlayer];
+        
+        if (keys['w'] || keys['ArrowUp']) {
+            currentPlayer.targetY -= currentPlayer.speed;
+            if (currentPlayer.stamina > 0) currentPlayer.stamina -= 0.1;
+        }
+        if (keys['s'] || keys['ArrowDown']) {
+            currentPlayer.targetY += currentPlayer.speed;
+            if (currentPlayer.stamina > 0) currentPlayer.stamina -= 0.1;
+        }
+        if (keys['a'] || keys['ArrowLeft']) {
+            currentPlayer.targetX -= currentPlayer.speed;
+            currentPlayer.direction = 'left';
+            if (currentPlayer.stamina > 0) currentPlayer.stamina -= 0.1;
+        }
+        if (keys['d'] || keys['ArrowRight']) {
+            currentPlayer.targetX += currentPlayer.speed;
+            currentPlayer.direction = 'right';
+            if (currentPlayer.stamina > 0) currentPlayer.stamina -= 0.1;
+        }
+        
+        // Regenerate stamina when not moving
+        if (!currentPlayer.isMoving && currentPlayer.stamina < 100) {
+            currentPlayer.stamina += 0.2;
+        }
+        
+        // Update all players
+        gameState.players.forEach(player => {
+            const dx = player.targetX - player.x;
+            const dy = player.targetY - player.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance > 1) {
+                player.isMoving = true;
+                player.x += (dx / distance) * Math.min(player.speed, distance);
+                player.y += (dy / distance) * Math.min(player.speed, distance);
+                player.animationFrame += 0.1;
+            } else {
+                player.isMoving = false;
+            }
+            
+            // Boundaries
+            if (player.team === 'player') {
+                player.x = Math.max(50, Math.min(500, player.x));
+            } else {
+                player.x = Math.max(500, Math.min(canvas.width - 50, player.x));
+            }
+            player.y = Math.max(50, Math.min(canvas.height - 50, player.y));
+        });
+        
+        // Goalkeeper movement
+        gameState.goalkeeperY += gameState.goalkeeperSpeed;
+        const goalTop = canvas.height / 2 - currentDifficulty.goalWidth / 2;
+        const goalBottom = canvas.height / 2 + currentDifficulty.goalWidth / 2;
+        
+        if (gameState.goalkeeperY > goalBottom - 20 || gameState.goalkeeperY < goalTop + 20) {
+            gameState.goalkeeperSpeed *= -1;
+        }
+        
+        // Ball physics
+        gameState.ballX += gameState.ballSpeedX;
+        gameState.ballY += gameState.ballSpeedY;
+        
+        if (gameState.ballY > 590 || gameState.ballY < 10) {
+            gameState.ballSpeedY *= -0.8;
+            gameState.ballY = Math.max(10, Math.min(590, gameState.ballY));
+        }
+        
+        gameState.ballSpeedY += 0.15;
+        gameState.ballSpeedX *= 0.99;
+        gameState.ballSpeedY *= 0.99;
+        
+        // Ball out of bounds
+        if (gameState.ballX < 0 || gameState.ballX > canvas.width) {
+            resetBall();
+        }
+        
+        // Update possession
+        updatePossession();
+        
+        // AI movement
+        updateAI();
+        
+        // Check goal
+        checkGoal();
+        
+        frameCount++;
+    }
+    
+    function updatePossession() {
+        gameState.possession = -1;
+        
+        gameState.players.forEach((player, index) => {
+            const dx = player.x - gameState.ballX;
+            const dy = player.y - gameState.ballY;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < 25) {
+                gameState.possession = index;
+                
+                if (distance < 20) {
+                    gameState.ballSpeedX *= 0.8;
+                    gameState.ballSpeedY *= 0.8;
+                    const angle = Math.atan2(dy, dx);
+                    gameState.ballX = player.x - Math.cos(angle) * 15;
+                    gameState.ballY = player.y - Math.sin(angle) * 15;
+                }
+            }
+        });
+    }
+    
+    function updateAI() {
+        gameState.players.forEach((player, index) => {
+            if (player.team === 'ai') {
+                if (gameState.possession < TEAM_SIZE) {
+                    const ballDx = gameState.ballX - player.x;
+                    const ballDy = gameState.ballY - player.y;
+                    const ballDistance = Math.sqrt(ballDx * ballDx + ballDy * ballDy);
+                    
+                    if (ballDistance < 200) {
+                        player.targetX += (ballDx / ballDistance) * player.speed * currentDifficulty.aiReaction;
+                        player.targetY += (ballDy / ballDistance) * player.speed * currentDifficulty.aiReaction;
+                    }
+                }
+                
+                if (player.role === 'defender') {
+                    const baseX = 550 + (index - TEAM_SIZE) * 50;
+                    player.targetX = baseX + Math.sin(frameCount * 0.05) * 30;
+                }
+                
+                if (player.targetX < player.x) {
+                    player.direction = 'left';
+                } else if (player.targetX > player.x) {
+                    player.direction = 'right';
+                }
+            }
+        });
+    }
+    
+    function shootBall() {
+        const currentPlayer = gameState.players[selectedPlayer];
+        const dx = gameState.ballX - currentPlayer.x;
+        const dy = gameState.ballY - currentPlayer.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 40) {
+            const isShot = gameState.ballX > canvas.width * 0.7;
+            
+            if (isShot) {
+                gameState.shots++;
+                const goalDx = canvas.width - 30 - gameState.ballX;
+                const goalDy = (canvas.height / 2) - gameState.ballY;
+                const goalDistance = Math.sqrt(goalDx * goalDx + goalDy * goalDy);
+                
+                gameState.ballSpeedX = (goalDx / goalDistance) * 15;
+                gameState.ballSpeedY = (goalDy / goalDistance) * 15;
+                
+                if (currentPlayer.isMoving) {
+                    gameState.ballSpeedX += Math.cos(Math.atan2(dy, dx)) * 3;
+                    gameState.ballSpeedY += Math.sin(Math.atan2(dy, dx)) * 3;
+                }
+            } else {
+                passBall();
+            }
+        }
+    }
+    
+    function passBall() {
+        const currentPlayer = gameState.players[selectedPlayer];
+        const dx = gameState.ballX - currentPlayer.x;
+        const dy = gameState.ballY - currentPlayer.y;
+        const distance = Math.sqrt(dx * dx + dy * dy);
+        
+        if (distance < 40) {
+            let nearestTeammate = null;
+            let minDistance = Infinity;
+            
+            gameState.players.forEach((player, index) => {
+                if (player.team === 'player' && index !== selectedPlayer) {
+                    const teammateDx = player.x - currentPlayer.x;
+                    const teammateDy = player.y - currentPlayer.y;
+                    const teammateDistance = Math.sqrt(teammateDx * teammateDx + teammateDy * teammateDy);
+                    
+                    if (teammateDistance < minDistance && teammateDistance < 200) {
+                        minDistance = teammateDistance;
+                        nearestTeammate = { player, index };
+                    }
+                }
+            });
+            
+            if (nearestTeammate) {
+                gameState.passes++;
+                const passDx = nearestTeammate.player.x - gameState.ballX;
+                const passDy = nearestTeammate.player.y - gameState.ballY;
+                const passDistance = Math.sqrt(passDx * passDx + passDy * passDy);
+                
+                gameState.ballSpeedX = (passDx / passDistance) * 10;
+                gameState.ballSpeedY = (passDy / passDistance) * 10;
+                
+                selectedPlayer = nearestTeammate.index;
+                updateButtonStyles();
+            } else {
+                gameState.ballSpeedX = 8;
+                gameState.ballSpeedY = -2;
+            }
+        }
+    }
+    
+    function directPassToPlayer(playerIndex) {
+        if (playerIndex === selectedPlayer) return;
+        
+        const currentPlayer = gameState.players[selectedPlayer];
+        const targetPlayer = gameState.players[playerIndex];
+        
+        if (currentPlayer && targetPlayer && targetPlayer.team === 'player') {
+            const passDx = targetPlayer.x - currentPlayer.x;
+            const passDy = targetPlayer.y - currentPlayer.y;
+            const passDistance = Math.sqrt(passDx * passDx + passDy * passDy);
+            
+            if (passDistance < 300) {
+                gameState.passes++;
+                gameState.ballSpeedX = (passDx / passDistance) * 12;
+                gameState.ballSpeedY = (passDy / passDistance) * 12;
+                selectedPlayer = playerIndex;
+                updateButtonStyles();
+            }
+        }
+    }
+    
+    function checkGoal() {
+        const goalTop = canvas.height / 2 - currentDifficulty.goalWidth / 2;
+        const goalBottom = canvas.height / 2 + currentDifficulty.goalWidth / 2;
+        
+        if (gameState.ballX > canvas.width - 30 && 
+            gameState.ballY > goalTop && 
+            gameState.ballY < goalBottom) {
+            
+            const gkDx = gameState.ballX - gameState.goalkeeperX;
+            const gkDy = gameState.ballY - gameState.goalkeeperY;
+            const gkDistance = Math.sqrt(gkDx * gkDx + gkDy * gkDy);
+            
+            if (gkDistance > currentDifficulty.goalkeeperRange) {
+                score += 100;
+                gameState.goals++;
+                updateScore();
+                
+                // Goal celebration
+                setTimeout(() => {
+                    resetBall();
+                    resetPlayers();
+                }, 1500);
+            } else {
+                gameState.ballSpeedX *= -1;
+                gameState.ballSpeedY *= -0.5;
+            }
+        }
+    }
+    
+    function resetBall() {
+        gameState.ballX = 200;
+        gameState.ballY = 300;
+        gameState.ballSpeedX = 0;
+        gameState.ballSpeedY = 0;
+        gameState.possession = -1;
+    }
+    
+    function resetPlayers() {
+        const initialPositions = [
+            { x: 150, y: 300 },
+            { x: 250, y: 200 },
+            { x: 250, y: 400 },
+            { x: 350, y: 250 },
+            { x: 350, y: 350 }
+        ];
+        
+        for (let i = 0; i < TEAM_SIZE; i++) {
+            gameState.players[i].x = initialPositions[i].x;
+            gameState.players[i].y = initialPositions[i].y;
+            gameState.players[i].targetX = initialPositions[i].x;
+            gameState.players[i].targetY = initialPositions[i].y;
+            gameState.players[i].direction = 'right';
+            gameState.players[i].stamina = 100;
+        }
+        
+        selectedPlayer = 0;
+        updateButtonStyles();
+    }
+    
+    // Set up button event listeners
+    function setupButtons() {
+        // Difficulty buttons
+        document.getElementById('easyBtn').addEventListener('click', () => {
+            currentDifficulty = DIFFICULTY.EASY;
+            gameState.goalkeeperSpeed = currentDifficulty.goalkeeperSpeed;
+            updateButtonStyles();
+        });
+        
+        document.getElementById('mediumBtn').addEventListener('click', () => {
+            currentDifficulty = DIFFICULTY.MEDIUM;
+            gameState.goalkeeperSpeed = currentDifficulty.goalkeeperSpeed;
+            updateButtonStyles();
+        });
+        
+        document.getElementById('hardBtn').addEventListener('click', () => {
+            currentDifficulty = DIFFICULTY.HARD;
+            gameState.goalkeeperSpeed = currentDifficulty.goalkeeperSpeed;
+            updateButtonStyles();
+        });
+        
+        // Player selection buttons
+        for (let i = 1; i <= 5; i++) {
+            document.getElementById(`player${i}Btn`).addEventListener('click', () => {
+                selectedPlayer = i - 1;
+                updateButtonStyles();
+            });
+        }
+        
+        // Action buttons
+        document.getElementById('shootBtn').addEventListener('click', shootBall);
+        
+        document.getElementById('passBtn').addEventListener('click', () => {
+            // Pass to the player whose button was last pressed
+            for (let i = 1; i <= 5; i++) {
+                directPassToPlayer(i - 1);
+            }
+        });
+        
+        document.getElementById('resetBtn').addEventListener('click', () => {
+            resetBall();
+            resetPlayers();
+        });
+    }
+    
+    // Initialize button styles
+    updateButtonStyles();
+    
+    // Set up buttons after DOM is ready
+    setTimeout(setupButtons, 100);
+    
+    // Game loop
+    function gameLoop() {
+        update();
+        draw();
+        requestAnimationFrame(gameLoop);
+    }
+    
+    // Start game loop
+    gameLoop();
+    
+    // Keyboard controls
+    document.addEventListener('keydown', (e) => {
+        const key = e.key.toLowerCase();
+        
+        // Movement keys
+        if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+            keys[key] = true;
+        }
+        
+        // Player selection (1-5)
+        if (key >= '1' && key <= '5') {
+            const playerIndex = parseInt(key) - 1;
+            if (playerIndex < TEAM_SIZE) {
+                selectedPlayer = playerIndex;
+                updateButtonStyles();
+            }
+        }
+        
+        // Shoot (Space)
+        if (key === ' ') {
+            e.preventDefault();
+            shootBall();
+        }
+        
+        // Pass (P)
+        if (key === 'p') {
+            e.preventDefault();
+            passBall();
+        }
+        
+        // Reset (R)
+        if (key === 'r') {
+            resetBall();
+            resetPlayers();
+        }
+    });
+    
+    document.addEventListener('keyup', (e) => {
+        const key = e.key.toLowerCase();
+        if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+            keys[key] = false;
+        }
+    });
+    
+    // Clean up when game ends
+    return () => {
+        gameRunning = false;
+        if (gameInterval) clearInterval(gameInterval);
+    };
+}
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+function playCarRace() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 350;
+    gameContainer.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    
+    // Enhanced game state with more properties
+    gameState = {
+        carX: canvas.width / 2 - 25,
+        cars: [],
+        roadLines: [],
+        speed: 3,
+        maxSpeed: 10,
+        minSpeed: 2,
+        acceleration: 0.05,
+        deceleration: 0.02,
+        lastSpawnTime: 0,
+        spawnInterval: 1000, // ms between car spawns
+        scoreMultiplier: 1,
+        invincible: false, // for brief period after collision
+        invincibleTimer: 0,
+        gameActive: true
+    };
+    
+    // Initialize road lines
+    for (let i = 0; i < 10; i++) {
+        gameState.roadLines.push({x: canvas.width / 2 - 2, y: i * 50});
+    }
+    
+    // Load car image or create gradient
+    function createCarGradient(color, x, y) {
+        const gradient = ctx.createLinearGradient(x, y, x, y + 80);
+        gradient.addColorStop(0, color);
+        gradient.addColorStop(1, darkenColor(color, 40));
+        return gradient;
+    }
+    
+    function darkenColor(color, percent) {
+        // Helper function to darken colors
+        const num = parseInt(color.replace("#", ""), 16);
+        const amt = Math.round(2.55 * percent);
+        const R = (num >> 16) - amt;
+        const G = (num >> 8 & 0x00FF) - amt;
+        const B = (num & 0x0000FF) - amt;
+        return "#" + (
+            0x1000000 +
+            (R < 255 ? R < 1 ? 0 : R : 255) * 0x10000 +
+            (G < 255 ? G < 1 ? 0 : G : 255) * 0x100 +
+            (B < 255 ? B < 1 ? 0 : B : 255)
+        ).toString(16).slice(1);
+    }
+    
+    function draw() {
+        // Clear canvas with fade effect for motion blur
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.2)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Road
+        ctx.fillStyle = '#333';
+        ctx.fillRect(100, 0, canvas.width - 200, canvas.height);
+        
+        // Road edges
+        ctx.fillStyle = '#fff';
+        ctx.fillRect(95, 0, 5, canvas.height);
+        ctx.fillRect(canvas.width - 100, 0, 5, canvas.height);
+        
+        // Grass with pattern
+        ctx.fillStyle = '#27ae60';
+        ctx.fillRect(0, 0, 95, canvas.height);
+        ctx.fillRect(canvas.width - 95, 0, 95, canvas.height);
+        
+        // Grass stripes
+        ctx.fillStyle = '#229954';
+        for (let i = 0; i < canvas.height; i += 20) {
+            ctx.fillRect(20, i, 20, 10);
+            ctx.fillRect(canvas.width - 40, i, 20, 10);
+        }
+        
+        // Road lines with glow effect
+        ctx.shadowBlur = 10;
+        ctx.shadowColor = '#fff';
+        gameState.roadLines.forEach(line => {
+            ctx.fillStyle = '#fff';
+            ctx.fillRect(line.x, line.y, 4, 30);
+        });
+        ctx.shadowBlur = 0;
+        
+        // Draw player car with details
+        drawCar(gameState.carX, 250, '#e74c3c', true);
+        
+        // Draw other cars
+        gameState.cars.forEach(car => {
+            drawCar(car.x, car.y, car.color, false);
+        });
+        
+        // Draw speedometer
+        drawSpeedometer();
+        
+        // Draw invincibility effect if active
+        if (gameState.invincible) {
+            ctx.globalAlpha = 0.5;
+            ctx.fillStyle = '#3498db';
+            ctx.fillRect(gameState.carX - 5, 245, 60, 90);
+            ctx.globalAlpha = 1.0;
+        }
+    }
+    
+    function drawCar(x, y, color, isPlayer) {
+        // Car body
+        const gradient = createCarGradient(color, x, y);
+        ctx.fillStyle = gradient;
+        ctx.fillRect(x, y, 50, 80);
+        
+        // Car details
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillRect(x + 5, y + 10, 40, 60); // Windows
+        
+        // Wheels
+        ctx.fillStyle = '#000';
+        ctx.fillRect(x - 5, y + 10, 5, 20);
+        ctx.fillRect(x + 50, y + 10, 5, 20);
+        ctx.fillRect(x - 5, y + 50, 5, 20);
+        ctx.fillRect(x + 50, y + 50, 5, 20);
+        
+        // Player car has special marking
+        if (isPlayer) {
+            ctx.fillStyle = '#f1c40f';
+            ctx.fillRect(x + 20, y - 5, 10, 10);
+        }
+    }
+    
+    function drawSpeedometer() {
+        const speedX = 20;
+        const speedY = 20;
+        const width = 100;
+        const height = 20;
+        
+        // Background
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.7)';
+        ctx.fillRect(speedX, speedY, width, height);
+        
+        // Speed bar
+        const speedPercent = (gameState.speed - gameState.minSpeed) / 
+                           (gameState.maxSpeed - gameState.minSpeed);
+        ctx.fillStyle = speedPercent > 0.8 ? '#e74c3c' : 
+                       speedPercent > 0.6 ? '#f39c12' : '#2ecc71';
+        ctx.fillRect(speedX + 2, speedY + 2, (width - 4) * speedPercent, height - 4);
+        
+        // Speed text
+        ctx.fillStyle = '#fff';
+        ctx.font = '12px Arial';
+        ctx.fillText(`Speed: ${Math.round(gameState.speed * 10)}`, speedX + 5, speedY + 15);
+    }
+    
+    function update() {
+        if (!gameState.gameActive) return;
+        
+        const currentTime = Date.now();
+        
+        // Player movement with smoother controls
+        if (keys['ArrowLeft'] && gameState.carX > 110) {
+            gameState.carX -= 5 + gameState.speed * 0.2;
+        }
+        if (keys['ArrowRight'] && gameState.carX < canvas.width - 160) {
+            gameState.carX += 5 + gameState.speed * 0.2;
+        }
+        
+        // Speed control
+        if (keys['ArrowUp']) {
+            gameState.speed = Math.min(
+                gameState.speed + gameState.acceleration, 
+                gameState.maxSpeed
+            );
+            gameState.scoreMultiplier = 1 + (gameState.speed - gameState.minSpeed) / 2;
+        } else {
+            gameState.speed = Math.max(
+                gameState.speed - gameState.deceleration, 
+                gameState.minSpeed
+            );
+        }
+        
+        // Update invincibility timer
+        if (gameState.invincible) {
+            gameState.invincibleTimer--;
+            if (gameState.invincibleTimer <= 0) {
+                gameState.invincible = false;
+            }
+        }
+        
+        // Move road lines with speed-based animation
+        gameState.roadLines.forEach(line => {
+            line.y += gameState.speed * 1.5;
+            if (line.y > canvas.height) line.y = -30;
+        });
+        
+        // Move and update other cars
+        for (let i = gameState.cars.length - 1; i >= 0; i--) {
+            const car = gameState.cars[i];
+            car.y += gameState.speed * 0.8; // Slightly slower than road lines
+            
+            // Collision detection (skip if invincible)
+            if (!gameState.invincible && isCollision(car)) {
+                handleCollision();
+                gameState.cars.splice(i, 1);
+                continue;
+            }
+            
+            // Remove off-screen cars and add score
+            if (car.y > canvas.height) {
+                gameState.cars.splice(i, 1);
+                score += Math.round(10 * gameState.scoreMultiplier);
+                updateScore();
+            }
+        }
+        
+        // Improved car spawning based on time and speed
+        if (currentTime - gameState.lastSpawnTime > 
+            gameState.spawnInterval / (gameState.speed / gameState.minSpeed)) {
+            
+            // Random lane: 200 (left) or 400 (right)
+            const lane = Math.random() > 0.5 ? 200 : 400;
+            
+            // Check if lane is clear
+            const laneClear = !gameState.cars.some(car => 
+                car.x === lane && car.y > -150 && car.y < 100
+            );
+            
+            if (laneClear) {
+                gameState.cars.push({
+                    x: lane,
+                    y: -150, // Start further up
+                    color: `hsl(${Math.floor(Math.random() * 60)}, 70%, 50%)`, // Reddish colors for enemy cars
+                    speedVariance: (Math.random() - 0.5) * 0.5
+                });
+                gameState.lastSpawnTime = currentTime;
+            }
+        }
+    }
+    
+    function isCollision(car) {
+        return car.x < gameState.carX + 45 &&
+               car.x + 45 > gameState.carX &&
+               car.y < 330 &&
+               car.y + 75 > 250;
+    }
+    
+    function handleCollision() {
+        if (gameState.invincible) return;
+        
+        lives--;
+        updateLives();
+        
+        if (lives <= 0) {
+            gameState.gameActive = false;
+            showGameOver();
+            clearInterval(gameInterval);
+            return;
+        }
+        
+        // Make player invincible for 2 seconds after collision
+        gameState.invincible = true;
+        gameState.invincibleTimer = 120; // 2 seconds at 60fps
+        
+        // Slow down on collision
+        gameState.speed = Math.max(gameState.minSpeed, gameState.speed - 2);
+        
+        // Visual feedback (screen shake could be added here)
+        canvas.style.border = '3px solid red';
+        setTimeout(() => {
+            canvas.style.border = 'none';
+        }, 200);
+    }
+    
+    // Main game loop with requestAnimationFrame for smoother animation
+    let lastTime = 0;
+    function gameLoop(timestamp) {
+        const deltaTime = timestamp - lastTime;
+        
+        if (deltaTime >= 16) { // Approximately 60fps
+            update();
+            draw();
+            lastTime = timestamp;
+        }
+        
+        if (gameState.gameActive) {
+            requestAnimationFrame(gameLoop);
+        }
+    }
+    
+    // Start the game
+    gameInterval = setInterval(() => {
+        // Keep this for backward compatibility
+    }, 1000/60);
+    
+    // Start the new game loop
+    requestAnimationFrame(gameLoop);
+    
+    // Cleanup function to stop the game properly
+    canvas.cleanup = function() {
+        gameState.gameActive = false;
+        clearInterval(gameInterval);
+    };
+}
+        
+        
+        
+        
 
-        function playCarRace() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 800;
-            canvas.height = 350;
-            gameContainer.appendChild(canvas);
-            const ctx = canvas.getContext('2d');
-            
-            gameState = {
-                carX: canvas.width / 2 - 25,
-                cars: [],
-                roadLines: [],
-                speed: 3
-            };
-            
-            // Road lines
-            for (let i = 0; i < 10; i++) {
-                gameState.roadLines.push({x: canvas.width / 2 - 2, y: i * 50});
-            }
-            
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Road
-                ctx.fillStyle = '#555';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Grass
-                ctx.fillStyle = '#2ecc71';
-                ctx.fillRect(0, 0, 100, canvas.height);
-                ctx.fillRect(canvas.width - 100, 0, 100, canvas.height);
-                
-                // Road lines
-                ctx.fillStyle = '#fff';
-                gameState.roadLines.forEach(line => {
-                    ctx.fillRect(line.x, line.y, 4, 30);
-                });
-                
-                // Player car
-                ctx.fillStyle = '#e74c3c';
-                ctx.fillRect(gameState.carX, 250, 50, 80);
-                
-                // Other cars
-                gameState.cars.forEach(car => {
-                    ctx.fillStyle = car.color;
-                    ctx.fillRect(car.x, car.y, 50, 80);
-                });
-            }
-            
-            function update() {
-                // Move player
-                if (keys['ArrowLeft'] && gameState.carX > 110) gameState.carX -= 5;
-                if (keys['ArrowRight'] && gameState.carX < canvas.width - 160) gameState.carX += 5;
-                if (keys['ArrowUp']) gameState.speed = Math.min(gameState.speed + 0.05, 8);
-                else gameState.speed = Math.max(gameState.speed - 0.02, 3);
-                
-                // Move road lines
-                gameState.roadLines.forEach(line => {
-                    line.y += gameState.speed;
-                    if (line.y > canvas.height) line.y = -30;
-                });
-                
-                // Move other cars
-                for (let i = gameState.cars.length - 1; i >= 0; i--) {
-                    gameState.cars[i].y += gameState.speed;
-                    
-                    // Collision
-                    if (gameState.cars[i].x < gameState.carX + 50 &&
-                        gameState.cars[i].x + 50 > gameState.carX &&
-                        gameState.cars[i].y < 330 &&
-                        gameState.cars[i].y + 80 > 250) {
-                        lives--;
-                        updateLives();
-                        if (lives <= 0) {
-                            showGameOver();
-                            clearInterval(gameInterval);
-                            return;
-                        }
-                        gameState.cars.splice(i, 1);
-                        continue;
-                    }
-                    
-                    // Remove off-screen cars
-                    if (gameState.cars[i].y > canvas.height) {
-                        gameState.cars.splice(i, 1);
-                        score += 10;
-                        updateScore();
-                    }
-                }
-                
-                // Add new cars
-                if (Math.random() < 0.02) {
-                    gameState.cars.push({
-                        x: Math.random() > 0.5 ? 200 : 400,
-                        y: -100,
-                        color: `hsl(${Math.random() * 360}, 70%, 50%)`
-                    });
-                }
-            }
-            
-            gameInterval = setInterval(() => {
-                update();
-                draw();
-            }, 1000/60);
-        }
+
 
         function playAirplaneRace() {
             const canvas = document.createElement('canvas');
@@ -1043,125 +1998,524 @@
                 draw();
             }, 1000/60);
         }
-
-        function playMotorbike() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 800;
-            canvas.height = 350;
-            gameContainer.appendChild(canvas);
-            const ctx = canvas.getContext('2d');
+        
+        
+        
+        
+        
+        
+        
+function playMotorbike() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 500;
+    gameContainer.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    
+    // Enhanced game state with traffic elements
+    gameState = {
+        // Player vehicle
+        bikeX: 100,
+        bikeY: 350,
+        bikeSpeed: 3,
+        bikeWidth: 60,
+        bikeHeight: 30,
+        jumpHeight: 0,
+        isJumping: false,
+        
+        // Traffic elements
+        cars: [],
+        people: [],
+        obstacles: [],
+        trafficLights: [
+            { x: 300, y: 150, state: 'red', timer: 0 }, // Top road
+            { x: 500, y: 150, state: 'red', timer: 0 }, // Top road
+            { x: 300, y: 350, state: 'green', timer: 0 }  // Bottom road
+        ],
+        
+        // Game mechanics
+        score: 0,
+        speed: 3,
+        carSpawnRate: 0.01,
+        personSpawnRate: 0.005,
+        trafficLightInterval: 150, // frames between light changes
+        lanePositions: [120, 220, 320, 420] // Different lanes for traffic
+    };
+    
+    // Initialize traffic lights
+    gameState.trafficLights.forEach(light => {
+        light.timer = Math.random() * gameState.trafficLightInterval;
+    });
+    
+    // Color palette for vehicles
+    const carColors = ['#e74c3c', '#3498db', '#2ecc71', '#f39c12', '#9b59b6', '#1abc9c'];
+    
+    function drawRoad() {
+        // Sky
+        ctx.fillStyle = '#87CEEB';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Ground/grass
+        ctx.fillStyle = '#27ae60';
+        ctx.fillRect(0, 0, canvas.width, 80);
+        ctx.fillRect(0, 280, canvas.width, 80);
+        ctx.fillRect(0, 480, canvas.width, 20);
+        
+        // Roads
+        ctx.fillStyle = '#34495e';
+        ctx.fillRect(0, 80, canvas.width, 100); // Top road
+        ctx.fillRect(0, 280, canvas.width, 100); // Bottom road
+        
+        // Road markings
+        ctx.fillStyle = '#f1c40f';
+        ctx.strokeStyle = '#f1c40f';
+        ctx.lineWidth = 2;
+        
+        // Top road lane markings
+        for (let i = 0; i < canvas.width; i += 40) {
+            ctx.fillRect(i, 130, 20, 5);
+        }
+        
+        // Bottom road lane markings
+        for (let i = 0; i < canvas.width; i += 40) {
+            ctx.fillRect(i, 330, 20, 5);
+        }
+        
+        // Sidewalks
+        ctx.fillStyle = '#bdc3c7';
+        ctx.fillRect(0, 180, canvas.width, 20);
+        ctx.fillRect(0, 380, canvas.width, 20);
+    }
+    
+    function drawTrafficLights() {
+        gameState.trafficLights.forEach(light => {
+            // Traffic light pole
+            ctx.fillStyle = '#7f8c8d';
+            ctx.fillRect(light.x, light.y, 15, 40);
             
-            gameState = {
-                bikeX: 100,
-                bikeY: 250,
-                obstacles: [],
-                speed: 3,
-                jumpHeight: 0,
-                isJumping: false
-            };
+            // Traffic light box
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillRect(light.x - 10, light.y - 50, 35, 50);
+            ctx.fillStyle = '#000';
+            ctx.fillRect(light.x - 12, light.y - 52, 39, 54);
             
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            // Lights
+            const lights = ['red', 'yellow', 'green'];
+            lights.forEach((color, i) => {
+                let lightColor = '#555';
+                if (light.state === color) {
+                    lightColor = color;
+                }
                 
-                // Background
-                ctx.fillStyle = '#f5f5f5';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Ground
-                ctx.fillStyle = '#8B4513';
-                ctx.fillRect(0, 300, canvas.width, 50);
-                
-                // Bike
-                ctx.fillStyle = '#333';
-                ctx.fillRect(gameState.bikeX, gameState.bikeY - gameState.jumpHeight, 60, 30);
-                
-                // Wheels
-                ctx.fillStyle = '#000';
                 ctx.beginPath();
-                ctx.arc(gameState.bikeX + 15, gameState.bikeY + 15 - gameState.jumpHeight, 15, 0, Math.PI * 2);
+                ctx.arc(light.x + 7, light.y - 35 + (i * 15), 8, 0, Math.PI * 2);
+                ctx.fillStyle = lightColor;
                 ctx.fill();
-                ctx.beginPath();
-                ctx.arc(gameState.bikeX + 45, gameState.bikeY + 15 - gameState.jumpHeight, 15, 0, Math.PI * 2);
-                ctx.fill();
+                ctx.strokeStyle = '#000';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            });
+        });
+    }
+    
+    function drawPlayer() {
+        // Motorcycle body
+        ctx.fillStyle = '#e74c3c';
+        ctx.fillRect(gameState.bikeX, gameState.bikeY - gameState.jumpHeight, gameState.bikeWidth, gameState.bikeHeight);
+        
+        // Motorcycle details
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillRect(gameState.bikeX + 10, gameState.bikeY - gameState.jumpHeight - 10, 40, 10); // Seat
+        
+        // Wheels
+        ctx.fillStyle = '#000';
+        ctx.beginPath();
+        ctx.arc(gameState.bikeX + 15, gameState.bikeY + 15 - gameState.jumpHeight, 12, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(gameState.bikeX + 45, gameState.bikeY + 15 - gameState.jumpHeight, 12, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Wheel hubs
+        ctx.fillStyle = '#f39c12';
+        ctx.beginPath();
+        ctx.arc(gameState.bikeX + 15, gameState.bikeY + 15 - gameState.jumpHeight, 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(gameState.bikeX + 45, gameState.bikeY + 15 - gameState.jumpHeight, 4, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Headlight
+        ctx.fillStyle = '#f1c40f';
+        ctx.beginPath();
+        ctx.arc(gameState.bikeX + 60, gameState.bikeY + 5 - gameState.jumpHeight, 8, 0, Math.PI * 2);
+        ctx.fill();
+    }
+    
+    function drawCars() {
+        gameState.cars.forEach(car => {
+            // Car body
+            ctx.fillStyle = car.color;
+            ctx.fillRect(car.x, car.y, car.width, car.height);
+            
+            // Car windows
+            ctx.fillStyle = '#3498db';
+            ctx.fillRect(car.x + 5, car.y + 5, 20, 10);
+            ctx.fillRect(car.x + 30, car.y + 5, 20, 10);
+            
+            // Wheels
+            ctx.fillStyle = '#000';
+            ctx.beginPath();
+            ctx.arc(car.x + 10, car.y + car.height, 8, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.beginPath();
+            ctx.arc(car.x + car.width - 10, car.y + car.height, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Headlights if moving right
+            if (car.speed > 0) {
+                ctx.fillStyle = '#f1c40f';
+                ctx.fillRect(car.x + car.width - 5, car.y + 10, 5, 8);
+            } else {
+                ctx.fillStyle = '#f1c40f';
+                ctx.fillRect(car.x, car.y + 10, 5, 8);
+            }
+        });
+    }
+    
+    function drawPeople() {
+        gameState.people.forEach(person => {
+            // Head
+            ctx.fillStyle = '#ffcc99';
+            ctx.beginPath();
+            ctx.arc(person.x + 10, person.y, 8, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Body
+            ctx.fillStyle = person.color;
+            ctx.fillRect(person.x + 5, person.y + 8, 10, 20);
+            
+            // Legs
+            ctx.fillStyle = '#2c3e50';
+            ctx.fillRect(person.x + 5, person.y + 28, 4, 15);
+            ctx.fillRect(person.x + 11, person.y + 28, 4, 15);
+            
+            // Arms
+            ctx.fillStyle = person.color;
+            ctx.fillRect(person.x, person.y + 10, 5, 12);
+            ctx.fillRect(person.x + 15, person.y + 10, 5, 12);
+        });
+    }
+    
+    function drawObstacles() {
+        ctx.fillStyle = '#2c3e50';
+        gameState.obstacles.forEach(obstacle => {
+            ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+            
+            // Add some detail to obstacles
+            ctx.fillStyle = '#e74c3c';
+            ctx.fillRect(obstacle.x + 5, obstacle.y + 5, obstacle.width - 10, 3);
+            ctx.fillStyle = '#2c3e50';
+        });
+    }
+    
+    function updateTrafficLights() {
+        gameState.trafficLights.forEach(light => {
+            light.timer++;
+            
+            if (light.timer >= gameState.trafficLightInterval) {
+                light.timer = 0;
                 
-                // Obstacles
-                ctx.fillStyle = '#2c3e50';
-                gameState.obstacles.forEach(obstacle => {
-                    ctx.fillRect(obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                // Change light state
+                if (light.state === 'red') {
+                    light.state = 'green';
+                } else if (light.state === 'green') {
+                    light.state = 'yellow';
+                } else {
+                    light.state = 'red';
+                }
+            }
+        });
+    }
+    
+    function spawnCars() {
+        if (Math.random() < gameState.carSpawnRate) {
+            const laneY = gameState.lanePositions[Math.floor(Math.random() * gameState.lanePositions.length)];
+            const isTopRoad = laneY < 200;
+            
+            // Check traffic light for this lane
+            const trafficLight = gameState.trafficLights.find(light => 
+                Math.abs(light.y - laneY) < 50
+            );
+            
+            // Only spawn if light is green or random chance for yellow
+            if (!trafficLight || trafficLight.state === 'green' || 
+                (trafficLight.state === 'yellow' && Math.random() > 0.7)) {
+                
+                const direction = Math.random() > 0.5 ? 1 : -1;
+                const startX = direction > 0 ? -60 : canvas.width;
+                
+                gameState.cars.push({
+                    x: startX,
+                    y: laneY,
+                    width: 60,
+                    height: 30,
+                    speed: (2 + Math.random() * 2) * direction,
+                    color: carColors[Math.floor(Math.random() * carColors.length)]
                 });
             }
+        }
+    }
+    
+    function spawnPeople() {
+        if (Math.random() < gameState.personSpawnRate) {
+            const side = Math.random() > 0.5 ? 'left' : 'right';
+            const startX = side === 'left' ? -20 : canvas.width;
+            const sidewalkY = Math.random() > 0.5 ? 185 : 385;
             
-            function update() {
-                // Move bike
-                gameState.bikeX += gameState.speed;
-                
-                // Control speed
-                if (keys['ArrowUp']) gameState.speed = Math.min(gameState.speed + 0.05, 6);
-                if (keys['ArrowDown']) gameState.speed = Math.max(gameState.speed - 0.05, 2);
-                
-                // Jump
-                if (keys[' '] && !gameState.isJumping) {
-                    gameState.isJumping = true;
-                    gameState.jumpHeight = 0;
-                }
-                
-                if (gameState.isJumping) {
-                    gameState.jumpHeight += 4;
-                    if (gameState.jumpHeight > 60) gameState.isJumping = false;
-                } else if (gameState.jumpHeight > 0) {
-                    gameState.jumpHeight = Math.max(0, gameState.jumpHeight - 4);
-                }
-                
-                // Generate obstacles
-                if (Math.random() < 0.02) {
-                    gameState.obstacles.push({
-                        x: canvas.width,
-                        y: 280,
-                        width: 30,
-                        height: 20
-                    });
-                }
-                
-                // Move obstacles
-                for (let i = gameState.obstacles.length - 1; i >= 0; i--) {
-                    gameState.obstacles[i].x -= gameState.speed;
-                    
-                    // Check collision
-                    if (gameState.obstacles[i].x < gameState.bikeX + 60 &&
-                        gameState.obstacles[i].x + 30 > gameState.bikeX &&
-                        gameState.obstacles[i].y < gameState.bikeY + 30 - gameState.jumpHeight &&
-                        gameState.obstacles[i].y + 20 > gameState.bikeY - gameState.jumpHeight) {
-                        lives--;
-                        updateLives();
-                        if (lives <= 0) {
-                            showGameOver();
-                            clearInterval(gameInterval);
-                            return;
-                        }
-                        gameState.obstacles.splice(i, 1);
-                        continue;
-                    }
-                    
-                    // Remove off-screen obstacles
-                    if (gameState.obstacles[i].x < -30) {
-                        gameState.obstacles.splice(i, 1);
-                        score += 10;
-                        updateScore();
-                    }
-                }
-                
-                // Reset bike position
-                if (gameState.bikeX > canvas.width) {
-                    gameState.bikeX = -60;
-                }
+            gameState.people.push({
+                x: startX,
+                y: sidewalkY,
+                width: 20,
+                height: 40,
+                speed: (0.5 + Math.random() * 1) * (side === 'left' ? 1 : -1),
+                color: ['#3498db', '#e74c3c', '#2ecc71', '#f39c12'][Math.floor(Math.random() * 4)]
+            });
+        }
+    }
+    
+    function spawnObstacles() {
+        if (Math.random() < 0.02) {
+            const type = Math.floor(Math.random() * 3);
+            let width, height;
+            
+            switch(type) {
+                case 0: // Cone
+                    width = 20;
+                    height = 30;
+                    break;
+                case 1: // Box
+                    width = 35;
+                    height = 35;
+                    break;
+                case 2: // Rock
+                    width = 25;
+                    height = 25;
+                    break;
             }
             
-            gameInterval = setInterval(() => {
-                update();
-                draw();
-            }, 1000/60);
+            gameState.obstacles.push({
+                x: canvas.width,
+                y: 330,
+                width: width,
+                height: height,
+                type: type
+            });
         }
+    }
+    
+    function updateCars() {
+        for (let i = gameState.cars.length - 1; i >= 0; i--) {
+            const car = gameState.cars[i];
+            
+            // Update position
+            car.x += car.speed;
+            
+            // Check if car is off screen
+            if ((car.speed > 0 && car.x > canvas.width) || 
+                (car.speed < 0 && car.x < -car.width)) {
+                gameState.cars.splice(i, 1);
+                gameState.score += 5;
+                updateScore();
+                continue;
+            }
+            
+            // Check collision with player
+            if (car.x < gameState.bikeX + gameState.bikeWidth &&
+                car.x + car.width > gameState.bikeX &&
+                car.y < gameState.bikeY + gameState.bikeHeight - gameState.jumpHeight &&
+                car.y + car.height > gameState.bikeY - gameState.jumpHeight) {
+                
+                lives--;
+                updateLives();
+                if (lives <= 0) {
+                    showGameOver();
+                    clearInterval(gameInterval);
+                    return;
+                }
+                gameState.cars.splice(i, 1);
+            }
+        }
+    }
+    
+    function updatePeople() {
+        for (let i = gameState.people.length - 1; i >= 0; i--) {
+            const person = gameState.people[i];
+            
+            // Update position
+            person.x += person.speed;
+            
+            // Check if person is off screen
+            if ((person.speed > 0 && person.x > canvas.width) || 
+                (person.speed < 0 && person.x < -person.width)) {
+                gameState.people.splice(i, 1);
+                gameState.score += 3;
+                updateScore();
+                continue;
+            }
+            
+            // Check collision with player
+            if (person.x < gameState.bikeX + gameState.bikeWidth &&
+                person.x + person.width > gameState.bikeX &&
+                person.y < gameState.bikeY + gameState.bikeHeight - gameState.jumpHeight &&
+                person.y + person.height > gameState.bikeY - gameState.jumpHeight) {
+                
+                lives--;
+                updateLives();
+                if (lives <= 0) {
+                    showGameOver();
+                    clearInterval(gameInterval);
+                    return;
+                }
+                gameState.people.splice(i, 1);
+            }
+        }
+    }
+    
+    function updateObstacles() {
+        for (let i = gameState.obstacles.length - 1; i >= 0; i--) {
+            const obstacle = gameState.obstacles[i];
+            
+            // Update position
+            obstacle.x -= gameState.bikeSpeed;
+            
+            // Check collision
+            if (obstacle.x < gameState.bikeX + gameState.bikeWidth &&
+                obstacle.x + obstacle.width > gameState.bikeX &&
+                obstacle.y < gameState.bikeY + gameState.bikeHeight - gameState.jumpHeight &&
+                obstacle.y + obstacle.height > gameState.bikeY - gameState.jumpHeight) {
+                
+                lives--;
+                updateLives();
+                if (lives <= 0) {
+                    showGameOver();
+                    clearInterval(gameInterval);
+                    return;
+                }
+                gameState.obstacles.splice(i, 1);
+                continue;
+            }
+            
+            // Remove off-screen obstacles
+            if (obstacle.x < -obstacle.width) {
+                gameState.obstacles.splice(i, 1);
+                gameState.score += 10;
+                updateScore();
+            }
+        }
+    }
+    
+    function updatePlayer() {
+        // Move player based on speed
+        gameState.bikeX += gameState.bikeSpeed;
+        
+        // Control speed with arrow keys
+        if (keys['ArrowUp']) {
+            gameState.bikeSpeed = Math.min(gameState.bikeSpeed + 0.05, 6);
+        }
+        if (keys['ArrowDown']) {
+            gameState.bikeSpeed = Math.max(gameState.bikeSpeed - 0.05, 2);
+        }
+        
+        // Jump with spacebar
+        if (keys[' '] && !gameState.isJumping) {
+            gameState.isJumping = true;
+            gameState.jumpHeight = 0;
+        }
+        
+        // Jump mechanics
+        if (gameState.isJumping) {
+            gameState.jumpHeight += 4;
+            if (gameState.jumpHeight > 60) {
+                gameState.isJumping = false;
+            }
+        } else if (gameState.jumpHeight > 0) {
+            gameState.jumpHeight = Math.max(0, gameState.jumpHeight - 4);
+        }
+        
+        // Lane switching with left/right arrow keys
+        if (keys['ArrowLeft'] && gameState.bikeY > 300) {
+            gameState.bikeY = Math.max(300, gameState.bikeY - 100);
+        }
+        if (keys['ArrowRight'] && gameState.bikeY < 400) {
+            gameState.bikeY = Math.min(400, gameState.bikeY + 100);
+        }
+        
+        // Reset position when off screen
+        if (gameState.bikeX > canvas.width) {
+            gameState.bikeX = -gameState.bikeWidth;
+            gameState.score += 50;
+            updateScore();
+        }
+    }
+    
+    function draw() {
+        // Clear canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw all elements
+        drawRoad();
+        drawTrafficLights();
+        drawCars();
+        drawPeople();
+        drawObstacles();
+        drawPlayer();
+        
+        // Draw score on screen
+        ctx.fillStyle = '#2c3e50';
+        ctx.font = '16px Arial';
+        ctx.fillText(`Score: ${gameState.score}`, 10, 25);
+        ctx.fillText(`Speed: ${gameState.bikeSpeed.toFixed(1)}`, 10, 45);
+    }
+    
+    function update() {
+        updateTrafficLights();
+        updatePlayer();
+        updateCars();
+        updatePeople();
+        updateObstacles();
+        
+        spawnCars();
+        spawnPeople();
+        spawnObstacles();
+    }
+    
+    // Update the global score function
+    const originalUpdateScore = updateScore;
+    updateScore = function() {
+        score = gameState.score;
+        originalUpdateScore();
+    };
+    
+    // Start the game loop
+    gameInterval = setInterval(() => {
+        update();
+        draw();
+    }, 1000/60);
+}
 
+// Replace the original playMotorbike function with the new one
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
+        
         function playDraft() {
             gameContainer.innerHTML = `
                 <div style="text-align: center;">
@@ -1301,432 +2655,1437 @@
             newWord();
         }
 
-        function playAviator() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 800;
-            canvas.height = 350;
-            gameContainer.appendChild(canvas);
-            const ctx = canvas.getContext('2d');
-            
-            gameState = {
-                planeX: 100,
-                planeY: 175,
-                bullets: [],
-                enemies: [],
-                lastShot: 0
-            };
-            
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Sky
-                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                gradient.addColorStop(0, '#87CEEB');
-                gradient.addColorStop(1, '#1a237e');
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Plane
-                ctx.fillStyle = '#e74c3c';
-                ctx.beginPath();
-                ctx.moveTo(gameState.planeX, gameState.planeY);
-                ctx.lineTo(gameState.planeX - 20, gameState.planeY - 10);
-                ctx.lineTo(gameState.planeX - 20, gameState.planeY + 10);
-                ctx.closePath();
-                ctx.fill();
-                
-                ctx.fillStyle = '#c0392b';
-                ctx.beginPath();
-                ctx.ellipse(gameState.planeX - 10, gameState.planeY, 30, 15, 0, 0, Math.PI * 2);
-                ctx.fill();
-                
-                // Bullets
-                ctx.fillStyle = '#f1c40f';
-                gameState.bullets.forEach(bullet => {
-                    ctx.fillRect(bullet.x, bullet.y, 10, 5);
-                });
-                
-                // Enemies
-                ctx.fillStyle = '#2c3e50';
-                gameState.enemies.forEach(enemy => {
-                    ctx.beginPath();
-                    ctx.moveTo(enemy.x, enemy.y);
-                    ctx.lineTo(enemy.x - 20, enemy.y - 15);
-                    ctx.lineTo(enemy.x - 20, enemy.y + 15);
-                    ctx.closePath();
-                    ctx.fill();
-                });
-            }
-            
-            function update() {
-                // Move plane
-                if (keys['ArrowUp'] && gameState.planeY > 20) gameState.planeY -= 5;
-                if (keys['ArrowDown'] && gameState.planeY < canvas.height - 20) gameState.planeY += 5;
-                if (keys['ArrowLeft'] && gameState.planeX > 20) gameState.planeX -= 5;
-                if (keys['ArrowRight'] && gameState.planeX < 200) gameState.planeX += 5;
-                
-                // Shoot
-                const now = Date.now();
-                if (keys[' '] && now - gameState.lastShot > 200) {
-                    gameState.bullets.push({x: gameState.planeX + 20, y: gameState.planeY - 2, speed: 10});
-                    gameState.lastShot = now;
-                    keys[' '] = false;
-                }
-                
-                // Move bullets
-                for (let i = gameState.bullets.length - 1; i >= 0; i--) {
-                    gameState.bullets[i].x += gameState.bullets[i].speed;
-                    
-                    // Check hit
-                    for (let j = gameState.enemies.length - 1; j >= 0; j--) {
-                        const dx = gameState.bullets[i].x - gameState.enemies[j].x;
-                        const dy = gameState.bullets[i].y - gameState.enemies[j].y;
-                        if (Math.sqrt(dx * dx + dy * dy) < 30) {
-                            gameState.bullets.splice(i, 1);
-                            gameState.enemies.splice(j, 1);
-                            score += 100;
-                            updateScore();
-                            break;
-                        }
-                    }
-                    
-                    // Remove off-screen bullets
-                    if (gameState.bullets[i] && gameState.bullets[i].x > canvas.width) {
-                        gameState.bullets.splice(i, 1);
-                    }
-                }
-                
-                // Move enemies
-                for (let i = gameState.enemies.length - 1; i >= 0; i--) {
-                    gameState.enemies[i].x -= 3;
-                    
-                    // Check collision with plane
-                    const dx = gameState.planeX - gameState.enemies[i].x;
-                    const dy = gameState.planeY - gameState.enemies[i].y;
-                    if (Math.sqrt(dx * dx + dy * dy) < 40) {
-                        lives--;
-                        updateLives();
-                        if (lives <= 0) {
-                            showGameOver();
-                            clearInterval(gameInterval);
-                            return;
-                        }
-                        gameState.enemies.splice(i, 1);
-                        continue;
-                    }
-                    
-                    // Remove off-screen enemies
-                    if (gameState.enemies[i].x < -50) {
-                        gameState.enemies.splice(i, 1);
-                    }
-                }
-                
-                // Add enemies
-                if (Math.random() < 0.01) {
-                    gameState.enemies.push({
-                        x: canvas.width,
-                        y: Math.random() * (canvas.height - 40) + 20,
-                        speed: 3
-                    });
-                }
-            }
-            
-            gameInterval = setInterval(() => {
-                update();
-                draw();
-            }, 1000/60);
-        }
+        
+        
 
-        function playSpaceShooter() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 800;
-            canvas.height = 350;
-            gameContainer.appendChild(canvas);
-            const ctx = canvas.getContext('2d');
-            
-            gameState = {
-                shipX: 100,
-                shipY: 175,
-                bullets: [],
-                asteroids: [],
-                lastShot: 0
-            };
-            
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Space
-                ctx.fillStyle = '#000';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Stars
-                ctx.fillStyle = '#fff';
-                for (let i = 0; i < 100; i++) {
-                    ctx.fillRect(Math.random() * canvas.width, Math.random() * canvas.height, 2, 2);
-                }
-                
-                // Ship
-                ctx.fillStyle = '#3498db';
-                ctx.beginPath();
-                ctx.moveTo(gameState.shipX, gameState.shipY);
-                ctx.lineTo(gameState.shipX - 20, gameState.shipY - 15);
-                ctx.lineTo(gameState.shipX - 20, gameState.shipY + 15);
-                ctx.closePath();
-                ctx.fill();
-                
-                ctx.fillStyle = '#2980b9';
-                ctx.fillRect(gameState.shipX - 20, gameState.shipY - 10, 30, 20);
-                
-                // Bullets
-                ctx.fillStyle = '#f1c40f';
-                gameState.bullets.forEach(bullet => {
-                    ctx.beginPath();
-                    ctx.arc(bullet.x, bullet.y, 3, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-                
-                // Asteroids
-                ctx.fillStyle = '#95a5a6';
-                gameState.asteroids.forEach(asteroid => {
-                    ctx.beginPath();
-                    ctx.arc(asteroid.x, asteroid.y, asteroid.size, 0, Math.PI * 2);
-                    ctx.fill();
-                });
-            }
-            
-            function update() {
-                // Move ship
-                if (keys['ArrowUp'] && gameState.shipY > 20) gameState.shipY -= 5;
-                if (keys['ArrowDown'] && gameState.shipY < canvas.height - 20) gameState.shipY += 5;
-                if (keys['ArrowLeft'] && gameState.shipX > 20) gameState.shipX -= 5;
-                if (keys['ArrowRight'] && gameState.shipX < 200) gameState.shipX += 5;
-                
-                // Shoot
-                const now = Date.now();
-                if (keys[' '] && now - gameState.lastShot > 300) {
-                    gameState.bullets.push({x: gameState.shipX + 10, y: gameState.shipY, speed: 8});
-                    gameState.lastShot = now;
-                    keys[' '] = false;
-                }
-                
-                // Move bullets
-                for (let i = gameState.bullets.length - 1; i >= 0; i--) {
-                    gameState.bullets[i].x += gameState.bullets[i].speed;
-                    
-                    // Check asteroid hit
-                    for (let j = gameState.asteroids.length - 1; j >= 0; j--) {
-                        const dx = gameState.bullets[i].x - gameState.asteroids[j].x;
-                        const dy = gameState.bullets[i].y - gameState.asteroids[j].y;
-                        if (Math.sqrt(dx * dx + dy * dy) < gameState.asteroids[j].size) {
-                            gameState.bullets.splice(i, 1);
-                            gameState.asteroids.splice(j, 1);
-                            score += 50;
-                            updateScore();
-                            break;
-                        }
-                    }
-                    
-                    // Remove off-screen bullets
-                    if (gameState.bullets[i] && gameState.bullets[i].x > canvas.width) {
-                        gameState.bullets.splice(i, 1);
-                    }
-                }
-                
-                // Move asteroids
-                for (let i = gameState.asteroids.length - 1; i >= 0; i--) {
-                    gameState.asteroids[i].x -= gameState.asteroids[i].speed;
-                    
-                    // Check collision with ship
-                    const dx = gameState.shipX - gameState.asteroids[i].x;
-                    const dy = gameState.shipY - gameState.asteroids[i].y;
-                    if (Math.sqrt(dx * dx + dy * dy) < gameState.asteroids[i].size + 15) {
-                        lives--;
-                        updateLives();
-                        if (lives <= 0) {
-                            showGameOver();
-                            clearInterval(gameInterval);
-                            return;
-                        }
-                        gameState.asteroids.splice(i, 1);
-                        continue;
-                    }
-                    
-                    // Remove off-screen asteroids
-                    if (gameState.asteroids[i].x < -50) {
-                        gameState.asteroids.splice(i, 1);
-                    }
-                }
-                
-                // Add asteroids
-                if (Math.random() < 0.02) {
-                    gameState.asteroids.push({
-                        x: canvas.width,
-                        y: Math.random() * canvas.height,
-                        size: Math.random() * 15 + 10,
-                        speed: Math.random() * 2 + 1
-                    });
-                }
-            }
-            
-            gameInterval = setInterval(() => {
-                update();
-                draw();
-            }, 1000/60);
-        }
 
-        function playSnake() {
-            const canvas = document.createElement('canvas');
-            canvas.width = 800;
-            canvas.height = 350;
-            gameContainer.appendChild(canvas);
-            const ctx = canvas.getContext('2d');
+
+
+
+
+function playAviator() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 1000;
+    canvas.height = 500;
+    canvas.style.borderRadius = '10px';
+    canvas.style.boxShadow = '0 10px 30px rgba(0,0,0,0.3)';
+    gameContainer.innerHTML = '';
+    gameContainer.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+    
+    // Enhanced game state with more features
+    const gameState = {
+        planeX: 150,
+        planeY: 250,
+        planeAngle: 0,
+        bullets: [],
+        enemies: [],
+        lastShot: 0,
+        scoreMultiplier: 1,
+        powerUps: [],
+        clouds: [],
+        explosions: [],
+        isGameOver: false,
+        combo: 0,
+        lastComboTime: 0
+    };
+    
+    // Initialize clouds
+    for(let i = 0; i < 8; i++) {
+        gameState.clouds.push({
+            x: Math.random() * canvas.width,
+            y: Math.random() * canvas.height * 0.7,
+            size: 30 + Math.random() * 40,
+            speed: 0.5 + Math.random() * 1
+        });
+    }
+    
+    // Preload particle effects
+    class Particle {
+        constructor(x, y, color) {
+            this.x = x;
+            this.y = y;
+            this.color = color;
+            this.size = Math.random() * 6 + 1;
+            this.speedX = Math.random() * 4 - 2;
+            this.speedY = Math.random() * 4 - 2;
+            this.life = 30;
+        }
+        
+        update() {
+            this.x += this.speedX;
+            this.y += this.speedY;
+            this.life--;
+        }
+        
+        draw() {
+            ctx.globalAlpha = this.life / 30;
+            ctx.fillStyle = this.color;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.globalAlpha = 1;
+        }
+    }
+    
+    // Draw functions
+    function drawParallaxBackground() {
+        // Deep space gradient
+        const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+        gradient.addColorStop(0, '#0c1445');
+        gradient.addColorStop(0.5, '#1a237e');
+        gradient.addColorStop(1, '#311b92');
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Stars
+        ctx.fillStyle = 'white';
+        for(let i = 0; i < 150; i++) {
+            const x = (i * 13) % canvas.width;
+            const y = (i * 7) % canvas.height;
+            const size = 0.5 + Math.sin(Date.now() * 0.001 + i) * 0.3;
+            ctx.globalAlpha = 0.5 + Math.sin(Date.now() * 0.0005 + i) * 0.3;
+            ctx.beginPath();
+            ctx.arc(x, y, size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+        
+        // Moving clouds
+        gameState.clouds.forEach(cloud => {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.1)';
+            ctx.beginPath();
+            ctx.arc(cloud.x, cloud.y, cloud.size, 0, Math.PI * 2);
+            ctx.arc(cloud.x + cloud.size * 0.5, cloud.y - cloud.size * 0.3, cloud.size * 0.7, 0, Math.PI * 2);
+            ctx.arc(cloud.x - cloud.size * 0.5, cloud.y - cloud.size * 0.3, cloud.size * 0.7, 0, Math.PI * 2);
+            ctx.fill();
             
-            gameState = {
-                snake: [{x: 200, y: 175}],
-                food: {x: 300, y: 175},
-                direction: 'right',
-                nextDirection: 'right',
-                gridSize: 20,
-                speed: 8,
-                lastMove: 0
-            };
+            cloud.x -= cloud.speed;
+            if(cloud.x < -100) cloud.x = canvas.width + 100;
+        });
+    }
+    
+    function drawPlane() {
+        ctx.save();
+        ctx.translate(gameState.planeX, gameState.planeY);
+        ctx.rotate(gameState.planeAngle);
+        
+        // Plane body
+        ctx.fillStyle = '#3498db';
+        ctx.beginPath();
+        ctx.ellipse(0, 0, 35, 15, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Cockpit
+        ctx.fillStyle = '#2980b9';
+        ctx.beginPath();
+        ctx.ellipse(15, 0, 20, 10, 0, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Wings
+        ctx.fillStyle = '#2c3e50';
+        ctx.fillRect(-15, -25, 50, 8);
+        ctx.fillRect(-15, 17, 50, 8);
+        
+        // Tail
+        ctx.fillRect(-40, -15, 20, 8);
+        ctx.fillRect(-40, 7, 20, 8);
+        
+        // Engine glow
+        const glow = ctx.createRadialGradient(-40, 0, 0, -40, 0, 15);
+        glow.addColorStop(0, 'rgba(255, 165, 0, 0.8)');
+        glow.addColorStop(1, 'rgba(255, 165, 0, 0)');
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(-40, 0, 15, 0, Math.PI * 2);
+        ctx.fill();
+        
+        ctx.restore();
+    }
+    
+    function drawBullets() {
+        gameState.bullets.forEach(bullet => {
+            // Bullet trail
+            const gradient = ctx.createLinearGradient(bullet.x - 20, bullet.y, bullet.x, bullet.y);
+            gradient.addColorStop(0, 'rgba(255, 255, 100, 0)');
+            gradient.addColorStop(0.5, '#ffff00');
+            gradient.addColorStop(1, '#ff9900');
+            ctx.fillStyle = gradient;
+            ctx.fillRect(bullet.x - 20, bullet.y - 3, 25, 6);
             
-            function draw() {
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
-                
-                // Background
-                ctx.fillStyle = '#1a1a2e';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Grid
-                ctx.strokeStyle = '#2c3e50';
-                ctx.lineWidth = 0.5;
-                for (let x = 0; x < canvas.width; x += gameState.gridSize) {
-                    ctx.beginPath();
-                    ctx.moveTo(x, 0);
-                    ctx.lineTo(x, canvas.height);
-                    ctx.stroke();
-                }
-                for (let y = 0; y < canvas.height; y += gameState.gridSize) {
-                    ctx.beginPath();
-                    ctx.moveTo(0, y);
-                    ctx.lineTo(canvas.width, y);
-                    ctx.stroke();
-                }
-                
-                // Snake
-                gameState.snake.forEach((segment, index) => {
-                    ctx.fillStyle = index === 0 ? '#2ecc71' : '#27ae60';
-                    ctx.fillRect(segment.x, segment.y, gameState.gridSize, gameState.gridSize);
-                });
-                
-                // Food
-                ctx.fillStyle = '#e74c3c';
-                ctx.beginPath();
-                ctx.arc(
-                    gameState.food.x + gameState.gridSize/2,
-                    gameState.food.y + gameState.gridSize/2,
-                    gameState.gridSize/2,
-                    0,
-                    Math.PI * 2
-                );
-                ctx.fill();
+            // Bullet core
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(bullet.x, bullet.y, 4, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+    
+    function drawEnemies() {
+        gameState.enemies.forEach(enemy => {
+            ctx.save();
+            ctx.translate(enemy.x, enemy.y);
+            ctx.rotate(enemy.rotation || 0);
+            
+            // Enemy ship
+            ctx.fillStyle = '#e74c3c';
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(-30, -20);
+            ctx.lineTo(-60, 0);
+            ctx.lineTo(-30, 20);
+            ctx.closePath();
+            ctx.fill();
+            
+            // Enemy details
+            ctx.fillStyle = '#c0392b';
+            ctx.fillRect(-25, -8, 20, 16);
+            
+            // Enemy glow
+            ctx.fillStyle = 'rgba(255, 0, 0, 0.3)';
+            ctx.beginPath();
+            ctx.arc(10, 0, 15, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+            
+            // Update rotation
+            if(!enemy.rotation) enemy.rotation = 0;
+            enemy.rotation += 0.02;
+        });
+    }
+    
+    function drawPowerUps() {
+        gameState.powerUps.forEach(powerUp => {
+            ctx.save();
+            ctx.translate(powerUp.x, powerUp.y);
+            
+            // Pulsating effect
+            const pulse = Math.sin(Date.now() * 0.01) * 0.2 + 1;
+            
+            // Power-up orb
+            const gradient = ctx.createRadialGradient(0, 0, 0, 0, 0, 15);
+            gradient.addColorStop(0, powerUp.color);
+            gradient.addColorStop(1, 'rgba(255,255,255,0.3)');
+            ctx.fillStyle = gradient;
+            ctx.beginPath();
+            ctx.arc(0, 0, 15 * pulse, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Power-up symbol
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(powerUp.type === 'score' ? '2x' : '⚡', 0, 0);
+            
+            ctx.restore();
+        });
+    }
+    
+    function drawExplosions() {
+        gameState.explosions.forEach((explosion, index) => {
+            explosion.particles.forEach(particle => {
+                particle.update();
+                particle.draw();
+            });
+            
+            // Remove dead explosions
+            if(explosion.particles.every(p => p.life <= 0)) {
+                gameState.explosions.splice(index, 1);
             }
+        });
+    }
+    
+    function drawHUD() {
+        // Score display
+        ctx.fillStyle = 'rgba(0, 0, 0, 0.5)';
+        ctx.fillRect(20, 20, 200, 50);
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 24px Arial';
+        ctx.fillText(`Score: ${score}`, 40, 45);
+        ctx.fillText(`Multiplier: x${gameState.scoreMultiplier}`, 40, 70);
+        
+        // Lives display
+        ctx.fillStyle = 'rgba(255, 50, 50, 0.5)';
+        ctx.fillRect(canvas.width - 220, 20, 200, 50);
+        ctx.fillStyle = 'white';
+        ctx.font = 'bold 24px Arial';
+        ctx.fillText(`Lives: ${'❤️'.repeat(lives)}`, canvas.width - 200, 45);
+        ctx.fillText(`Combo: ${gameState.combo}`, canvas.width - 200, 70);
+        
+        // Controls hint
+        if(Date.now() - startTime < 5000) {
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+            ctx.font = '16px Arial';
+            ctx.textAlign = 'center';
+            ctx.fillText('Use Arrow Keys to move, Space to shoot', canvas.width/2, canvas.height - 30);
+            ctx.textAlign = 'left';
+        }
+    }
+    
+    function draw() {
+        drawParallaxBackground();
+        drawExplosions();
+        drawBullets();
+        drawEnemies();
+        drawPowerUps();
+        drawPlane();
+        drawHUD();
+    }
+    
+    // Game logic
+    function update() {
+        if(gameState.isGameOver) return;
+        
+        // Plane movement with tilt
+        const targetAngle = 0;
+        if(keys['ArrowUp']) {
+            gameState.planeY -= 7;
+            gameState.planeAngle = -0.2;
+        }
+        if(keys['ArrowDown']) {
+            gameState.planeY += 7;
+            gameState.planeAngle = 0.2;
+        }
+        if(keys['ArrowLeft']) gameState.planeX -= 7;
+        if(keys['ArrowRight']) gameState.planeX += 7;
+        
+        // Keep plane in bounds
+        gameState.planeX = Math.max(30, Math.min(canvas.width * 0.3, gameState.planeX));
+        gameState.planeY = Math.max(30, Math.min(canvas.height - 30, gameState.planeY));
+        
+        // Smooth angle return
+        gameState.planeAngle += (targetAngle - gameState.planeAngle) * 0.1;
+        
+        // Shooting with cooldown
+        const now = Date.now();
+        if(keys[' '] && now - gameState.lastShot > 150) {
+            // Double shot with multiplier
+            for(let i = -1; i <= 1; i += 2) {
+                gameState.bullets.push({
+                    x: gameState.planeX + 40,
+                    y: gameState.planeY + (i * 10),
+                    speed: 12
+                });
+            }
+            gameState.lastShot = now;
+            keys[' '] = false;
+        }
+        
+        // Update bullets
+        gameState.bullets.forEach((bullet, index) => {
+            bullet.x += bullet.speed;
             
-            function update() {
-                // Change direction
-                if (keys['ArrowUp'] && gameState.direction !== 'down') gameState.nextDirection = 'up';
-                if (keys['ArrowDown'] && gameState.direction !== 'up') gameState.nextDirection = 'down';
-                if (keys['ArrowLeft'] && gameState.direction !== 'right') gameState.nextDirection = 'left';
-                if (keys['ArrowRight'] && gameState.direction !== 'left') gameState.nextDirection = 'right';
+            // Check collisions with enemies
+            for(let j = gameState.enemies.length - 1; j >= 0; j--) {
+                const enemy = gameState.enemies[j];
+                const dx = bullet.x - enemy.x;
+                const dy = bullet.y - enemy.y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
                 
-                // Move snake
-                const now = Date.now();
-                if (now - gameState.lastMove > 1000 / gameState.speed) {
-                    gameState.direction = gameState.nextDirection;
-                    gameState.lastMove = now;
+                if(distance < 25) {
+                    // Create explosion
+                    const particles = [];
+                    for(let k = 0; k < 15; k++) {
+                        particles.push(new Particle(enemy.x, enemy.y, '#ff5555'));
+                    }
+                    gameState.explosions.push({ particles });
                     
-                    // New head position
-                    const head = {...gameState.snake[0]};
-                    switch (gameState.direction) {
-                        case 'up': head.y -= gameState.gridSize; break;
-                        case 'down': head.y += gameState.gridSize; break;
-                        case 'left': head.x -= gameState.gridSize; break;
-                        case 'right': head.x += gameState.gridSize; break;
+                    // Remove bullet and enemy
+                    gameState.bullets.splice(index, 1);
+                    gameState.enemies.splice(j, 1);
+                    
+                    // Update combo
+                    gameState.combo++;
+                    gameState.lastComboTime = now;
+                    if(gameState.combo % 5 === 0) {
+                        gameState.scoreMultiplier = Math.min(5, gameState.combo / 5 + 1);
                     }
                     
-                    // Wall collision
-                    if (head.x < 0 || head.x >= canvas.width || head.y < 0 || head.y >= canvas.height) {
-                        lives--;
-                        updateLives();
-                        if (lives <= 0) {
-                            showGameOver();
-                            clearInterval(gameInterval);
-                            return;
-                        }
-                        resetSnake();
+                    // Add score
+                    score += 100 * gameState.scoreMultiplier;
+                    updateScore();
+                    break;
+                }
+            }
+        });
+        
+        // Clean up off-screen bullets
+        gameState.bullets = gameState.bullets.filter(b => b.x < canvas.width + 50);
+        
+        // Update enemies
+        gameState.enemies.forEach(enemy => {
+            enemy.x -= enemy.speed;
+            
+            // Check collision with plane
+            const dx = gameState.planeX - enemy.x;
+            const dy = gameState.planeY - enemy.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if(distance < 40) {
+                // Create big explosion
+                const particles = [];
+                for(let k = 0; k < 30; k++) {
+                    particles.push(new Particle(gameState.planeX, gameState.planeY, '#ff3333'));
+                }
+                gameState.explosions.push({ particles });
+                
+                lives--;
+                updateLives();
+                gameState.enemies = gameState.enemies.filter(e => e !== enemy);
+                gameState.combo = 0;
+                gameState.scoreMultiplier = 1;
+                
+                if(lives <= 0) {
+                    gameState.isGameOver = true;
+                    setTimeout(() => {
+                        showGameOver();
+                        clearInterval(gameInterval);
+                    }, 1000);
+                }
+            }
+        });
+        
+        // Clean up off-screen enemies
+        gameState.enemies = gameState.enemies.filter(e => e.x > -100);
+        
+        // Spawn enemies with increasing difficulty
+        const spawnChance = 0.015 + Math.min(0.03, score / 10000);
+        if(Math.random() < spawnChance) {
+            gameState.enemies.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 100) + 50,
+                speed: 3 + Math.min(4, score / 5000)
+            });
+        }
+        
+        // Spawn power-ups
+        if(Math.random() < 0.005) {
+            gameState.powerUps.push({
+                x: canvas.width,
+                y: Math.random() * (canvas.height - 100) + 50,
+                type: Math.random() > 0.5 ? 'score' : 'speed',
+                color: Math.random() > 0.5 ? '#00ff88' : '#ffaa00',
+                speed: 2
+            });
+        }
+        
+        // Update power-ups
+        gameState.powerUps.forEach((powerUp, index) => {
+            powerUp.x -= powerUp.speed;
+            
+            // Check collection
+            const dx = gameState.planeX - powerUp.x;
+            const dy = gameState.planeY - powerUp.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if(distance < 30) {
+                if(powerUp.type === 'score') {
+                    gameState.scoreMultiplier = 2;
+                    score += 500;
+                } else {
+                    // Speed boost
+                    gameState.bullets.forEach(b => b.speed += 3);
+                    setTimeout(() => {
+                        gameState.bullets.forEach(b => b.speed -= 3);
+                    }, 5000);
+                }
+                gameState.powerUps.splice(index, 1);
+                updateScore();
+            }
+            
+            // Remove off-screen
+            if(powerUp.x < -50) {
+                gameState.powerUps.splice(index, 1);
+            }
+        });
+        
+        // Update combo timer
+        if(now - gameState.lastComboTime > 3000) {
+            gameState.combo = 0;
+            gameState.scoreMultiplier = 1;
+        }
+    }
+    
+    // Start game
+    const startTime = Date.now();
+    gameInterval = setInterval(() => {
+        update();
+        draw();
+    }, 1000/60);
+    
+    // Add touch controls for mobile
+    if('ontouchstart' in window) {
+        createTouchControls(canvas, gameState);
+    }
+}
+
+function createTouchControls(canvas, gameState) {
+    const controls = document.createElement('div');
+    controls.style.cssText = `
+        position: absolute;
+        bottom: 20px;
+        left: 0;
+        right: 0;
+        display: flex;
+        justify-content: space-around;
+        padding: 20px;
+    `;
+    
+    const fireBtn = document.createElement('button');
+    fireBtn.innerHTML = '🔥';
+    fireBtn.style.cssText = `
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        background: rgba(255,0,0,0.5);
+        border: 3px solid white;
+        font-size: 30px;
+        color: white;
+        cursor: pointer;
+    `;
+    
+    const joystick = document.createElement('div');
+    joystick.style.cssText = `
+        width: 150px;
+        height: 150px;
+        background: rgba(0,0,0,0.3);
+        border-radius: 50%;
+        position: relative;
+    `;
+    
+    const joystickKnob = document.createElement('div');
+    joystickKnob.style.cssText = `
+        width: 60px;
+        height: 60px;
+        background: rgba(255,255,255,0.8);
+        border-radius: 50%;
+        position: absolute;
+        top: 45px;
+        left: 45px;
+    `;
+    
+    joystick.appendChild(joystickKnob);
+    controls.appendChild(joystick);
+    controls.appendChild(fireBtn);
+    gameContainer.appendChild(controls);
+    
+    // Touch controls implementation
+    let touchStart = null;
+    
+    joystick.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        touchStart = {x: e.touches[0].clientX, y: e.touches[0].clientY};
+    });
+    
+    joystick.addEventListener('touchmove', (e) => {
+        if(!touchStart) return;
+        e.preventDefault();
+        const touch = e.touches[0];
+        const deltaX = touch.clientX - touchStart.x;
+        const deltaY = touch.clientY - touchStart.y;
+        
+        // Update keys based on joystick position
+        keys['ArrowUp'] = deltaY < -20;
+        keys['ArrowDown'] = deltaY > 20;
+        keys['ArrowLeft'] = deltaX < -20;
+        keys['ArrowRight'] = deltaX > 20;
+    });
+    
+    joystick.addEventListener('touchend', () => {
+        touchStart = null;
+        ['ArrowUp', 'ArrowDown', 'ArrowLeft', 'ArrowRight'].forEach(key => {
+            keys[key] = false;
+        });
+    });
+    
+    fireBtn.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        keys[' '] = true;
+    });
+    
+    fireBtn.addEventListener('touchend', () => {
+        keys[' '] = false;
+    });
+}
+
+
+
+
+
+
+
+
+
+
+function playSpaceShooter() {
+    // Create canvas with improved styling
+    const canvas = document.createElement('canvas');
+    canvas.width = 800;
+    canvas.height = 350;
+    canvas.style.border = '2px solid linear-gradient(45deg, #667eea 0%, #764ba2 100%)';
+    canvas.style.borderRadius = '12px';
+    canvas.style.boxShadow = '0 20px 60px rgba(0, 0, 0, 0.3)';
+    canvas.style.background = 'radial-gradient(ellipse at center, #0c0e1a 0%, #05070f 100%)';
+    gameContainer.appendChild(canvas);
+    
+    const ctx = canvas.getContext('2d');
+    
+    // Enhanced game state with additional features
+    gameState = {
+        shipX: 100,
+        shipY: 175,
+        bullets: [],
+        asteroids: [],
+        particles: [],
+        powerUps: [],
+        lastShot: 0,
+        scoreMultiplier: 1,
+        shield: 0,
+        isBossActive: false,
+        bossHealth: 0
+    };
+    
+    // Pre-calculate for performance
+    const centerX = canvas.width / 2;
+    const centerY = canvas.height / 2;
+    
+    // Gradient caches for performance
+    const spaceGradient = ctx.createRadialGradient(centerX, centerY, 0, centerX, centerY, Math.max(canvas.width, canvas.height));
+    spaceGradient.addColorStop(0, '#0a0c18');
+    spaceGradient.addColorStop(1, '#05070f');
+    
+    const shipGradient = ctx.createLinearGradient(0, 0, 40, 0);
+    shipGradient.addColorStop(0, '#4facfe');
+    shipGradient.addColorStop(1, '#00f2fe');
+    
+    const engineGradient = ctx.createLinearGradient(0, 0, 20, 0);
+    engineGradient.addColorStop(0, '#ff7e5f');
+    engineGradient.addColorStop(1, '#feb47b');
+    
+    // Starfield for parallax effect
+    const stars = Array.from({length: 200}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        size: Math.random() * 2 + 0.5,
+        speed: Math.random() * 0.5 + 0.2,
+        opacity: Math.random() * 0.7 + 0.3
+    }));
+    
+    const nebula = Array.from({length: 5}, () => ({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        radius: Math.random() * 100 + 50,
+        color: `rgba(${Math.floor(Math.random() * 100 + 100)}, ${Math.floor(Math.random() * 100)}, ${Math.floor(Math.random() * 100 + 150)}, 0.05)`
+    }));
+    
+    function drawStarfield() {
+        // Nebula background
+        nebula.forEach(n => {
+            ctx.beginPath();
+            ctx.arc(n.x, n.y, n.radius, 0, Math.PI * 2);
+            ctx.fillStyle = n.color;
+            ctx.fill();
+        });
+        
+        // Animated stars
+        stars.forEach(star => {
+            star.x -= star.speed;
+            if (star.x < 0) {
+                star.x = canvas.width;
+                star.y = Math.random() * canvas.height;
+            }
+            
+            ctx.beginPath();
+            ctx.arc(star.x, star.y, star.size, 0, Math.PI * 2);
+            ctx.fillStyle = `rgba(255, 255, 255, ${star.opacity})`;
+            ctx.fill();
+            
+            // Twinkle effect
+            if (Math.random() < 0.01) {
+                star.opacity = Math.random() * 0.7 + 0.3;
+            }
+        });
+    }
+    
+    function drawShip() {
+        const ship = gameState;
+        
+        // Engine glow
+        if (keys['ArrowRight'] || keys['ArrowLeft'] || keys['ArrowUp'] || keys['ArrowDown']) {
+            ctx.beginPath();
+            ctx.ellipse(ship.shipX - 25, ship.shipY, 15, 8, 0, 0, Math.PI * 2);
+            const engineGlow = ctx.createRadialGradient(
+                ship.shipX - 25, ship.shipY, 0,
+                ship.shipX - 25, ship.shipY, 15
+            );
+            engineGlow.addColorStop(0, 'rgba(255, 126, 95, 0.8)');
+            engineGlow.addColorStop(1, 'rgba(254, 180, 123, 0)');
+            ctx.fillStyle = engineGlow;
+            ctx.fill();
+        }
+        
+        // Ship body with gradient
+        ctx.save();
+        ctx.translate(ship.shipX, ship.shipY);
+        
+        // Ship wings
+        ctx.fillStyle = shipGradient;
+        ctx.beginPath();
+        ctx.moveTo(-20, -15);
+        ctx.lineTo(-20, 15);
+        ctx.lineTo(-10, 0);
+        ctx.closePath();
+        ctx.fill();
+        
+        // Ship cockpit
+        ctx.beginPath();
+        ctx.roundRect(-20, -10, 30, 20, [0, 8, 8, 0]);
+        ctx.fill();
+        
+        // Cockpit window
+        ctx.fillStyle = '#00d4ff';
+        ctx.beginPath();
+        ctx.arc(-5, 0, 6, 0, Math.PI * 2);
+        ctx.fill();
+        
+        // Shield effect
+        if (ship.shield > 0) {
+            ctx.strokeStyle = `rgba(0, 212, 255, ${ship.shield / 100})`;
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.arc(0, 0, 25, 0, Math.PI * 2);
+            ctx.stroke();
+        }
+        
+        ctx.restore();
+    }
+    
+    function drawBullets() {
+        gameState.bullets.forEach(bullet => {
+            // Bullet glow
+            ctx.beginPath();
+            ctx.arc(bullet.x, bullet.y, 8, 0, Math.PI * 2);
+            const bulletGlow = ctx.createRadialGradient(
+                bullet.x, bullet.y, 0,
+                bullet.x, bullet.y, 8
+            );
+            bulletGlow.addColorStop(0, 'rgba(241, 196, 15, 0.8)');
+            bulletGlow.addColorStop(1, 'rgba(241, 196, 15, 0)');
+            ctx.fillStyle = bulletGlow;
+            ctx.fill();
+            
+            // Bullet core
+            ctx.beginPath();
+            ctx.arc(bullet.x, bullet.y, 3, 0, Math.PI * 2);
+            ctx.fillStyle = '#ffffff';
+            ctx.fill();
+            
+            // Trail effect
+            ctx.beginPath();
+            ctx.moveTo(bullet.x - bullet.speed, bullet.y);
+            ctx.lineTo(bullet.x, bullet.y);
+            ctx.strokeStyle = 'rgba(241, 196, 15, 0.5)';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        });
+    }
+    
+    function drawAsteroids() {
+        gameState.asteroids.forEach(asteroid => {
+            ctx.save();
+            ctx.translate(asteroid.x, asteroid.y);
+            
+            // Rotation
+            ctx.rotate(asteroid.rotation || 0);
+            asteroid.rotation = (asteroid.rotation || 0) + 0.02;
+            
+            // Asteroid with texture
+            ctx.beginPath();
+            for (let i = 0; i < 8; i++) {
+                const angle = (i * Math.PI * 2) / 8;
+                const radius = asteroid.size + Math.sin(i) * 3;
+                const x = Math.cos(angle) * radius;
+                const y = Math.sin(angle) * radius;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+            
+            // Gradient fill
+            const asteroidGradient = ctx.createRadialGradient(0, 0, 0, 0, 0, asteroid.size);
+            asteroidGradient.addColorStop(0, '#7f8c8d');
+            asteroidGradient.addColorStop(1, '#2c3e50');
+            ctx.fillStyle = asteroidGradient;
+            ctx.fill();
+            
+            // Craters
+            ctx.fillStyle = '#34495e';
+            ctx.beginPath();
+            ctx.arc(-asteroid.size * 0.3, -asteroid.size * 0.2, asteroid.size * 0.2, 0, Math.PI * 2);
+            ctx.fill();
+            
+            ctx.restore();
+        });
+    }
+    
+    function drawParticles() {
+        gameState.particles.forEach((particle, index) => {
+            ctx.globalAlpha = particle.opacity;
+            ctx.fillStyle = particle.color;
+            ctx.beginPath();
+            ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Update particle
+            particle.x += particle.vx;
+            particle.y += particle.vy;
+            particle.opacity -= 0.02;
+            particle.size *= 0.95;
+            
+            // Remove dead particles
+            if (particle.opacity <= 0) {
+                gameState.particles.splice(index, 1);
+            }
+        });
+        ctx.globalAlpha = 1;
+    }
+    
+    function createExplosion(x, y, color = '#ff7e5f') {
+        for (let i = 0; i < 15; i++) {
+            gameState.particles.push({
+                x,
+                y,
+                vx: (Math.random() - 0.5) * 8,
+                vy: (Math.random() - 0.5) * 8,
+                size: Math.random() * 4 + 2,
+                color,
+                opacity: 1
+            });
+        }
+    }
+    
+    function drawUI() {
+        // Score display with glow
+        ctx.font = 'bold 20px "Segoe UI", Arial, sans-serif';
+        ctx.fillStyle = '#ffffff';
+        ctx.textAlign = 'left';
+        ctx.shadowColor = '#00f2fe';
+        ctx.shadowBlur = 10;
+        ctx.fillText(`SCORE: ${score}`, 20, 30);
+        ctx.shadowBlur = 0;
+        
+        // Lives display
+        ctx.fillStyle = '#ff4757';
+        for (let i = 0; i < lives; i++) {
+            ctx.beginPath();
+            ctx.arc(30 + i * 30, 60, 8, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        
+        // Shield bar
+        if (gameState.shield > 0) {
+            ctx.fillStyle = 'rgba(0, 212, 255, 0.3)';
+            ctx.fillRect(20, 80, 100, 10);
+            ctx.fillStyle = '#00d4ff';
+            ctx.fillRect(20, 80, gameState.shield, 10);
+        }
+    }
+    
+    function draw() {
+        // Clear with fade effect
+        ctx.fillStyle = 'rgba(10, 12, 24, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        // Draw starfield
+        drawStarfield();
+        
+        // Draw all game objects
+        drawAsteroids();
+        drawBullets();
+        drawShip();
+        drawParticles();
+        drawUI();
+    }
+    
+    function update() {
+        // Enhanced ship movement with inertia
+        const moveSpeed = 5;
+        if (keys['ArrowUp'] && gameState.shipY > 20) gameState.shipY -= moveSpeed;
+        if (keys['ArrowDown'] && gameState.shipY < canvas.height - 20) gameState.shipY += moveSpeed;
+        if (keys['ArrowLeft'] && gameState.shipX > 20) gameState.shipX -= moveSpeed;
+        if (keys['ArrowRight'] && gameState.shipX < 300) gameState.shipX += moveSpeed;
+        
+        // Enhanced shooting with auto-fire option
+        const now = Date.now();
+        if (keys[' '] && now - gameState.lastShot > 150) {
+            // Create dual bullets for better visual
+            gameState.bullets.push(
+                {x: gameState.shipX + 10, y: gameState.shipY - 5, speed: 10},
+                {x: gameState.shipX + 10, y: gameState.shipY + 5, speed: 10}
+            );
+            gameState.lastShot = now;
+            
+            // Muzzle flash
+            createExplosion(gameState.shipX + 15, gameState.shipY, '#f1c40f');
+        }
+        
+        // Move bullets
+        for (let i = gameState.bullets.length - 1; i >= 0; i--) {
+            gameState.bullets[i].x += gameState.bullets[i].speed;
+            
+            // Check asteroid hit with improved collision
+            for (let j = gameState.asteroids.length - 1; j >= 0; j--) {
+                const dx = gameState.bullets[i].x - gameState.asteroids[j].x;
+                const dy = gameState.bullets[i].y - gameState.asteroids[j].y;
+                const distance = Math.sqrt(dx * dx + dy * dy);
+                
+                if (distance < gameState.asteroids[j].size) {
+                    // Create explosion
+                    createExplosion(gameState.asteroids[j].x, gameState.asteroids[j].y);
+                    
+                    // Remove bullet and asteroid
+                    gameState.bullets.splice(i, 1);
+                    gameState.asteroids.splice(j, 1);
+                    
+                    // Score with multiplier
+                    score += 50 * gameState.scoreMultiplier;
+                    updateScore();
+                    break;
+                }
+            }
+            
+            // Remove off-screen bullets
+            if (gameState.bullets[i] && gameState.bullets[i].x > canvas.width) {
+                gameState.bullets.splice(i, 1);
+            }
+        }
+        
+        // Move asteroids
+        for (let i = gameState.asteroids.length - 1; i >= 0; i--) {
+            gameState.asteroids[i].x -= gameState.asteroids[i].speed;
+            
+            // Check collision with ship
+            const dx = gameState.shipX - gameState.asteroids[i].x;
+            const dy = gameState.shipY - gameState.asteroids[i].y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+            
+            if (distance < gameState.asteroids[i].size + 15) {
+                if (gameState.shield > 0) {
+                    gameState.shield -= 20;
+                    createExplosion(gameState.asteroids[i].x, gameState.asteroids[i].y, '#00d4ff');
+                } else {
+                    lives--;
+                    updateLives();
+                    createExplosion(gameState.shipX, gameState.shipY, '#ff4757');
+                    
+                    if (lives <= 0) {
+                        showGameOver();
+                        clearInterval(gameInterval);
                         return;
                     }
-                    
-                    // Self collision
-                    for (let segment of gameState.snake) {
-                        if (head.x === segment.x && head.y === segment.y) {
-                            lives--;
-                            updateLives();
-                            if (lives <= 0) {
-                                showGameOver();
-                                clearInterval(gameInterval);
-                                return;
-                            }
-                            resetSnake();
-                            return;
-                        }
-                    }
-                    
-                    // Add new head
-                    gameState.snake.unshift(head);
-                    
-                    // Food collision
-                    if (head.x === gameState.food.x && head.y === gameState.food.y) {
-                        score += 10;
-                        updateScore();
-                        placeFood();
-                        if (score % 50 === 0) gameState.speed += 1;
-                    } else {
-                        gameState.snake.pop();
-                    }
                 }
+                gameState.asteroids.splice(i, 1);
+                continue;
             }
             
-            function placeFood() {
-                let foodPlaced = false;
-                while (!foodPlaced) {
-                    gameState.food.x = Math.floor(Math.random() * (canvas.width / gameState.gridSize)) * gameState.gridSize;
-                    gameState.food.y = Math.floor(Math.random() * (canvas.height / gameState.gridSize)) * gameState.gridSize;
-                    
-                    foodPlaced = true;
-                    for (let segment of gameState.snake) {
-                        if (gameState.food.x === segment.x && gameState.food.y === segment.y) {
-                            foodPlaced = false;
-                            break;
-                        }
-                    }
-                }
+            // Remove off-screen asteroids
+            if (gameState.asteroids[i].x < -50) {
+                gameState.asteroids.splice(i, 1);
             }
-            
-            function resetSnake() {
-                gameState.snake = [{x: 200, y: 175}];
-                gameState.direction = 'right';
-                gameState.nextDirection = 'right';
-                placeFood();
-            }
-            
-            resetSnake();
-            gameInterval = setInterval(() => {
-                update();
-                draw();
-            }, 1000/60);
         }
+        
+        // Add asteroids with varying difficulty
+        const asteroidChance = 0.02 + (score / 10000) * 0.01;
+        if (Math.random() < asteroidChance) {
+            gameState.asteroids.push({
+                x: canvas.width,
+                y: Math.random() * canvas.height,
+                size: Math.random() * 20 + 10,
+                speed: Math.random() * 3 + 1 + (score / 5000),
+                rotation: 0
+            });
+        }
+        
+        // Regenerate shield slowly
+        if (gameState.shield < 100 && Math.random() < 0.01) {
+            gameState.shield += 1;
+        }
+    }
+    
+    // Use requestAnimationFrame for smoother animation
+    let lastTime = 0;
+    function gameLoop(timestamp) {
+        if (!lastTime) lastTime = timestamp;
+        const deltaTime = timestamp - lastTime;
+        
+        if (deltaTime > 16) { // ~60fps
+            update();
+            draw();
+            lastTime = timestamp;
+        }
+        
+        if (lives > 0) {
+            gameInterval = requestAnimationFrame(gameLoop);
+        }
+    }
+    
+    // Start the game loop
+    gameInterval = requestAnimationFrame(gameLoop);
+    
+    // Add screen shake on hit
+    function screenShake(intensity = 5) {
+        canvas.style.transform = `translate(${Math.random() * intensity - intensity/2}px, ${Math.random() * intensity - intensity/2}px)`;
+        setTimeout(() => {
+            canvas.style.transform = 'translate(0, 0)';
+        }, 100);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+function playSnake() {
+    // Configuration
+    const CONFIG = {
+        CANVAS: {
+            WIDTH: 800,
+            HEIGHT: 400,
+            BACKGROUND: '#0f172a',
+            GRID_COLOR: '#1e293b',
+            GRID_LINE_WIDTH: 0.5
+        },
+        SNAKE: {
+            HEAD_COLOR: '#22c55e',
+            BODY_COLOR: '#16a34a',
+            GRID_SIZE: 20,
+            START_SPEED: 8,
+            SPEED_INCREMENT: 0.5
+        },
+        FOOD: {
+            COLOR: '#ef4444',
+            GLOW_COLOR: 'rgba(239, 68, 68, 0.3)'
+        },
+        GAME: {
+            FPS: 60,
+            START_LIVES: 3,
+            FOOD_SCORE: 10,
+            SPEED_INTERVAL: 50
+        }
+    };
+
+    // Game State Management
+    class GameState {
+        constructor() {
+            this.snake = [{x: 200, y: 200}];
+            this.food = this.generateFood();
+            this.direction = 'right';
+            this.nextDirection = 'right';
+            this.speed = CONFIG.SNAKE.START_SPEED;
+            this.lastMoveTime = 0;
+            this.score = 0;
+            this.isGameOver = false;
+            this.gameLoopId = null;
+            this.animationFrameId = null;
+        }
+        
+        generateFood() {
+            const maxX = Math.floor(CONFIG.CANVAS.WIDTH / CONFIG.SNAKE.GRID_SIZE) - 1;
+            const maxY = Math.floor(CONFIG.CANVAS.HEIGHT / CONFIG.SNAKE.GRID_SIZE) - 1;
+            
+            let food;
+            do {
+                food = {
+                    x: Math.floor(Math.random() * maxX) * CONFIG.SNAKE.GRID_SIZE,
+                    y: Math.floor(Math.random() * maxY) * CONFIG.SNAKE.GRID_SIZE
+                };
+            } while (this.isPositionOccupied(food.x, food.y));
+            
+            return food;
+        }
+        
+        isPositionOccupied(x, y) {
+            return this.snake.some(segment => segment.x === x && segment.y === y);
+        }
+    }
+
+    // Create game elements
+    const gameContainer = document.getElementById('gameContainer');
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    canvas.width = CONFIG.CANVAS.WIDTH;
+    canvas.height = CONFIG.CANVAS.HEIGHT;
+    canvas.classList.add('snake-canvas');
+    gameContainer.appendChild(canvas);
+    
+    const gameState = new GameState();
+    
+    // Drawing utilities
+    const Graphics = {
+        drawBackground() {
+            ctx.fillStyle = CONFIG.CANVAS.BACKGROUND;
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            this.drawGrid();
+        },
+        
+        drawGrid() {
+            ctx.strokeStyle = CONFIG.CANVAS.GRID_COLOR;
+            ctx.lineWidth = CONFIG.CANVAS.GRID_LINE_WIDTH;
+            
+            // Vertical lines
+            for (let x = 0; x <= canvas.width; x += CONFIG.SNAKE.GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+            }
+            
+            // Horizontal lines
+            for (let y = 0; y <= canvas.height; y += CONFIG.SNAKE.GRID_SIZE) {
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+        },
+        
+        drawSnake() {
+            gameState.snake.forEach((segment, index) => {
+                const isHead = index === 0;
+                ctx.fillStyle = isHead ? CONFIG.SNAKE.HEAD_COLOR : CONFIG.SNAKE.BODY_COLOR;
+                
+                // Add subtle shadow for depth
+                if (isHead) {
+                    ctx.shadowColor = 'rgba(34, 197, 94, 0.5)';
+                    ctx.shadowBlur = 8;
+                }
+                
+                this.drawRoundedRect(
+                    segment.x, 
+                    segment.y, 
+                    CONFIG.SNAKE.GRID_SIZE, 
+                    CONFIG.SNAKE.GRID_SIZE, 
+                    4
+                );
+                
+                ctx.shadowBlur = 0;
+                
+                // Draw eyes on head
+                if (isHead) {
+                    this.drawSnakeEyes(segment);
+                }
+            });
+        },
+        
+        drawSnakeEyes(head) {
+            const eyeSize = CONFIG.SNAKE.GRID_SIZE / 5;
+            const eyeOffset = CONFIG.SNAKE.GRID_SIZE / 3;
+            
+            ctx.fillStyle = '#000';
+            
+            switch(gameState.direction) {
+                case 'right':
+                    this.drawCircle(head.x + CONFIG.SNAKE.GRID_SIZE - eyeOffset, head.y + eyeOffset, eyeSize);
+                    this.drawCircle(head.x + CONFIG.SNAKE.GRID_SIZE - eyeOffset, head.y + CONFIG.SNAKE.GRID_SIZE - eyeOffset, eyeSize);
+                    break;
+                case 'left':
+                    this.drawCircle(head.x + eyeOffset, head.y + eyeOffset, eyeSize);
+                    this.drawCircle(head.x + eyeOffset, head.y + CONFIG.SNAKE.GRID_SIZE - eyeOffset, eyeSize);
+                    break;
+                case 'up':
+                    this.drawCircle(head.x + eyeOffset, head.y + eyeOffset, eyeSize);
+                    this.drawCircle(head.x + CONFIG.SNAKE.GRID_SIZE - eyeOffset, head.y + eyeOffset, eyeSize);
+                    break;
+                case 'down':
+                    this.drawCircle(head.x + eyeOffset, head.y + CONFIG.SNAKE.GRID_SIZE - eyeOffset, eyeSize);
+                    this.drawCircle(head.x + CONFIG.SNAKE.GRID_SIZE - eyeOffset, head.y + CONFIG.SNAKE.GRID_SIZE - eyeOffset, eyeSize);
+                    break;
+            }
+        },
+        
+        drawFood() {
+            const centerX = gameState.food.x + CONFIG.SNAKE.GRID_SIZE / 2;
+            const centerY = gameState.food.y + CONFIG.SNAKE.GRID_SIZE / 2;
+            const radius = CONFIG.SNAKE.GRID_SIZE / 2;
+            
+            // Glow effect
+            ctx.shadowColor = CONFIG.FOOD.GLOW_COLOR;
+            ctx.shadowBlur = 15;
+            
+            // Outer circle
+            ctx.fillStyle = CONFIG.FOOD.COLOR;
+            this.drawCircle(centerX, centerY, radius);
+            
+            // Inner highlight
+            ctx.shadowBlur = 0;
+            ctx.fillStyle = '#fff';
+            this.drawCircle(centerX - radius/3, centerY - radius/3, radius/4);
+            
+            // Pulse animation
+            const pulse = (Date.now() % 1000) / 1000;
+            const pulseSize = radius * (0.8 + 0.2 * Math.sin(pulse * Math.PI * 2));
+            
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 1;
+            this.drawCircle(centerX, centerY, pulseSize);
+        },
+        
+        drawRoundedRect(x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        },
+        
+        drawCircle(x, y, radius) {
+            ctx.beginPath();
+            ctx.arc(x, y, radius, 0, Math.PI * 2);
+            ctx.fill();
+        },
+        
+        drawScore() {
+            ctx.fillStyle = '#e2e8f0';
+            ctx.font = 'bold 16px "Segoe UI", system-ui, sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`Score: ${gameState.score}`, 10, 25);
+            ctx.fillText(`Speed: ${gameState.speed.toFixed(1)}`, 10, 50);
+            ctx.fillText(`Length: ${gameState.snake.length}`, 10, 75);
+        },
+        
+        drawGameOver() {
+            // Semi-transparent overlay
+            ctx.fillStyle = 'rgba(15, 23, 42, 0.9)';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Game over text
+            ctx.fillStyle = '#f8fafc';
+            ctx.font = 'bold 48px "Segoe UI", system-ui, sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('GAME OVER', canvas.width / 2, canvas.height / 2 - 40);
+            
+            ctx.font = '20px "Segoe UI", system-ui, sans-serif';
+            ctx.fillText(`Final Score: ${gameState.score}`, canvas.width / 2, canvas.height / 2 + 20);
+            ctx.fillText('Press SPACE to restart', canvas.width / 2, canvas.height / 2 + 60);
+        }
+    };
+    
+    // Game logic
+    const GameLogic = {
+        handleInput() {
+            if (gameState.isGameOver) return;
+            
+            const keyMap = {
+                'ArrowUp': { dir: 'up', opposite: 'down' },
+                'ArrowDown': { dir: 'down', opposite: 'up' },
+                'ArrowLeft': { dir: 'left', opposite: 'right' },
+                'ArrowRight': { dir: 'right', opposite: 'left' }
+            };
+            
+            for (const [key, { dir, opposite }] of Object.entries(keyMap)) {
+                if (keys[key] && gameState.direction !== opposite) {
+                    gameState.nextDirection = dir;
+                    break; // Prevent multiple direction changes per frame
+                }
+            }
+        },
+        
+        update() {
+            if (gameState.isGameOver) return;
+            
+            this.handleInput();
+            
+            const currentTime = performance.now();
+            const moveInterval = 1000 / gameState.speed;
+            
+            if (currentTime - gameState.lastMoveTime >= moveInterval) {
+                gameState.direction = gameState.nextDirection;
+                gameState.lastMoveTime = currentTime;
+                
+                const newHead = this.calculateNewHead();
+                
+                if (this.checkCollision(newHead)) {
+                    this.handleCollision();
+                    return;
+                }
+                
+                gameState.snake.unshift(newHead);
+                
+                if (this.checkFoodCollision(newHead)) {
+                    this.handleFoodCollision();
+                } else {
+                    gameState.snake.pop();
+                }
+            }
+        },
+        
+        calculateNewHead() {
+            const head = { ...gameState.snake[0] };
+            const grid = CONFIG.SNAKE.GRID_SIZE;
+            
+            switch(gameState.direction) {
+                case 'up': head.y -= grid; break;
+                case 'down': head.y += grid; break;
+                case 'left': head.x -= grid; break;
+                case 'right': head.x += grid; break;
+            }
+            
+            return head;
+        },
+        
+        checkCollision(head) {
+            // Wall collision
+            if (head.x < 0 || head.x >= canvas.width || 
+                head.y < 0 || head.y >= canvas.height) {
+                return true;
+            }
+            
+            // Self collision
+            return gameState.snake.some(segment => 
+                segment.x === head.x && segment.y === head.y
+            );
+        },
+        
+        checkFoodCollision(head) {
+            return head.x === gameState.food.x && head.y === gameState.food.y;
+        },
+        
+        handleCollision() {
+            lives--;
+            updateLives();
+            
+            if (lives <= 0) {
+                this.gameOver();
+            } else {
+                this.resetSnake();
+            }
+        },
+        
+        handleFoodCollision() {
+            gameState.score += CONFIG.GAME.FOOD_SCORE;
+            updateScore();
+            
+            // Increase speed every N points
+            if (gameState.score % CONFIG.GAME.SPEED_INTERVAL === 0) {
+                gameState.speed += CONFIG.SNAKE.SPEED_INCREMENT;
+            }
+            
+            // Generate new food
+            gameState.food = gameState.generateFood();
+        },
+        
+        resetSnake() {
+            gameState.snake = [{x: 200, y: 200}];
+            gameState.direction = 'right';
+            gameState.nextDirection = 'right';
+            gameState.food = gameState.generateFood();
+        },
+        
+        gameOver() {
+            gameState.isGameOver = true;
+            showGameOver();
+            
+            // Add keyboard restart
+            const restartHandler = (e) => {
+                if (e.code === 'Space') {
+                    this.restartGame();
+                    document.removeEventListener('keydown', restartHandler);
+                }
+            };
+            document.addEventListener('keydown', restartHandler);
+        },
+        
+        restartGame() {
+            lives = CONFIG.GAME.START_LIVES;
+            gameState.score = 0;
+            gameState.speed = CONFIG.SNAKE.START_SPEED;
+            gameState.isGameOver = false;
+            updateScore();
+            updateLives();
+            this.resetSnake();
+            startGameLoop();
+        }
+    };
+    
+    // Game loop
+    function gameLoop() {
+        Graphics.drawBackground();
+        GameLogic.update();
+        Graphics.drawSnake();
+        Graphics.drawFood();
+        Graphics.drawScore();
+        
+        if (gameState.isGameOver) {
+            Graphics.drawGameOver();
+        } else {
+            gameState.animationFrameId = requestAnimationFrame(gameLoop);
+        }
+    }
+    
+    function startGameLoop() {
+        if (gameState.animationFrameId) {
+            cancelAnimationFrame(gameState.animationFrameId);
+        }
+        gameState.animationFrameId = requestAnimationFrame(gameLoop);
+    }
+    
+    // Initialize game
+    startGameLoop();
+    
+    // Cleanup function
+    return () => {
+        if (gameState.animationFrameId) {
+            cancelAnimationFrame(gameState.animationFrameId);
+        }
+        canvas.remove();
+    };
+}
+
+// Add CSS for polish
+const style = document.createElement('style');
+style.textContent = `
+    .snake-canvas {
+        border-radius: 8px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        transition: transform 0.3s ease;
+    }
+    
+    .snake-canvas:hover {
+        transform: translateY(-2px);
+    }
+    
+    .snake-canvas:focus {
+        outline: 2px solid #3b82f6;
+        outline-offset: 2px;
+    }
+`;
+document.head.appendChild(style);
+
+
+
+
+
+
+
+
+
+
+
 
         function playBreakout() {
             const canvas = document.createElement('canvas');
